@@ -1,6 +1,6 @@
 const JobCard = ({ job }) => {
 return (
-    <div className="flex flex-col justify-start p-5 border-1 rounded-lg shadow-lg bg-[9d4edd]">
+    <div className="flex flex-col justify-start w-80 p-5 border rounded-lg shadow-lg bg-[#c9d9f0]">
         <img
             className="w-full h-[100px] object-cover rounded-lg bg-blue-100"
             src="https://www.dsinnovators.com/images/dsi_logo.svg"
@@ -24,10 +24,9 @@ return (
         </div>
         {/* to cover remaining space */}
         <span className="flex-1"></span>
-        <button onClick={()=> console.log("Cliked")}>Click me</button>
         <div>
             <a 
-                className="block w-full p-2 bg-purple-600 hover:bg-purple-800 cursor-pointer font-semibold text-white text-center no-underline rounded"
+                className="block w-full p-2 bg-purple-600 hover:bg-purple-800 cursor-pointer font-semibold text-white text-center no-underline rounded mt-3"
                 href={job.url} 
                 target="_blank" 
                 rel="noopener noreferrer"

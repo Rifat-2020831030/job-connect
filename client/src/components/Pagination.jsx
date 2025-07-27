@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
 
-const Pagination = ({ 
-  currentPage, 
-  totalPages, 
+const Pagination = ({
+  currentPage,
+  totalPages,
   onPageChange,
-  maxVisiblePages = 5 
+  maxVisiblePages = 5,
 }) => {
-  const [inputPage, setInputPage] = useState('');
+  const [inputPage, setInputPage] = useState("");
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages && page !== currentPage) {
@@ -20,7 +21,7 @@ const Pagination = ({
     if (!isNaN(page) && page >= 1 && page <= totalPages) {
       handlePageChange(page);
     }
-    setInputPage('');
+    setInputPage("");
   };
 
   const getVisiblePages = () => {
@@ -31,24 +32,28 @@ const Pagination = ({
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
 
-    return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+    return Array.from(
+      { length: endPage - startPage + 1 },
+      (_, i) => startPage + i
+    );
   };
 
   const visiblePages = getVisiblePages();
 
   return (
-    <div className="flex flex-col items-center space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
-      {/* Previous Button */}
+    <div className="flex items-center space-x-4">
+      {/* Previous Icon */}
       <button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`px-4 py-2 rounded-md ${
+        className={`focus:outline-none ${
           currentPage === 1
-            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-            : 'bg-blue-500 text-white hover:bg-blue-600'
+            ? "text-gray-300 cursor-not-allowed"
+            : "text-violet-500 hover:text-violet-700"
         }`}
+        aria-label="Previous page"
       >
-        Previous
+        <ChevronLeftIcon className="h-8 w-8" />
       </button>
 
       {/* Page Numbers */}
@@ -60,13 +65,15 @@ const Pagination = ({
               onClick={() => handlePageChange(1)}
               className={`px-3 py-1 rounded-md ${
                 1 === currentPage
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 hover:bg-gray-300'
+                  ? "bg-violet-500 text-white"
+                  : "bg-gray-200 hover:bg-gray-300"
               }`}
             >
               1
             </button>
-            {!visiblePages.includes(2) && <span className="px-3 py-1">...</span>}
+            {!visiblePages.includes(2) && (
+              <span className="px-3 py-1">...</span>
+            )}
           </>
         )}
 
@@ -77,8 +84,8 @@ const Pagination = ({
             onClick={() => handlePageChange(page)}
             className={`px-3 py-1 rounded-md ${
               page === currentPage
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 hover:bg-gray-300'
+                ? "bg-violet-500 text-white"
+                : "bg-gray-200 hover:bg-gray-300"
             }`}
           >
             {page}
@@ -95,8 +102,8 @@ const Pagination = ({
               onClick={() => handlePageChange(totalPages)}
               className={`px-3 py-1 rounded-md ${
                 totalPages === currentPage
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 hover:bg-gray-300'
+                  ? "bg-violet-500 text-white"
+                  : "bg-violet-200 hover:bg-violet-300"
               }`}
             >
               {totalPages}
@@ -105,22 +112,26 @@ const Pagination = ({
         )}
       </div>
 
-      {/* Next Button */}
+      {/* Next Icon */}
       <button
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className={`px-4 py-2 rounded-md ${
+        className={`focus:outline-none ${
           currentPage === totalPages
-            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-            : 'bg-blue-500 text-white hover:bg-blue-600'
+            ? "text-gray-300 cursor-not-allowed"
+            : "text-violet-500 hover:text-violet-700"
         }`}
+        aria-label="Next page"
       >
-        Next
+        <ChevronRightIcon className="h-8 w-8" />
       </button>
 
       {/* Page Input (for larger screens) */}
       {totalPages > 10 && (
-        <form onSubmit={handleInputSubmit} className="hidden sm:flex items-center space-x-2">
+        <form
+          onSubmit={handleInputSubmit}
+          className="hidden sm:flex items-center space-x-2"
+        >
           <span className="text-sm text-gray-600">Go to:</span>
           <input
             type="number"
