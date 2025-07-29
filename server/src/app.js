@@ -39,6 +39,6 @@ app.use("/api/email", emailRouter);
 
 app.listen(PORT, () => {
   connectDB();
-  console.log(`The server is running on: localhost:3000`);
+  console.log(`The server is running on: ${process.env.origin}:${PORT}`);
   spider.start();
 });

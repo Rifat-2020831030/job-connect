@@ -8,6 +8,8 @@ const connectOptions = {
   serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds if no server is available
   connectTimeoutMS: 10000, // Timeout for initial connection
   socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+  tls: true,
+  tlsInsecure: false,
 };
 
 let db;
