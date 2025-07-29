@@ -84,7 +84,7 @@ const Home = () => {
             {/* Site Name with Gradient */}
             <div className="text-center mb-16">
               <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
-                JobFinder
+                ChakriLagbe
               </h1>
               {/* <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Discover your dream job from thousands of opportunities across top
