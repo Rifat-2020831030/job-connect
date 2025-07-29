@@ -13,8 +13,8 @@ const emailRouter = require("./routers/email");
 const app = express();
 
 const corsOption = {
-  origin: "*",
-  method: ["GET"],
+  origin: process.env.origin,
+  method: ["GET", "POST"],
 };
 
 const limiter = rateLimit({
