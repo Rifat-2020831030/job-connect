@@ -11,6 +11,7 @@ const jobsStat = require('./routers/stat');
 const emailRouter = require("./routers/email");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 const corsOption = {
   origin: process.env.origin,
@@ -36,7 +37,7 @@ app.use("/api/jobs", jobsRouter);
 app.use("/api/stat", jobsStat);
 app.use("/api/email", emailRouter);
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   connectDB();
   console.log(`The server is running on: localhost:3000`);
   spider.start();
