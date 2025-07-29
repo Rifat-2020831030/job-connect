@@ -8,6 +8,7 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 
+import EmailCard from "../components/EmailCard";
 import Stat from "../components/Stat";
 import JobList from "../subpages/JobList";
 
@@ -50,7 +51,7 @@ const Home = () => {
 
   const handleSearch = () => {
     setIsSearching(true);
-    setSelectedCompany(""); 
+    setSelectedCompany("");
     setSearchQuery(searchQuery.trim());
     setSortBy("relevance"); // Reset sort to relevance on new search
     window.scrollTo({
@@ -212,6 +213,9 @@ const Home = () => {
             />
           </div>
         </div>
+
+        {/* Newsletter section */}
+        <EmailCard />
       </div>
     </div>
   );

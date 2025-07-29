@@ -49,7 +49,7 @@ const Pagination = ({
         className={`focus:outline-none ${
           currentPage === 1
             ? "text-gray-300 cursor-not-allowed"
-            : "text-violet-500 hover:text-violet-700"
+            : "text-[#4c36cc] hover:text-[#2b2260]"
         }`}
         aria-label="Previous page"
       >
@@ -65,7 +65,7 @@ const Pagination = ({
               onClick={() => handlePageChange(1)}
               className={`px-3 py-1 rounded-md ${
                 1 === currentPage
-                  ? "bg-violet-500 text-white"
+                  ? "bg-[#1d1160] text-white"
                   : "bg-gray-200 hover:bg-gray-300"
               }`}
             >
@@ -84,7 +84,7 @@ const Pagination = ({
             onClick={() => handlePageChange(page)}
             className={`px-3 py-1 rounded-md ${
               page === currentPage
-                ? "bg-violet-500 text-white"
+                ? "bg-[#4c36cc] text-white"
                 : "bg-gray-200 hover:bg-gray-300"
             }`}
           >
@@ -102,8 +102,8 @@ const Pagination = ({
               onClick={() => handlePageChange(totalPages)}
               className={`px-3 py-1 rounded-md ${
                 totalPages === currentPage
-                  ? "bg-violet-500 text-white"
-                  : "bg-violet-200 hover:bg-violet-300"
+                  ? "bg-[#4c36cc] text-white"
+                  : "bg-blue-200 hover:bg-blue-300"
               }`}
             >
               {totalPages}
@@ -119,7 +119,7 @@ const Pagination = ({
         className={`focus:outline-none ${
           currentPage === totalPages
             ? "text-gray-300 cursor-not-allowed"
-            : "text-violet-500 hover:text-violet-700"
+            : "text-[#4c36cc] hover:text-[#2b2260]"
         }`}
         aria-label="Next page"
       >

@@ -1,0 +1,12 @@
+*/node_modules/
+node_modules/
+# ignore all log files
+*.log
+# ignore all env files
+.env
+# ignore all coverage files
+coverage/
+# ignore all build files
+dist/
+# ignore all test files
+test/
