@@ -3,11 +3,6 @@ import os
 import sys
 import logging
 import subprocess
-from scrapy.crawler import CrawlerProcess
-from scrapy.utils.project import get_project_settings
-from jobsearcher.spiders.bs23_job_spider import JobSpider as BS23JobSpider
-from jobsearcher.spiders.dsi_job_spider import JobSpider as DSIJobSpider
-from jobsearcher.spiders.optimizely_job_spider import JobSpider as OptimizelyJobSpider
 
 # Configure logging
 logging.basicConfig(
@@ -43,14 +38,24 @@ def run_spiders_sequentially():
     Run all spiders one by one in a queue
     """
     logging.info("Starting spider runner...")
+def run_spiders_sequentially():
+    """
+    Run all spiders one by one in a queue
+    """
+    logging.info("Starting spider runner...")
+
+    # Import scrapy modules after requirements are installed
+    from scrapy.crawler import CrawlerProcess
+    from scrapy.utils.project import get_project_settings
+    from jobsearcher.spiders.bs23_job_spider import JobSpider as BS23JobSpider
+    from jobsearcher.spiders.dsi_job_spider import JobSpider as DSIJobSpider
+    from jobsearcher.spiders.optimizely_job_spider import JobSpider as OptimizelyJobSpider
 
     # Get project settings
     settings = get_project_settings()
 
-    # Create a crawler process with project settings
     process = CrawlerProcess(settings)
-
-    # Add all spiders to the process
+    
     logging.info("Adding BS23 job spider to the queue")
     process.crawl(BS23JobSpider)
 
