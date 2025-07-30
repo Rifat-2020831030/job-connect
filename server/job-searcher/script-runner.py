@@ -17,20 +17,47 @@ logging.basicConfig(
 
 def install_requirements():
     """
-    Install requirements from requirements.txt
+    Install required packages directly via apt and pip
     """
+    required_packages = {
+        "scrapy": "python3-scrapy",
+        "pymongo": "python3-pymongo"
+    }
+    
     try:
-        logging.info("Installing requirements from requirements.txt...")
-        result = subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"], 
-                              check=True, capture_output=True, text=True)
-        logging.info("Requirements installed successfully")
+        for package, apt_package in required_packages.items():
+            logging.info(f"Installing {package} via apt...")
+            try:
+                # Try to install via apt
+                apt_result = subprocess.run(["apt", "install", "-y", apt_package], 
+                                          check=True, capture_output=True, text=True)
+                logging.info(f"Successfully installed {apt_package} via apt")
+                print("apt_result.stdout: ", apt_result.stdout)
+            except (subprocess.CalledProcessError, FileNotFoundError) as apt_err:
+                logging.warning(f"Failed to install via pip: {apt_err}")
+                # Create and use virtual environment as last resort
+                venv_dir = os.path.join(os.path.dirname(__file__), "venv")
+                logging.info(f"Creating virtual environment in {venv_dir}")
+                subprocess.run([sys.executable, "-m", "venv", venv_dir], check=True)
+                
+                # Determine pip path in the virtual environment
+                if sys.platform == "win32":
+                    pip_path = os.path.join(venv_dir, "Scripts", "pip")
+                else:
+                    pip_path = os.path.join(venv_dir, "bin", "pip")
+                
+                # Install in the virtual environment
+                logging.info(f"Installing {package} in virtual environment")
+                subprocess.run([pip_path, "install", package], check=True)
+                logging.info(f"Successfully installed {package} in virtual environment")
+        
         return True
     except subprocess.CalledProcessError as e:
-        logging.error(f"Failed to install requirements: {e.stderr}")
+        logging.error(f"Failed to install packages: {e.stderr}")
         return False
-    except FileNotFoundError:
-        logging.warning("requirements.txt not found, skipping installation")
-        return True
+    except Exception as e:
+        logging.error(f"Error during package installation: {str(e)}")
+        return False
 
 
 def run_spiders_sequentially():
