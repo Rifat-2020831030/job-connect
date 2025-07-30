@@ -1,5 +1,4 @@
 const express = require("express");
-const spider = require("../spider-runner");
 const cors = require("cors");
 const { rateLimit } = require("express-rate-limit");
 const {connectDB} = require("./db/database");
@@ -9,6 +8,7 @@ dotenv.config();
 const jobsRouter = require("./routers/jobs");
 const jobsStat = require('./routers/stat');
 const emailRouter = require("./routers/email");
+const scrapeRouter = require("./routers/scrape");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,9 +36,9 @@ app.get("/", (req, res, next) => {
 app.use("/api/jobs", jobsRouter);
 app.use("/api/stat", jobsStat);
 app.use("/api/email", emailRouter);
+app.use("/api/scrape", scrapeRouter);
 
 app.listen(PORT, () => {
   connectDB();
   console.log(`The server is running on: ${process.env.origin}:${PORT}`);
-  spider.start();
 });
