@@ -39,7 +39,8 @@ def install_requirements():
     """
     required_packages = {
         "scrapy": "python3-scrapy",
-        "pymongo": "python3-pymongo"
+        "pymongo": "python3-pymongo",
+        "python-dotenv": "python3-dotenv",
     }
 
     try:
@@ -110,9 +111,8 @@ def run_spiders_sequentially():
         if sys.platform == "win32":
             python_executable = os.path.join(venv_dir, "Scripts", "python.exe")
         else:
+            # Create a script to run inside the virtual environment
             python_executable = os.path.join(venv_dir, "bin", "python")
-
-        # Create a script to run inside the virtual environment
         temp_script_path = os.path.join(
             os.path.dirname(__file__), "_run_spiders.py")
         with open(temp_script_path, "w") as f:
@@ -120,11 +120,19 @@ def run_spiders_sequentially():
 import os
 import sys
 import logging
+import datetime
+from pathlib import Path
+from dotenv import load_dotenv
+from pymongo import MongoClient
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 from jobsearcher.spiders.bs23_job_spider import JobSpider as BS23JobSpider
 from jobsearcher.spiders.dsi_job_spider import JobSpider as DSIJobSpider
 from jobsearcher.spiders.optimizely_job_spider import JobSpider as OptimizelyJobSpider
+
+# Load environment variables from .env file in the root directory
+dotenv_path = Path(__file__).resolve().parent.parent / '.env'
+load_dotenv(dotenv_path)
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
@@ -148,6 +156,25 @@ logging.info("Starting the crawling process. Spiders will run one by one.")
 process.start()  # This will block until all spiders are finished
 
 logging.info("All spiders have completed their runs.")
+
+# Log the completion in MongoDB
+try:
+    # Use the environment variables for MongoDB connection
+    mongo_uri = os.getenv('db_uri')
+    mongo_db = os.getenv('MONGO_DATABASE', 'job-collection')
+    client = MongoClient(mongo_uri)
+    db = client[mongo_db]
+    log_collection = db['scraper-log']
+    
+    log_entry = {
+        "timestamp": datetime.datetime.now(),
+        "run_status": "success"
+    }
+    
+    log_collection.insert_one(log_entry)
+    logging.info("Scraping summary logged to MongoDB successfully")
+except Exception as e:
+    logging.error(f"Failed to log scraping summary to MongoDB: {e}")
 """)
 
         try:
@@ -158,15 +185,22 @@ logging.info("All spiders have completed their runs.")
         except subprocess.CalledProcessError as e:
             logging.error(f"Failed to run spiders in virtual environment: {e}")
             raise
-    else:
-        # Fall back to system Python if no virtual environment
+    else:        # Fall back to system Python if no virtual environment
         try:
             import scrapy
+            import datetime
+            from pathlib import Path
+            from dotenv import load_dotenv
+            from pymongo import MongoClient
             from scrapy.crawler import CrawlerProcess
             from scrapy.utils.project import get_project_settings
             from jobsearcher.spiders.bs23_job_spider import JobSpider as BS23JobSpider
             from jobsearcher.spiders.dsi_job_spider import JobSpider as DSIJobSpider
+            # Load environment variables from .env file in the root directory
             from jobsearcher.spiders.optimizely_job_spider import JobSpider as OptimizelyJobSpider
+            dotenv_path = Path(__file__).resolve(
+            ).parent.parent / '.env'
+            load_dotenv(dotenv_path)
 
             # Get project settings
             settings = get_project_settings()
@@ -188,6 +222,26 @@ logging.info("All spiders have completed their runs.")
             process.start()  # This will block until all spiders are finished
 
             logging.info("All spiders have completed their runs.")
+            # Log the completion in MongoDB
+            try:
+                # Use the environment variables for MongoDB connection
+                mongo_uri = os.getenv('db_uri')
+                mongo_db = os.getenv('MONGO_DATABASE', 'job-collection')
+                client = MongoClient(mongo_uri)
+                db = client[mongo_db]
+                log_collection = db['scraper-log']
+
+                log_entry = {
+                    "timestamp": datetime.datetime.now(),
+                    "run_status": "success"
+                }
+
+                log_collection.insert_one(log_entry)
+                logging.info("Scraping summary logged to MongoDB successfully")
+            except Exception as e:
+                logging.error(
+                    f"Failed to log scraping summary to MongoDB: {e}")
+
         except ImportError as e:
             logging.error(f"Failed to import required modules: {e}")
             raise

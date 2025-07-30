@@ -7,14 +7,23 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+from dotenv import load_dotenv
+from pathlib import Path
+import os
 BOT_NAME = "jobsearcher"
 
 SPIDER_MODULES = ["jobsearcher.spiders"]
 NEWSPIDER_MODULE = "jobsearcher.spiders"
 
-MONGO_URI = 'mongodb+srv://codehasan:OpztN7I2YW8rU0Oz@cluster0.4crljyh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
-MONGO_DATABASE = 'job-collection'
-MONGO_COLLECTION = 'jobs'
+
+# Load environment variables from .env file in the root directory
+dotenv_path = Path(__file__).resolve().parent.parent.parent / '.env'
+load_dotenv(dotenv_path)
+
+# Use the environment variables
+MONGO_URI = os.getenv('db_uri')
+MONGO_DATABASE = os.getenv('MONGO_DATABASE', 'job-collection')
+MONGO_COLLECTION = os.getenv('MONGO_COLLECTION', 'jobs')
 
 ITEM_PIPELINES = {
     'jobsearcher.pipelines.JobsearcherPipeline': 300,
