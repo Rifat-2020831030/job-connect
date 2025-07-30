@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 
 export const runScraper = () => {
     return new Promise((resolve, reject) => {
-        const scriptPath = path.join(__dirname, '../../jobsearcher/script-runner.py');
+        const scriptPath = path.join(__dirname, '../../job-searcher/script-runner.py');
         const pythonProcess = spawn('python', [scriptPath]);
     
         let output = '';
