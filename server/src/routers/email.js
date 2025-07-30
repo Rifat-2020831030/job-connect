@@ -5,5 +5,6 @@ const router = express.Router();
 router.post("/subscribe", email.subscribeEmail);
 router.post("/unsubscribe", email.unsubscribeEmail);
 router.get("/", email.getEmailList);
+router.post("/verify-code", email.verifyCode);
 
 module.exports = router;

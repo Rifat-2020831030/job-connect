@@ -10,6 +10,7 @@ const jobsStat = require("./routers/stat");
 const emailRouter = require("./routers/email");
 const scrapeRouter = require("./routers/scrape");
 const { jobSearcherCron } = require("../spider-runner");
+const mailSenderRouter = require("./routers/sendMail");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -41,6 +42,7 @@ app.use("/api/jobs", jobsRouter);
 app.use("/api/stat", jobsStat);
 app.use("/api/email", emailRouter);
 app.use("/api/scrape", scrapeRouter);
+app.use('/api/mail', mailSenderRouter);
 
 // Initialize db connection before starting the server
 connectDB()

@@ -1,8 +1,17 @@
 const scrapeRunner = require('../controller/scrape-runner');
+const dotenv = require("dotenv");
+dotenv.config();
 const express = require('express');
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+const auth = (req, res, next)=> {
+    const token = req.query.token;
+    if (!token || token !== process.env.SCRAPE_TOKEN) {
+        return res.status(403).json({ message: 'Unauthorized request' });
+    }
+}
+
+router.get('/',auth, async (req, res) => {
     try {
         console.log('Starting scrape process...');
         const output = await scrapeRunner.runScraper();
