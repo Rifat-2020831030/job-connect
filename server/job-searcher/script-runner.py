@@ -3,6 +3,7 @@ import os
 import sys
 import logging
 import subprocess
+import importlib.util
 
 # Configure logging
 logging.basicConfig(
@@ -34,11 +35,12 @@ def install_requirements():
                 logging.info(f"Successfully installed {apt_package} via apt")
                 print("apt_result.stdout: ", apt_result.stdout)
             except (subprocess.CalledProcessError, FileNotFoundError) as apt_err:
-                logging.warning(f"Failed to install via pip: {apt_err}")
+                logging.warning(f"Failed to install via apt: {apt_err}")
                 # Create and use virtual environment as last resort
                 venv_dir = os.path.join(os.path.dirname(__file__), "venv")
                 logging.info(f"Creating virtual environment in {venv_dir}")
-                subprocess.run([sys.executable, "-m", "venv", venv_dir], check=True)
+                if not os.path.exists(venv_dir):
+                    subprocess.run([sys.executable, "-m", "venv", venv_dir], check=True)
                 
                 # Determine pip path in the virtual environment
                 if sys.platform == "win32":
@@ -65,38 +67,95 @@ def run_spiders_sequentially():
     Run all spiders one by one in a queue
     """
     logging.info("Starting spider runner...")
-def run_spiders_sequentially():
-    """
-    Run all spiders one by one in a queue
-    """
-    logging.info("Starting spider runner...")
 
-    # Import scrapy modules after requirements are installed
-    from scrapy.crawler import CrawlerProcess
-    from scrapy.utils.project import get_project_settings
-    from jobsearcher.spiders.bs23_job_spider import JobSpider as BS23JobSpider
-    from jobsearcher.spiders.dsi_job_spider import JobSpider as DSIJobSpider
-    from jobsearcher.spiders.optimizely_job_spider import JobSpider as OptimizelyJobSpider
+    # Activate virtual environment if it exists
+    venv_dir = os.path.join(os.path.dirname(__file__), "venv")
+    if os.path.exists(venv_dir):
+        logging.info(f"Using virtual environment at {venv_dir}")
+        
+        # Run a new Python process with the activated virtual environment
+        if sys.platform == "win32":
+            python_executable = os.path.join(venv_dir, "Scripts", "python.exe")
+        else:
+            python_executable = os.path.join(venv_dir, "bin", "python")
+            
+        # Create a script to run inside the virtual environment
+        temp_script_path = os.path.join(os.path.dirname(__file__), "_run_spiders.py")
+        with open(temp_script_path, "w") as f:
+            f.write("""
+import os
+import sys
+import logging
+from scrapy.crawler import CrawlerProcess
+from scrapy.utils.project import get_project_settings
+from jobsearcher.spiders.bs23_job_spider import JobSpider as BS23JobSpider
+from jobsearcher.spiders.dsi_job_spider import JobSpider as DSIJobSpider
+from jobsearcher.spiders.optimizely_job_spider import JobSpider as OptimizelyJobSpider
 
-    # Get project settings
-    settings = get_project_settings()
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
-    process = CrawlerProcess(settings)
-    
-    logging.info("Adding BS23 job spider to the queue")
-    process.crawl(BS23JobSpider)
+# Get project settings
+settings = get_project_settings()
 
-    logging.info("Adding DSI job spider to the queue")
-    process.crawl(DSIJobSpider)
+process = CrawlerProcess(settings)
 
-    logging.info("Adding Optimizely job spider to the queue")
-    process.crawl(OptimizelyJobSpider)
+logging.info("Adding BS23 job spider to the queue")
+process.crawl(BS23JobSpider)
 
-    # Start the crawling process
-    logging.info("Starting the crawling process. Spiders will run one by one.")
-    process.start()  # This will block until all spiders are finished
+logging.info("Adding DSI job spider to the queue")
+process.crawl(DSIJobSpider)
 
-    logging.info("All spiders have completed their runs.")
+logging.info("Adding Optimizely job spider to the queue")
+process.crawl(OptimizelyJobSpider)
+
+# Start the crawling process
+logging.info("Starting the crawling process. Spiders will run one by one.")
+process.start()  # This will block until all spiders are finished
+
+logging.info("All spiders have completed their runs.")
+""")
+        
+        try:
+            # Execute the script in the virtual environment
+            subprocess.run([python_executable, temp_script_path], check=True)
+            # Clean up temp script after execution
+            os.remove(temp_script_path)
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Failed to run spiders in virtual environment: {e}")
+            raise
+    else:
+        # Fall back to system Python if no virtual environment
+        try:
+            import scrapy
+            from scrapy.crawler import CrawlerProcess
+            from scrapy.utils.project import get_project_settings
+            from jobsearcher.spiders.bs23_job_spider import JobSpider as BS23JobSpider
+            from jobsearcher.spiders.dsi_job_spider import JobSpider as DSIJobSpider
+            from jobsearcher.spiders.optimizely_job_spider import JobSpider as OptimizelyJobSpider
+
+            # Get project settings
+            settings = get_project_settings()
+
+            process = CrawlerProcess(settings)
+            
+            logging.info("Adding BS23 job spider to the queue")
+            process.crawl(BS23JobSpider)
+
+            logging.info("Adding DSI job spider to the queue")
+            process.crawl(DSIJobSpider)
+
+            logging.info("Adding Optimizely job spider to the queue")
+            process.crawl(OptimizelyJobSpider)
+
+            # Start the crawling process
+            logging.info("Starting the crawling process. Spiders will run one by one.")
+            process.start()  # This will block until all spiders are finished
+
+            logging.info("All spiders have completed their runs.")
+        except ImportError as e:
+            logging.error(f"Failed to import required modules: {e}")
+            raise
 
 
 if __name__ == "__main__":
