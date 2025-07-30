@@ -10,3 +10,8 @@ coverage/
 dist/
 # ignore all test files
 test/
+# igonore venv files
+*/*/venv/
+.venv/
+venv/
+

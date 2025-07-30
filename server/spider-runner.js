@@ -9,7 +9,7 @@ const SCRAPER_DIR = path.join(__dirname, "job-searcher");
 
 
 const jobSearcherCron = new CronJob(
-  "*/3 * * * *", // cronTime
+  "0 2,9,17 * * *", // cronTime
   () => {
     runScraper();
   },
