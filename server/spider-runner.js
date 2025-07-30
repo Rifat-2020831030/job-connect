@@ -12,7 +12,7 @@ const spiderList = [
 ];
 
 const jobSearcherCron = new CronJob(
-  "0 */12 * * *", // cronTime
+  "*/10 * * * *", // cronTime
   () => {
     runAllSpider(spiderList);
   },
