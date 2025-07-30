@@ -19,7 +19,7 @@ const JobCard = ({ job }) => {
     <div className="flex flex-col justify-start w-80 p-5 border rounded-xl shadow-lg bg-[#c9d9f0]">
       <div className="relative">
         <img
-          className="w-full h-[100px] rounded-lg bg-[#7CB9E8] bg-transparent object-contain"
+          className="w-full h-[100px] rounded-lg bg-[#74b2e2] bg-transparent object-contain"
           src={job.logo}
           alt="Company logo"
         />

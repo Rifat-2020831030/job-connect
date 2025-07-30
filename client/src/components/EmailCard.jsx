@@ -1,12 +1,15 @@
 import axios from "axios";
 import { useState } from "react";
 
+import VerificationCard from "./VerificationCard";
+
 const EmailCard = () => {
   const [email, setEmail] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("success"); // success or error
   const [loading, setLoading] = useState(false);
+  const [showVerification, setShowVerification] = useState(false);
 
   const handleSubmittion = async (e) => {
     e.preventDefault();
@@ -36,23 +39,29 @@ const EmailCard = () => {
       );
 
       setLoading(false);
-      if (response.status === 200) {
-        setAlertMessage(response.data.message || "Subscription successful!");
-        setAlertType("success");
-        setShowAlert(true);
-        setEmail("");
+      if (response.data.status || response.status === 200) {
+        setShowVerification(true);
       } else {
         setAlertMessage(
-          response.data.message || "Subscription failed. Please try again."
+          response.data?.message || "Subscription failed. Please try again."
         );
         setAlertType("error");
         setShowAlert(true);
       }
     } catch (error) {
-      setAlertMessage("An error occurred. Please try again later.");
-      setAlertType("error");
-      setShowAlert(true);
+      console.error("Subscription error:", error);
       setLoading(false);
+      
+      // Handle 409 Conflict (email already exists)
+      if (error.response && error.response.status === 409) {
+        setAlertMessage("This email is already registered. Please use a different email.");
+        setAlertType("error");
+        setShowAlert(true);
+      } else {
+        setAlertMessage("An error occurred. Please try again later.");
+        setAlertType("error");
+        setShowAlert(true);
+      }
     }
   };
 
@@ -71,6 +80,7 @@ const EmailCard = () => {
           </div>
         </div>
       )}
+      {showVerification && <VerificationCard setShowVerification={setShowVerification} email={email} setAlertMessage={setAlertMessage} setAlertType={setAlertType} setShowAlert={setShowAlert} />}
       {showAlert && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div
