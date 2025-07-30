@@ -9,9 +9,13 @@ const jobsRouter = require("./routers/jobs");
 const jobsStat = require("./routers/stat");
 const emailRouter = require("./routers/email");
 const scrapeRouter = require("./routers/scrape");
+const { jobSearcherCron } = require("../spider-runner");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Start the job searcher cron job
+jobSearcherCron.start();
 
 const corsOption = {
   origin: process.env.origin,
@@ -38,7 +42,7 @@ app.use("/api/stat", jobsStat);
 app.use("/api/email", emailRouter);
 app.use("/api/scrape", scrapeRouter);
 
-// Initialize db connection before starting the server 
+// Initialize db connection before starting the server
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
