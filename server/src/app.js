@@ -38,7 +38,7 @@ app.use("/api/stat", jobsStat);
 app.use("/api/email", emailRouter);
 app.use("/api/scrape", scrapeRouter);
 
-// Initialize database connection before starting the server
+// Initialize db connection before starting the server 
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
