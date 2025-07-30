@@ -2,7 +2,7 @@ import { getDB } from "../db/database.js";
 
 export const getCompanies = async (req, res) => {
   try {
-    const db = getDB();
+    const db = await getDB();
     const response = await db.collection("jobs").find({}).toArray();
     // Extract unique companies from the jobs
     const companies = [...new Set(response.map((job) => job.company))].sort();
@@ -19,4 +19,3 @@ export const getCompanies = async (req, res) => {
     res.status(500).json({ error: "Error when fetching company list" });
   }
 };
-

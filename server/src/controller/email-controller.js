@@ -2,8 +2,13 @@ import { getDB } from "../db/database.js";
 
 export const subscribeEmail = async (req, res) => {
   try {
-    const db = getDB();
-    const { email, ipAddress = 'unknown', latlong = 'unknown', country = 'unknown'} = req.body;
+    const db = await getDB();
+    const {
+      email,
+      ipAddress = "unknown",
+      latlong = "unknown",
+      country = "unknown",
+    } = req.body;
 
     if (!email) {
       return res.status(400).json({ status: 0, message: "Email is required" });
@@ -18,7 +23,9 @@ export const subscribeEmail = async (req, res) => {
     }
 
     // Insert the new email into the database
-    await db.collection("emails").insertOne({ email, ipAddress, latlong, country });
+    await db
+      .collection("emails")
+      .insertOne({ email, ipAddress, latlong, country });
 
     res.status(200).json({
       status: 1,
@@ -33,10 +40,10 @@ export const subscribeEmail = async (req, res) => {
 
 export const unsubscribeEmail = async (req, res) => {
   try {
-    const db = getDB();
+    const db = await getDB();
     const { email } = req.body;
 
-    if(!email) {
+    if (!email) {
       res.status(400).json({ status: 0, message: "Email is required" });
       return;
     }
@@ -59,8 +66,8 @@ export const getEmailList = async (req, res) => {
   try {
     const db = get();
     const emails = await db.collection("emails").find({}.toArray());
-    if(emails.length === 0 ){
-      res.status(404).json({status: 0, message: "No emails found"});
+    if (emails.length === 0) {
+      res.status(404).json({ status: 0, message: "No emails found" });
       return;
     }
     res.status(200).json({
@@ -70,7 +77,8 @@ export const getEmailList = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching email list:", error);
-    res.status(500).json({ error: "Error occured while getting list of emails" });
-    
+    res
+      .status(500)
+      .json({ error: "Error occured while getting list of emails" });
   }
-}
+};

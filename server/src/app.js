@@ -1,12 +1,12 @@
 const express = require("express");
 const cors = require("cors");
 const { rateLimit } = require("express-rate-limit");
-const {connectDB} = require("./db/database");
+const { connectDB } = require("./db/database");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const jobsRouter = require("./routers/jobs");
-const jobsStat = require('./routers/stat');
+const jobsStat = require("./routers/stat");
 const emailRouter = require("./routers/email");
 const scrapeRouter = require("./routers/scrape");
 
@@ -38,7 +38,13 @@ app.use("/api/stat", jobsStat);
 app.use("/api/email", emailRouter);
 app.use("/api/scrape", scrapeRouter);
 
-app.listen(PORT, () => {
-  connectDB();
-  console.log(`The server is running on: ${process.env.origin}:${PORT}`);
-});
+// Initialize database connection before starting the server
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`The server is running on: localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to connect to database:", err);
+  });

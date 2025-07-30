@@ -8,26 +8,40 @@ const connectOptions = {
   serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds if no server is available
   connectTimeoutMS: 10000, // Timeout for initial connection
   socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+  tls: true, // Use TLS for secure connection
 };
 
-let db;
+let cachedClient = null;
+let cachedDb = null;
 
 const connectDB = async () => {
-  const client = new MongoClient(url, connectOptions);
-  try {
-    await client.connect();
-    console.log("Connected to MongoDB");
-    db = client.db(dbName);
-  } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
+  // If we have a cached connection, use it
+  if (cachedDb) {
+    console.log("Using cached database connection");
+    return cachedDb;
   }
+
+  // No cached connection, create a new one
+  if (!cachedClient) {
+    cachedClient = new MongoClient(url, connectOptions);
+    try {
+      await cachedClient.connect();
+      console.log("Connected to MongoDB");
+    } catch (error) {
+      console.error("Error connecting to MongoDB:", error);
+      throw error;
+    }
+  }
+
+  cachedDb = cachedClient.db(dbName);
+  return cachedDb;
 };
 
-const getDB = () => {
-  if (!db) {
-    throw new Error("Database not initialized. Call connectDB first.");
+const getDB = async () => {
+  if (!cachedDb) {
+    return connectDB();
   }
-  return db;
+  return cachedDb;
 };
 
 module.exports = {

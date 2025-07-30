@@ -1,16 +1,16 @@
-import { getDB } from "../db/database.js";
 import { ObjectId } from "mongodb";
+import { getDB } from "../db/database.js";
 
 export const getJobs = async (req, res) => {
   try {
-    const db = getDB();
+    const db = await getDB();
 
     const { page = 1, limit } = req.query; // Default to page 1 and limit 10
     const offset = (page - 1) * limit;
 
     // Get current date to compare with deadlines
     const currentDate = new Date();
-    
+
     const jobs = await db
       .collection("jobs")
       .find({})
@@ -19,7 +19,7 @@ export const getJobs = async (req, res) => {
       .toArray();
 
     // Filter jobs based on deadline
-    const filteredJobs = jobs.filter(job => {
+    const filteredJobs = jobs.filter((job) => {
       if (!job.deadline) return true; // If no deadline, include the job
       const deadlineDate = new Date(job.deadline);
       return deadlineDate >= currentDate; // Include only jobs with future deadlines
@@ -43,13 +43,15 @@ export const getJobs = async (req, res) => {
   }
 };
 
-export const getJobById = async (req,res) => {
+export const getJobById = async (req, res) => {
   try {
-    const db = getDB();
+    const db = await getDB();
     const jobId = req.params.id;
 
-    const job = await db.collection("jobs").findOne({ _id: new ObjectId(jobId) });
-    
+    const job = await db
+      .collection("jobs")
+      .findOne({ _id: new ObjectId(jobId) });
+
     if (!job) {
       return res.status(404).json({ status: 0, message: "Job not found" });
     }
@@ -63,4 +65,4 @@ export const getJobById = async (req,res) => {
     console.error("Error fetching job:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-}
+};
