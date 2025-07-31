@@ -7,7 +7,7 @@ const EmailCard = () => {
   const [email, setEmail] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const [alertType, setAlertType] = useState("success"); // success or error
+  const [alertType, setAlertType] = useState(""); // success or error
   const [loading, setLoading] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
 
@@ -70,7 +70,7 @@ const EmailCard = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-10 z-10 relative">
+    <div className="bg-gradient-to-r from-blue-600 to-purple-400 py-10 z-10 relative">
       {loading && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-xl max-w-md mx-auto text-center">
@@ -106,73 +106,7 @@ const EmailCard = () => {
           </div>
         </div>
       )}
-      {showAlert && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 transition-opacity duration-300">
-          <div
-            className={`bg-white rounded-xl shadow-2xl max-w-md mx-auto w-full transform transition-all duration-300 ease-in-out ${
-              alertType === "success"
-                ? "border-b-4 border-green-500"
-                : "border-b-4 border-red-500"
-            }`}
-          >
-            <div className="p-6">
-              <div className="flex items-center mb-4">
-                {alertType === "success" ? (
-                  <div className="bg-green-100 p-2 rounded-full mr-3">
-                    <svg
-                      className="w-6 h-6 text-green-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      ></path>
-                    </svg>
-                  </div>
-                ) : (
-                  <div className="bg-red-100 p-2 rounded-full mr-3">
-                    <svg
-                      className="w-6 h-6 text-red-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      ></path>
-                    </svg>
-                  </div>
-                )}
-                <h3
-                  className={`text-lg font-bold ${
-                    alertType === "success" ? "text-green-600" : "text-red-600"
-                  }`}
-                >
-                  {alertType === "success" ? "Success" : "Error"}
-                </h3>
-              </div>
-              <p className="text-gray-700 mb-5">{alertMessage}</p>
-              <div className="text-right">
-                <button
-                  onClick={closeAlert}
-                  className="bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-5 rounded-lg transition-colors duration-200 shadow-sm"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+     
       <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-center md:space-x-8">
           <div className="w-full md:w-1/2 mb-8 md:mb-0 text-center md:text-left">
