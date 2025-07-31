@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 router.post("/subscribe", email.subscribeEmail);
-router.post("/unsubscribe", email.unsubscribeEmail);
+router.get("/unsubscribe", email.unsubscribeEmail);
 router.get("/", email.getEmailList);
 router.post("/verify-code", email.verifyCode);
 

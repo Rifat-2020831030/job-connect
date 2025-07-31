@@ -24,7 +24,11 @@ const mailer = async (receiver, sub, msg = "", html = "") => {
         html: html,
       },
       (error, _info) => {
-        if(_info.rejected.length > 0) {
+        if (err) {
+          console.error("Email sending error:", err);
+          return false;
+        }
+        if (_info && _info.rejected && _info.rejected.length > 0) {
           console.error("Email sending failed:", _info.rejected);
           return false;
         }
