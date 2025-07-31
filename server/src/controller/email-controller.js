@@ -2,7 +2,6 @@ import crypto from "crypto";
 
 import { getDB } from "../db/database.js";
 import mailer from "../services/mail-service.js";
-import { reverse } from "dns";
 
 export const subscribeEmail = async (req, res) => {
   try {
@@ -283,7 +282,7 @@ export const sendJobAlert = async () => {
         <p>Here are the latest job openings in last 24 hours:</p>
         <hr style="border-top: 1px solid #ccc; margin: 20px 0;" width="100%></hr>
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f4; padding: 20px;">
-          <tr>
+          <tr style="display: flex; flex-direction: column; justify-content: center; align-items: center; row-gap: 10px; padding-bottom: 10px;">
             ${jobCards}
           </tr>
         </table>

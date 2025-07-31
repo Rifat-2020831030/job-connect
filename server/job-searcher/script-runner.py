@@ -130,51 +130,67 @@ from jobsearcher.spiders.bs23_job_spider import JobSpider as BS23JobSpider
 from jobsearcher.spiders.dsi_job_spider import JobSpider as DSIJobSpider
 from jobsearcher.spiders.optimizely_job_spider import JobSpider as OptimizelyJobSpider
 
-# Load environment variables from .env file in the root directory
-dotenv_path = Path(__file__).resolve().parent.parent / '.env'
-load_dotenv(dotenv_path)
-
-# Setup logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
-
-# Get project settings
-settings = get_project_settings()
-
-process = CrawlerProcess(settings)
-
-logging.info("Adding BS23 job spider to the queue")
-process.crawl(BS23JobSpider)
-
-logging.info("Adding DSI job spider to the queue")
-process.crawl(DSIJobSpider)
-
-logging.info("Adding Optimizely job spider to the queue")
-process.crawl(OptimizelyJobSpider)
-
-# Start the crawling process
-logging.info("Starting the crawling process. Spiders will run one by one.")
-process.start()  # This will block until all spiders are finished
-
-logging.info("All spiders have completed their runs.")
-
-# Log the completion in MongoDB
 try:
-    # Use the environment variables for MongoDB connection
+    # Load environment variables from .env file in the root directory
+    dotenv_path = Path(__file__).resolve().parent.parent / '.env'
+    load_dotenv(dotenv_path)
+
+    # Setup logging
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
+
+    # Get project settings
+    settings = get_project_settings()
+
+    process = CrawlerProcess(settings)
+
+    logging.info("Adding BS23 job spider to the queue")
+    process.crawl(BS23JobSpider)
+
+    logging.info("Adding DSI job spider to the queue")
+    process.crawl(DSIJobSpider)
+
+    logging.info("Adding Optimizely job spider to the queue")
+    process.crawl(OptimizelyJobSpider)
+
+    # Start the crawling process
+    logging.info("Starting the crawling process. Spiders will run one by one.")
+    process.start()  # This will block until all spiders are finished
+
+    logging.info("All spiders have completed their runs.")
+
+    # Log the completion in MongoDB
     mongo_uri = os.getenv('db_uri')
     mongo_db = os.getenv('MONGO_DATABASE', 'job-collection')
     client = MongoClient(mongo_uri)
     db = client[mongo_db]
     log_collection = db['scraper-log']
-    
-    log_entry = {
-        "timestamp": datetime.datetime.now(),
-        "run_status": "success"
-    }
-    
-    log_collection.insert_one(log_entry)
-    logging.info("Scraping summary logged to MongoDB successfully")
+                    
+    try:
+        log_entry = {
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "run_status": "success"
+        }
+        
+        log_collection.insert_one(log_entry)
+    except Exception as e:
+        logging.error(f"Failed to log scraping summary to MongoDB: {e}")
 except Exception as e:
-    logging.error(f"Failed to log scraping summary to MongoDB: {e}")
+    logging.error(f"Error running spiders: {str(e)}")
+    mongo_uri = os.getenv('db_uri')
+    mongo_db = os.getenv('MONGO_DATABASE', 'job-collection')
+    client = MongoClient(mongo_uri)
+    db = client[mongo_db]
+    log_collection = db['scraper-log']
+    log_entry = {
+        "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "run_status": "fail",
+        "error": str(e)
+    }
+    log_collection.insert_one(log_entry)
+finally:
+    # Close MongoDB connection
+    if client:
+        client.close()
 """)
 
         try:

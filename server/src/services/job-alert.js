@@ -3,7 +3,7 @@ import { CronJob } from "cron";
 import { sendJobAlert } from "../controller/email-controller.js";
 
 const jobAlertSchedule = new CronJob(
-  "*/59 * * * *",
+  "0 0-23/4 * * *",
   async () => {
     console.log("Start sending job alert to mailing list at ", new Date().toISOString());
     await sendJobAlert()
