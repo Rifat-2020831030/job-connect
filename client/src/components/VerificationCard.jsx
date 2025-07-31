@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 
 const VerificationCard = ({
+  setEmail,
   setShowVerification,
   email,
   setAlertType,
@@ -17,17 +18,24 @@ const VerificationCard = ({
       );
       console.log("Verification response:", response);
       if (response.status === 200) {
+        setEmail(""); 
         setShowVerification(false);
         setAlertMessage("Verification successful!");
         setAlertType("success");
         setShowAlert(true);
       } else {
         alert("Verification failed. Please check your code and try again.");
+        setShowVerification(true);
       }
     } catch (error) {
       console.error("Verification failed:", error);
-      setShowVerification(false);
-      alert("Verification failed. Please try again later.");
+      
+      const errorMessage = error.response?.data?.message || "Verification failed. Please try again later.";
+      setAlertMessage(errorMessage);
+      setAlertType("error");
+      setShowAlert(true);
+      // Keep the verification modal open so they can try again
+      setShowVerification(true);
     }
   };
 return (
