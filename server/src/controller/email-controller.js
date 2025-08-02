@@ -176,7 +176,9 @@ const getNewJobs = async () => {
     const newJobs = jobList.filter((job) => {
       const jobDate = new Date(job.timestamp);
       const currentDate = new Date();
-      return currentDate - jobDate <= 24 * 60 * 60 * 1000; // last 24 hours
+      const arg1 = currentDate - jobDate <= 24 * 60 * 60 * 1000; // last 24 hours
+      const arg2 = new Date(job.deadline) >= currentDate; // deadline not passed
+      return arg1 && arg2;
     });
 
     return newJobs;

@@ -17,11 +17,10 @@ const JobCard = ({ job }) => {
 
   return (
     <div className="flex flex-col justify-start w-80 p-5 border rounded-xl shadow-lg bg-[#c9d9f0]">
-      <div className="relative">
+      <div className="relative w-full h-[100px] rounded-lg bg-[#74b2e2] object-contain">
         <img
-          className="w-full h-[100px] rounded-lg bg-[#74b2e2] bg-transparent object-contain"
           src={job.logo}
-          alt="Company logo"
+          alt={job.company + " logo"}
         />
         {isRecent() && (
           <span className="text-xs absolute top-4 left-4 px-2 py-1 bg-blue-500 text-white font-bold rounded-lg">
@@ -41,9 +40,9 @@ const JobCard = ({ job }) => {
         </p>
       </div>
       <div className="flex flex-col gap-1 mt-4 ml-4">
-        <li>Salary: {job.salary}</li>
-        <li>Vacancy: {job.vacancy}</li>
-        <li>Deadline: {deadline}</li>
+        <li>Salary: {job.salary || "Not Specified"}</li>
+        <li>Vacancy: {job.vacancy || "Not Specified"}</li>
+        <li>Deadline: {deadline || "Not Specified"}</li>
       </div>
       {/* to cover remaining space */}
       <span className="flex-1"></span>
