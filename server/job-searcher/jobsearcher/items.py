@@ -22,4 +22,5 @@ class JobsearcherItem(scrapy.Item):
     hashValue = scrapy.Field()
     isUpdated = scrapy.Field(default=True)
     logo = scrapy.Field()
+    experience = scrapy.Field()
     pass
