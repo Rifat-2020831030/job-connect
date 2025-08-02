@@ -23,9 +23,13 @@ class JobSpider(scrapy.Spider):
     def parse_job(self, response):
         title = response.css('div.text-slate-900.font-bold.text-center.text-2xl.sm\\:text-4xl.mb-5::text').get()
         description = response.css('div:contains("Description") + div.mt-3\\.5 > p::text').getall()
+        description = ' '.join([desc.strip() for desc in description if desc.strip()])
         responsibilities = response.css('div:contains("Responsibilities") + div.mt-3\\.5 > ul > li::text').getall()
+        responsibilities = ' '.join([resp.strip() for resp in responsibilities if resp.strip()])
         requirements = response.css('div:contains("Requirements") + div.mt-3\\.5 > ul > li::text').getall()
+        requirements = ' '.join([req.strip() for req in requirements if req.strip()])
         benefits = response.css('div:contains("Benefits") + div.mt-3\\.5 > ul > li::text').getall()
+        benefits = ' '.join([benefit.strip() for benefit in benefits if benefit.strip()])
         deadline_raw = response.css('div.flex.items-center.gap-1::text').getall()
         deadline = None
 
@@ -52,19 +56,14 @@ class JobSpider(scrapy.Spider):
         item['vacancy'] = response.meta['vacancy']
         item['deadline'] = deadline
         item['salary'] = 'Not specified'
-        item['details'] = {
-            'description': description,
-            'responsibilities': responsibilities,
-            'requirements': requirements,
-            'benefits': benefits,
-        }
-        item['isUpdated'] = True
+        item['details'] = f"Description:\n{description}\n\nResponsibilities:{responsibilities}\n\nRequirements:{requirements}\n\nBenefits:{benefits}"
         # Convert item to dict before JSON serialization
         item_dict = dict(item)
         payloads = json.dumps(item_dict, sort_keys=True).encode('utf-8')
         hashValue = hashlib.sha256(payloads).hexdigest()
-        item['hashValue'] = hashValue
         
+        item['hashValue'] = hashValue
+        item['isUpdated'] = True
         # setting timestamp after hashvalue to stop the timestamp from changing the hash value
         item['timestamp'] = datetime.now().isoformat()
         yield item

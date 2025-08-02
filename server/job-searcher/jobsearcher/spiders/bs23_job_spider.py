@@ -42,9 +42,22 @@ class JobSpider(scrapy.Spider):
 
     def parse_job(self, response):
         data = response.meta['data']
-        details = response.css('div.job-overview__list ::text').getall()
-        # remove whitespace and newlines
-        details = [item.strip() for item in details if item.strip()]
+        # Extract salary from the job overview section
+        salary = response.css('div.job-overview__list-item-label:contains("Salary") + div.job-overview__list-item-value::text').get()
+        salary = salary.strip() if salary else "Not specified"
+        content_cards = response.css('section.content-card.section-gap')
+        job_description = ""
+
+        for i in range(len(content_cards) - 1):
+            card_text = content_cards[i].css('::text').getall()
+            card_text = [item.strip() for item in card_text if item.strip()]
+            
+            # Join this section's text with spaces and append to job_description with semicolon
+            section_text = " ".join(card_text)
+            if job_description and section_text:
+                job_description += "; " + section_text
+            elif section_text:
+                job_description = section_text
 
         item = JobsearcherItem()
         item['url'] = data['url']
@@ -52,19 +65,19 @@ class JobSpider(scrapy.Spider):
         item['deadline'] = data['deadline']
         item['vacancy'] = data['vacancy']
         item['location'] = data['location']
-        item['details'] = details
-        item['salary'] = details[5].strip()
+        item['details'] = job_description
+        item['salary'] = salary if salary else 'Not specified'
         item['company'] = 'Brain Station 23'
         item['logo'] = 'https://jpafrpxxjrkqeemswaqr.supabase.co/storage/v1/object/sign/image-storage/Brain-Station-Logo.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jMDEwMWQzYS04MTNmLTQxZDQtYjAwNC04ZDlkMWY2OTVhM2EiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZS1zdG9yYWdlL0JyYWluLVN0YXRpb24tTG9nby53ZWJwIiwiaWF0IjoxNzUzNjg2MTYwLCJleHAiOjE4MTY3NTgxNjB9.v492lC4pO1LHbitTd9EpYX2PLaW5M4y3ZvexFImKSZg'
         
-        item['isUpdated'] = True
-
         payloads = dict(item)
         payloads = json.dumps(payloads, sort_keys=True).encode('utf-8')
         hashValue = hashlib.sha256(payloads).hexdigest()
-        item['hashValue'] = hashValue
 
+        item['hashValue'] = hashValue
+        item['isUpdated'] = True
         # setting timestamp after hashvalue to stop the timestamp from changing the hash value
         item['timestamp'] = datetime.now().isoformat()
 
         yield item
+

@@ -4,6 +4,8 @@ node_modules/
 *.log
 # ignore all env files
 .env
+*/.env
+*/*/.env
 # ignore all coverage files
 coverage/
 # ignore all build files
