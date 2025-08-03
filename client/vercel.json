@@ -14,7 +14,7 @@
     },
     {
       "source": "/((?!api|favicon.ico|assets).*)",
-      "destination": "/error"
+      "destination": "/index.html"
     }
   ]
 }

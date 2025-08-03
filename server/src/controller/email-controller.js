@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { ObjectId } from "mongodb";
 
 import { getDB } from "../db/database.js";
 import mailer from "../services/mail-service.js";
@@ -83,15 +84,16 @@ export const subscribeEmail = async (req, res) => {
 export const unsubscribeEmail = async (req, res) => {
   try {
     const db = await getDB();
-    const { id } = req.query.id;
+    const { id } = req.query;
 
     if (!id) {
-      res.status(400).json({ status: 0, message: "Email is required" });
+      res.status(400).json({ status: 0, message: "ID is missing" });
       return;
     }
     const response = await db
       .collection("emails")
-      .findAndUpdateOne({ _id: id }, { $set: { verify: false } });
+      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { verify: false } });
+
 
     if (!response) {
       return res.status(404).json({ status: 0, message: "Email not found" });
@@ -99,7 +101,7 @@ export const unsubscribeEmail = async (req, res) => {
     res.status(200).json({
       status: 1,
       message: "Email unsubscribed successfully",
-      data: { email },
+      data: response.email ,
     });
   } catch (error) {
     console.error("Error unsubscribing email:", error);

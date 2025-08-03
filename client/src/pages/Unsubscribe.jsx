@@ -12,11 +12,17 @@ const Unsubscribe = () => {
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get("id");
+        if(!id) {
+          setError(true);
+          setErrorMessage("ID is required.");
+          return;
+        }
 
         setLoading(true);
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/email/unsubscribe?id=${id}`
         );
+
         if (response.status !== 200) {
           setError(true);
           setErrorMessage(response.data.message);
@@ -25,6 +31,10 @@ const Unsubscribe = () => {
         setLoading(false);
       } catch (error) {
         setLoading(false);
+        setError(true);
+        setErrorMessage(
+          error.response?.data?.message || "An unexpected error occurred."
+        );
         console.error("Error unsubscribing:", error);
       }
     };
