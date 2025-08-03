@@ -2,7 +2,7 @@ import { CronJob } from "cron";
 import { spawn } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
-import mailer from "./src/services/mail-service";
+import mailer from "./src/services/mail-service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
