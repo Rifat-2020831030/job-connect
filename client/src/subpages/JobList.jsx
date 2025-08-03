@@ -138,18 +138,18 @@ const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue }) => {
   return (
     <div className="space-y-8">
       {/* Jobs Grid */}
-      <div className="grid grid-cols-1 mx-auto md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 mx-auto md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-md:place-items-center max-md:justify-center">
         {loading ? (
           // Loading skeleton
-          Array.from({ length: 12 }).map((_, index) => (
+          Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
               className="bg-white p-6 rounded-lg shadow-md animate-pulse"
             >
-              <div className="h-4 bg-gray-200 rounded mb-4"></div>
-              <div className="h-3 bg-gray-200 rounded mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded mb-4"></div>
-              <div className="h-8 bg-gray-200 rounded"></div>
+              <div className="h-4 bg-gray-400 rounded mb-4"></div>
+              <div className="h-3 bg-gray-400 rounded mb-2"></div>
+              <div className="h-3 bg-gray-400 rounded mb-4"></div>
+              <div className="h-8 bg-gray-400 rounded"></div>
             </div>
           ))
         ) : filteredJobs.length > 0 ? (

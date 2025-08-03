@@ -1,7 +1,7 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import Error from "./pages/Error";
 import Home from "./pages/Home";
 import Unsubscribe from "./pages/Unsubscribe";
-import Error from "./pages/Error";
 
 const App = () => {
   return (

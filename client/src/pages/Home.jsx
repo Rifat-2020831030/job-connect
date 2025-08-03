@@ -188,7 +188,7 @@ const Home = () => {
                         }}
                         className={`px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors duration-200 cursor-pointer ${
                           selectedCompany === company
-                            ? "bg-blue-300 text-blue-900"
+                            ? "bg-blue-500 text-white font-bold"
                             : ""
                         }`}
                       >
