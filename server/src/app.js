@@ -21,9 +21,18 @@ const PORT = process.env.PORT || 3000;
 jobSearcherCron.start();
 jobAlertSchedule.start();
 
+// Allowed origins
+const allowedOrigins = [
+  "https://chakrilagbe.vercel.app", 
+  "https://server-health-tau.vercel.app", 
+  "http://163.47.36.226",
+  "*"
+];
+
+// CORS configuration with origin filtering
 const corsOption = {
-  origin: ["https://chakrilagbe.vercel.app", "server-health-tau.vercel.app", "163.47.36.226"],
-  method: ["GET", "POST"],
+  origin: allowedOrigins,
+  methods: ["GET", "POST"]
 };
 
 const limiter = rateLimit({

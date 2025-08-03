@@ -1,38 +1,20 @@
 {
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/",
       "destination": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=2592000, immutable"
-        }
-      ]
     },
     {
-      "source": "/(js|css|map)/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=2592000, immutable"
-        }
-      ]
+      "source": "/unsubscribe",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/error",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/((?!api|favicon.ico|assets).*)",
+      "destination": "/error"
     }
-  ],
-  "cleanUrls": true
+  ]
 }

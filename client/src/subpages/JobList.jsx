@@ -39,12 +39,10 @@ const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue }) => {
     // if seaching, show from quired jobs
     if (isQuery) {
       setFilteredJobs(queriedJobs.slice(startIndex, endIndex));
-      console.log("Filtered jobs after quried chages: ", filteredJobs, " for querued jobs: ", queriedJobs);
       return;
     }
     const paginatedJobs = jobs.slice(startIndex, endIndex);
     setFilteredJobs(paginatedJobs);
-    console.log("Jobs for page", page, ":", paginatedJobs);
   };
 
   const handleSort = (value) => {
@@ -97,7 +95,6 @@ const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue }) => {
       setCurrentPage(1);
       setTotalPages(Math.ceil(filtered.length / jobsPerPage) || 1);
       // setJobsbyPage(1, true); // Set jobs for first page based on search
-      console.log("Searching for:", searchQuery, " found:", filtered.length, "jobs");
       setFilteredJobs(filtered); 
     } else if (sortByValue !== "relevance") {
       // If sorting is applied without search
@@ -130,10 +127,6 @@ const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue }) => {
     handleSearch();
   }, [isSearching, searchQuery, sortByValue]);
 
-  useEffect(() =>{
-    console.log("Quried jobs :", queriedJobs);
-    console.log("Filtered jobs updated:", filteredJobs);
-  }, [filteredJobs])
 
   return (
     <div className="space-y-8">

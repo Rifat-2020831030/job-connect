@@ -16,7 +16,6 @@ const VerificationCard = ({
         `${import.meta.env.VITE_BACKEND_URL}/email/verify-code`,
         { email, code }
       );
-      console.log("Verification response:", response);
       if (response.status === 200 || response.data.status) {
         setEmail("");
         setShowVerification(false);

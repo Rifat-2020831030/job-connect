@@ -125,6 +125,46 @@ const generateCode = (digit) => {
   return code.toString().padStart(digit, "0");
 };
 
+const welcomeMailTemplate = () => {
+  const ctaUrl = process.env.FRONTEND_URL || "https://chakrilagbe.vercel.app";
+  return `
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        
+        <!-- Welcome Headline -->
+        <tr>
+            <td align="center" style="padding: 30px 30px 10px 30px;">
+                <h1 style="font-family: Arial, Helvetica, sans-serif; font-size: 28px; font-weight: bold; color: #1E293B; margin: 0;">
+                    Your registration has been successful!
+                </h1>
+            </td>
+        </tr>
+        
+        <!-- Welcome Message Body -->
+        <tr>
+            <td  style="padding: 0 30px 30px 30px;">
+                <p style="font-family: Arial, Helvetica, sans-serif; font-size: 16px; color: #475569; line-height: 1.6; margin: 0;">
+                    Thank you for registering with us. You will now receive updates on the latest job openings! Hopes you find your dream job soon.
+                </p>
+            </td>
+        </tr>
+        
+        <tr>
+            <td align="center" style="padding: 0 30px 40px 30px;">
+                <table border="0" cellspacing="0" cellpadding="0" role="presentation">
+                    <tr>
+                        <td align="center" style="background-color: #1e3a8a; border-radius: 6px;">
+                            <a href="${ctaUrl}" target="_blank" style="font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: bold; color: #ffffff; text-decoration: none; padding: 15px 35px; border: 1px solid #3b82f6; border-radius: 6px; display: inline-block;">
+                                Explore Current Openings
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+  `;
+};
+
 export const verifyCode = async (req, res) => {
   const { email, code } = req.body;
 
@@ -152,21 +192,25 @@ export const verifyCode = async (req, res) => {
         .status(400)
         .json({ status: 0, message: "Email already verified" });
     }
-
     await db
       .collection("emails")
       .updateOne(
         { email: email },
         { $set: { verify: true, code: null, exp: null } }
       );
-    res
-      .status(200)
-      .json({ status: 1, message: "Email verified successfully" });
-    
-    // send welcome mail
-    const html = ``
-    await mailer(email, 'Greetings from ChakriLagbe', '', html)
-    return;
+    res.status(200).json({ status: 1, message: "Email verified successfully" });
+
+    // send welcome mail (async operation after response)
+    setImmediate(async () => {
+      try {
+        const html = welcomeMailTemplate();
+        await mailer(email, "Greetings from ChakriLagbe", "", html);
+        console.log(`Welcome email sent to ${email}`);
+      } catch (error) {
+        console.error(`Error sending welcome email to ${email}:`, error);
+      }
+    });
+    console.log(`Welcome email sent to ${email}`);
   } catch (error) {
     console.error("Error verifying code:", error);
     return res.status(500).json({ status: 0, message: "Error verifying code" });
@@ -195,74 +239,173 @@ const getNewJobs = async () => {
 
 const jobCardBuilder = (job) => {
   return `
-    <td align="center">
-      <table width="320" cellpadding="0" cellspacing="0" border="0" style="background-color: #c9d9f0; border-radius: 12px; padding: 20px; border: 1px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-family: Arial, sans-serif;">
-        <!-- Company Logo -->
+    <!-- Card Container -->
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation" style="max-width: 300px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin: 0 auto 20px auto;">
+        <!-- Image Header -->
         <tr>
-          <td align="center" style="padding-bottom: 15px;">
-            <img src="${
-              job.logo
-            }" alt="Company logo" width="100%" height="100" style="border-radius: 8px; background-color: #74b2e2; display: block;" />
-          </td>
-        </tr>
-
-        <!-- Job Title -->
-        <tr>
-          <td style="font-size: 20px; font-weight: bold; color: #2d3748; padding-bottom: 10px; text-align: center;">
-            ${job.title}
-          </td>
-        </tr>
-
-        <!-- Company & Location Tags -->
-        <tr>
-          <td align="center" style="padding-bottom: 10px;">
-            <table cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td style="padding-right: 5px;">
-                  <span style="display: inline-block; padding: 6px 12px; background-color: #93c5fd; color: #1e3a8a; font-weight: bold; border-radius: 6px; font-size: 12px;">${
-                    job.company
-                  }</span>
-                </td>
-                <td>
-                  <span style="display: inline-block; padding: 6px 12px; background-color: #93c5fd; color: #1e3a8a; font-weight: bold; border-radius: 6px; font-size: 12px;">${
-                    job.location
-                  }</span>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <!-- Job Details -->
-        <tr>
-          <td style="font-size: 14px; color: #333; text-align: left; padding-bottom: 15px;">
-            <ul style="padding-left: 20px; margin: 0;">
-              <li>Salary: ${job.salary}</li>
-              <li>Vacancy: ${job.vacancy}</li>
-              <li>Deadline: ${new Date(job.deadline).toLocaleDateString(
-                "en-US",
-                {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                }
-              )}</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr>
-          <td align="center">
-            <a href="${
-              job.url
-            }" target="_blank" style="display: inline-block; width: 100%; padding: 12px 0; background-color: #1d1160; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 6px; font-size: 14px;">
-              Apply Now
-            </a>
-          </td>
+            <td align="center" style="padding: 0; text-align: center; background-color: #6BAAE8; border-radius: 8px 8px 0 0;">
+                <img src="${job.logo}" alt="${job.company} Logo" width="150" height="auto" style="display: block; max-width: 150px; height: auto; min-height: 50px; padding: 20px 0; border: 0; object-fit: cover;">
+            </td>
         </tr>
         
-      </table>
-    </td>
+        <!-- Job Title -->
+        <tr>
+            <td style="padding: 20px 25px 10px 25px;">
+                <h2 style="margin: 0; color: #1E293B; font-family: Arial, Helvetica, sans-serif; font-size: 18px; font-weight: 600;">${
+                  job.title
+                }</h2>
+            </td>
+        </tr>
+        
+        <!-- Company & Location -->
+        <tr>
+            <td style="padding: 0 25px 15px 25px;">
+                <!-- Using a table for the tags to ensure they don't break weirdly -->
+                <table border="0" cellpadding="0" cellspacing="0" role="presentation">
+                    <tr>
+                        <td style="padding-right: 8px; padding-bottom: 5px;">
+                            <span style="display: inline-block; background-color: #E0EAFC; border-radius: 4px; padding: 6px 10px; font-size: 13px; color: #1E293B; font-family: Arial, Helvetica, sans-serif; font-weight: 500;">${
+                              job.company
+                            }</span>
+                        </td>
+                        <td style="padding-bottom: 5px;">
+                             <span style="display: inline-block; background-color: #E0EAFC; border-radius: 4px; padding: 6px 10px; font-size: 13px; color: #1E293B; font-family: Arial, Helvetica, sans-serif; font-weight: 500;">${
+                               job.location
+                             }</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+        <!-- Divider -->
+        <tr>
+            <td style="padding: 0 25px;">
+                <div style="height: 1px; background-color: #E2E8F0; line-height: 1px; font-size: 1px;">&nbsp;</div>
+            </td>
+        </tr>
+        
+        <!-- Job Details -->
+        <tr>
+            <td style="padding: 15px 25px 25px 25px;">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation">
+                    <tr>
+                        <td style="width: 33.33%; padding-right: 10px; vertical-align: top;">
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">SALARY</p>
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">${
+                              job.salary
+                            }</p>
+                        </td>
+                        <td style="width: 33.33%; padding-right: 10px; vertical-align: top;">
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">VACANCY</p>
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">${
+                              job.vacancy
+                            }</p>
+                        </td>
+                        <td style="width: 33.33%; vertical-align: top;">
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">DEADLINE</p>
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">${new Date(
+                              job.deadline
+                            ).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+  `;
+};
+
+const createEmailTemplate = (jobList, unsubscribeUrl, data) => {
+  return `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <title>Your Daily Job Summary</title>
+  </head>
+  <body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f4f4f4;">
+    <!-- Email Container -->
+    <table cellspacing="0" cellpadding="0" border="0" width="100%" role="presentation" style="background-color: #f4f4f4;">
+      <tr>
+        <td align="center">
+          <table cellspacing="0" cellpadding="0" border="0" width="100%" role="presentation" style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+            <!-- Header -->
+            <tr>
+                <td style="background-color: #3b82f6; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                    <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-family: Arial, Helvetica, sans-serif;">Chakri Lagbe</h1>
+                </td>
+            </tr>
+            
+            <!-- Greeting -->
+            <tr>
+                <td style="padding: 30px 30px 10px 30px; font-family: Arial, Helvetica, sans-serif;">
+                    <p style="margin: 0; font-size: 16px; line-height: 1.5; color: #2d3748;">There are new jobs posted in the last 24 hours! Here is a summary:</p>
+                </td>
+            </tr>
+            
+            <!-- Stats Section -->
+            <tr>
+                <td style="padding: 10px 30px 20px 30px;">
+                    <table cellspacing="0" cellpadding="0" border="0" width="100%" role="presentation" style="background-color: #e6f7ff; border-radius: 8px; border: 1px solid #90cdf4;">
+                        <tr>
+                            <td style="padding: 20px; text-align: center;">
+                                <h2 style="color: #1e3a8a; margin: 0 0 20px 0; font-size: 20px; font-family: Arial, Helvetica, sans-serif;">Last 24 Hours Summary</h2>
+                                <table cellspacing="0" cellpadding="0" border="0" width="100%" role="presentation" style="text-align: center;">
+                                    <tr>
+                                        <td width="50%" style="padding: 0 5px;">
+                                            <div style="padding: 10px;">
+                                                <p style="font-size: 32px; font-weight: bold; color: #1e40af; margin: 0; font-family: Arial, Helvetica, sans-serif;">${data.jobCount}</p>
+                                                <p style="font-size: 14px; color: #2d3748; margin: 5px 0 0 0; font-family: Arial, Helvetica, sans-serif;">New Jobs</p>
+                                            </div>
+                                        </td>
+                                        <td width="50%" style="padding: 0 5px;">
+                                            <div style="padding: 10px;">
+                                                <p style="font-size: 32px; font-weight: bold; color: #1e40af; margin: 0; font-family: Arial, Helvetica, sans-serif;">${data.companyCount}</p>
+                                                <p style="font-size: 14px; color: #2d3748; margin: 5px 0 0 0; font-family: Arial, Helvetica, sans-serif;">Companies</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            
+            <!-- Button -->
+            <tr>
+                <td style="padding: 10px 30px 30px 30px; text-align: center;">
+                    <a href="https://chakrilagbe.vercel.app" style="background-color: #3b82f6; border-radius: 4px; color: #ffffff; display: inline-block; font-size: 16px; font-weight: bold; padding: 14px 30px; text-decoration: none; font-family: Arial, Helvetica, sans-serif; width: 80%; max-width: 400px;">View All Job Postings</a>
+                </td>
+            </tr>
+            
+            <!-- Job Cards Section -->
+            <tr>
+                <td align="center" style="padding: 0 10px;">
+                  ${jobList}
+                </td>
+            </tr> 
+            
+            <!-- Footer -->
+            <tr>
+                <td style="background-color: #dbeafe; padding: 20px 30px; text-align: center; color: #2d3748; font-size: 14px; border-radius: 0 0 8px 8px;">
+                    <p style="margin: 0 0 10px 0; color: #2d3748; font-family: Arial, Helvetica, sans-serif;">&copy; 2025 Chakri Lagbe. All rights reserved.</p>
+                    <p style="margin: 0; color: #2d3748; font-family: Arial, Helvetica, sans-serif; line-height: 1.5;">You are receiving this email because you have subscribed to job alerts. If you prefer not to receive these emails, <a href=${unsubscribeUrl} style="color: #1e40af; text-decoration: underline;">unsubscribe here</a>.</p>
+                </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
   `;
 };
 
@@ -281,21 +424,17 @@ export const sendJobAlert = async () => {
       return;
     }
 
+    // Get the count of new jobs and companies
+    const jobCount = newJobs.length;
+    const companies = [...new Set(newJobs.map((job) => job.company))];
+    const companyCount = companies.length;
+    const data = {
+      jobCount: jobCount,
+      companyCount: companyCount,
+    };
+
     // build job card html
     const jobCards = newJobs.map((job) => jobCardBuilder(job)).join("");
-    let emailContent = `
-      <div style="font-family: Arial, sans-serif; padding: 20px;">
-        <h1 style="color: #333;">New Job Alerts</h1>
-        <p>Here are the latest job openings in last 24 hours:</p>
-        <hr style="border-top: 1px solid #ccc; margin: 20px 0;" width="100%></hr>
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f4; padding: 20px;">
-          <tr style="display: flex; flex-direction: column; justify-content: center; align-items: center; row-gap: 10px; padding-bottom: 10px;">
-            ${jobCards}
-          </tr>
-        </table>
-      </div>
-      <hr style="border-top: 1px solid #ccc; margin: 20px 0;" width="100%></hr>
-    `;
     const subject = "Job Alerts From ChakriLagbe";
 
     // Info for alert logging
@@ -305,14 +444,12 @@ export const sendJobAlert = async () => {
 
     // send email to all mailing list
     for (const subscriber of mailingList) {
-      // Unsubscribe Link addition
-      let html =
-        emailContent +
-        `
-      <footer style="font-size: 12px; color: #666; text-align: center; margin-top: 20px;">
-        You are receiving this email because you have subscribed to ${process.env.FRONTEND_URL}. If you wish to unsubscribe, please click <a href="${process.env.FRONTEND_URL}/unsubscribe?id=${subscriber._id}" style="color: #1d1160;">here</a>.
-      </footer>
-      `;
+      // Building html with unsubscribe Link addition
+      let html = createEmailTemplate(
+        jobCards,
+        `${process.env.FRONTEND_URL}/unsubscribe?id=${subscriber._id}`,
+        data
+      );
       // sending mail
       try {
         await mailer(subscriber.email, subject, "", html);
