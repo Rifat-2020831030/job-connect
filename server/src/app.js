@@ -22,7 +22,7 @@ jobSearcherCron.start();
 jobAlertSchedule.start();
 
 const corsOption = {
-  origin: [process.env.origin],
+  origin: ["https://chakrilagbe.vercel.app", "server-health-tau.vercel.app", "163.47.36.226"],
   method: ["GET", "POST"],
 };
 
