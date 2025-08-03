@@ -22,7 +22,7 @@ jobSearcherCron.start();
 jobAlertSchedule.start();
 
 const corsOption = {
-  origin: process.env.origin,
+  origin: [process.env.origin],
   method: ["GET", "POST"],
 };
 
