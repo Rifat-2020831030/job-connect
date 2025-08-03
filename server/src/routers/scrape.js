@@ -9,6 +9,7 @@ const auth = (req, res, next)=> {
     if (!token || token !== process.env.SCRAPE_TOKEN) {
         return res.status(403).json({ message: 'Unauthorized request' });
     }
+    next();
 }
 
 router.get('/',auth, async (req, res) => {

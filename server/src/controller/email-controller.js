@@ -159,9 +159,14 @@ export const verifyCode = async (req, res) => {
         { email: email },
         { $set: { verify: true, code: null, exp: null } }
       );
-    return res
+    res
       .status(200)
       .json({ status: 1, message: "Email verified successfully" });
+    
+    // send welcome mail
+    const html = ``
+    await mailer(email, 'Greetings from ChakriLagbe', '', html)
+    return;
   } catch (error) {
     console.error("Error verifying code:", error);
     return res.status(500).json({ status: 0, message: "Error verifying code" });

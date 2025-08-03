@@ -2,6 +2,7 @@ import { CronJob } from "cron";
 import { spawn } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
+import mailer from "./src/services/mail-service";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -9,8 +10,8 @@ const SCRAPER_DIR = path.join(__dirname, "job-searcher");
 
 
 const jobSearcherCron = new CronJob(
-  "0 2,9,17 * * *", // cronTime
-  () => {
+  "0 0-23/4 * * *", // cronTime
+  async () => {
     runScraper();
   },
   null, // onComplete
@@ -19,8 +20,9 @@ const jobSearcherCron = new CronJob(
 );
 
 
-const runScraper = () => {
+const runScraper = async () => {
   console.log("Starting job searcher script...");
+  await mailer('hasan1096@protonmail.com', 'Job Searcher Script Started', `The job searcher script has started running. Server Time :${new Date().toLocaleString()}`);
   return new Promise((resolve, reject) => {
     const scriptPath = path.join(SCRAPER_DIR, "script-runner.py");
     const pythonProcess = spawn("python", [scriptPath], {
