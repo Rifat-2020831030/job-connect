@@ -4,7 +4,7 @@ import hashlib
 import json
 from datetime import datetime
 
-class Spider5(scrapy.Spider):
+class JobSpider(scrapy.Spider):
     name = 'spider5'
     allowed_domains = ['vivasoftltd.com']
     start_urls = ['https://vivasoftltd.com/career/']
