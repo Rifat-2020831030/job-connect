@@ -130,6 +130,7 @@ from jobsearcher.spiders.bs23_job_spider import JobSpider as BS23JobSpider
 from jobsearcher.spiders.dsi_job_spider import JobSpider as DSIJobSpider
 from jobsearcher.spiders.optimizely_job_spider import JobSpider as OptimizelyJobSpider
 from jobsearcher.spiders.spider4 import JobSpider as CefaloJobSpider
+from jobsearcher.spiders.spider6 import JobSpider as OllyoJobSpider
 
 try:
     # Load environment variables from .env file in the root directory
@@ -155,6 +156,9 @@ try:
                     
     logging.info("Adding Cefalo job spider to the queue")
     process.crawl(CefaloJobSpider)
+                    
+    logging.info("Adding Ollyo job spider to the queue")
+    process.crawl(OllyoJobSpider)
 
     # Start the crawling process
     logging.info("Starting the crawling process. Spiders will run one by one.")
@@ -218,6 +222,7 @@ finally:
             from jobsearcher.spiders.dsi_job_spider import JobSpider as DSIJobSpider
             from jobsearcher.spiders.optimizely_job_spider import JobSpider as OptimizelyJobSpider
             from jobsearcher.spiders.spider4 import JobSpider as CefaloJobSpider
+            from jobsearcher.spiders.spider6 import JobSpider as OllyoJobSpider
             dotenv_path = Path(__file__).resolve(
             ).parent.parent / '.env'
             load_dotenv(dotenv_path)
@@ -238,6 +243,9 @@ finally:
 
             logging.info("Adding Cefalo job spider to the queue")
             process.crawl(CefaloJobSpider)
+
+            logging.info("Adding Ollyo job spider to the queue")
+            process.crawl(OllyoJobSpider)
 
             # Start the crawling process
             logging.info(

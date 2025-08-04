@@ -1,8 +1,8 @@
 const JobCard = ({ job }) => {
   // Helper function to check if job is recent (within 3 days)
   const isRecent = () => {
-    if (!job.timeStamp) return false;
-    const jobDate = new Date(job.timeStamp);
+    if (!job.timestamp) return false;
+    const jobDate = new Date(job.timestamp);
     const currentDate = new Date();
     const diffTime = currentDate - jobDate;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
@@ -24,7 +24,7 @@ const JobCard = ({ job }) => {
           className="w-full h-full object-contain object-center rounded-t-xl"
         />
         {isRecent() && (
-          <span className="text-xs absolute top-4 left-4 px-2 py-1 bg-blue-500 text-white font-bold rounded-lg">
+          <span className="text-xs absolute top-4 left-4 px-2 py-1 bg-[#1d1160] text-white font-bold rounded-lg">
             NEW
           </span>
         )}
@@ -43,6 +43,7 @@ const JobCard = ({ job }) => {
       <div className="flex flex-col gap-1 ml-4 px-5">
         <li>Salary: {job.salary || "Not Specified"}</li>
         <li>Vacancy: {job.vacancy || "Not Specified"}</li>
+        <li>Experience: {job.experience || "Not Specified"}</li>
         <li>Deadline: {deadline || "Not Specified"}</li>
       </div>
       {/* to cover remaining space */}

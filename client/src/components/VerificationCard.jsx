@@ -44,14 +44,15 @@ const VerificationCard = ({
   };
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 p-4">
-      <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md mx-auto text-center">
-        <p className="text-gray-600 mb-4">
+      <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg mx-auto text-center">
+        <p className="text-gray-600 mb-4 text-lg">
           Please enter the verification code sent to your email.
         </p>
+        <p className="text-red-400 text-sm mb-4">Check your spam folder as well</p>
         <input
           type="text"
           placeholder="Enter verification code"
-          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 w-full"
+          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 w-1/2 min-w-fit"
           value={code}
           onChange={(e) => setCode(e.target.value)}
           required

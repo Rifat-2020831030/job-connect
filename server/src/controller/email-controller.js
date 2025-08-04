@@ -63,7 +63,6 @@ export const subscribeEmail = async (req, res) => {
     const subject = "Email Verification Code";
     const html = `<p>Your verification code is: <strong>${code}</strong> and will expire in <strong>24 hours</strong>.</br> If you did not request this, please ignore this email.</p>`;
     const response = await mailer(email, subject, "", html);
-    console.log("Email sent response:", response);
     // if (!response) {
     //   return res
     //     .status(500)
@@ -92,8 +91,7 @@ export const unsubscribeEmail = async (req, res) => {
     }
     const response = await db
       .collection("emails")
-      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { verify: false } });
-
+      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { verify: false, unsubscriptionTime: new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }) } });
 
     if (!response) {
       return res.status(404).json({ status: 0, message: "Email not found" });
@@ -194,13 +192,18 @@ export const verifyCode = async (req, res) => {
         .status(400)
         .json({ status: 0, message: "Email already verified" });
     }
-    await db
+    const response = await db
       .collection("emails")
       .updateOne(
-        { email: email },
-        { $set: { verify: true, code: null, exp: null } }
+      { email: email },
+      { $set: { verify: true, code: null, exp: null, subscriptionTime: new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }) } }
       );
-    res.status(200).json({ status: 1, message: "Email verified successfully" });
+    if(response.acknowledged) {
+      res.status(200).json({ status: 1, message: "Email verified successfully" });
+    }
+    else {
+      res.status(500).json({ status: 0, message: "Failed to verify email. Please try again later." });
+    }
 
     // send welcome mail (async operation after response)
     setImmediate(async () => {
