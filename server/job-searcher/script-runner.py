@@ -40,6 +40,7 @@ def install_requirements():
     required_packages = {
         "scrapy": "python3-scrapy",
         "pymongo": "python3-pymongo",
+        "python-dotenv": "python3-dotenv",
     }
 
     try:
@@ -225,8 +226,8 @@ finally:
             from jobsearcher.spiders.dsi_job_spider import JobSpider as DSIJobSpider
             from jobsearcher.spiders.optimizely_job_spider import JobSpider as OptimizelyJobSpider
             from jobsearcher.spiders.spider4 import JobSpider as CefaloJobSpider
-            # from jobsearcher.spiders.spider5 import JobSpider as VivasoftJobSpider
-            # from jobsearcher.spiders.spider6 import JobSpider as OllyoJobSpider
+            from jobsearcher.spiders.spider5 import JobSpider as VivasoftJobSpider
+            from jobsearcher.spiders.spider6 import JobSpider as OllyoJobSpider
             dotenv_path = Path(__file__).resolve(
             ).parent.parent / '.env'
             load_dotenv(dotenv_path)
