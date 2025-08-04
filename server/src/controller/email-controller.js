@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 
 import { getDB } from "../db/database.js";
 import mailer from "../services/mail-service.js";
+import { getLocalTime } from "../utils/local-time.js";
 
 export const subscribeEmail = async (req, res) => {
   try {
@@ -91,7 +92,7 @@ export const unsubscribeEmail = async (req, res) => {
     }
     const response = await db
       .collection("emails")
-      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { verify: false, unsubscriptionTime: new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }) } });
+      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { verify: false, unsubscriptionTime: getLocalTime() } });
 
     if (!response) {
       return res.status(404).json({ status: 0, message: "Email not found" });
@@ -196,7 +197,7 @@ export const verifyCode = async (req, res) => {
       .collection("emails")
       .updateOne(
       { email: email },
-      { $set: { verify: true, code: null, exp: null, subscriptionTime: new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }) } }
+      { $set: { verify: true, code: null, exp: null, subscriptionTime: getLocalTime() } }
       );
     if(response.acknowledged) {
       res.status(200).json({ status: 1, message: "Email verified successfully" });
@@ -468,7 +469,7 @@ export const sendJobAlert = async () => {
 
     // log the report
     await db.collection("job-alerts-report").insertOne({
-      timestamp: new Date().toISOString(),
+      timestamp: getLocalTime(),
       totalSubscribers: mailingList.length,
       totalJobs: newJobs.length,
       failedEmails: failedEmails,
