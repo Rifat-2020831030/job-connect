@@ -178,8 +178,9 @@ try:
     log_collection = db['scraper-log']
                     
     try:
+        utc_plus_6 = datetime.timezone(datetime.timedelta(hours=6))
         log_entry = {
-            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "timestamp": datetime.datetime.now(utc_plus_6),
             "run_status": "success"
         }
         
@@ -193,8 +194,9 @@ except Exception as e:
     client = MongoClient(mongo_uri)
     db = client[mongo_db]
     log_collection = db['scraper-log']
+    utc_plus_6 = datetime.timezone(datetime.timedelta(hours=6))
     log_entry = {
-        "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "timestamp": datetime.datetime.now(utc_plus_6),
         "run_status": "fail",
         "error": str(e)
     }
@@ -269,9 +271,9 @@ finally:
                 client = MongoClient(mongo_uri)
                 db = client[mongo_db]
                 log_collection = db['scraper-log']
-
+                utc_plus_6 = datetime.timezone(datetime.timedelta(hours=6))
                 log_entry = {
-                    "timestamp": datetime.datetime.now(),
+                    "timestamp": datetime.datetime.now(utc_plus_6),
                     "run_status": "success"
                 }
 
