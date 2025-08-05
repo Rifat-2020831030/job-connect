@@ -23,6 +23,7 @@ const Home = () => {
     totalCompanies: "0",
     totalLocations: "0",
   });
+  const [lastUpdated, setLastUpdated] = useState("");
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -46,7 +47,26 @@ const Home = () => {
         });
       }
     };
+    const fetchLastUpdated = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/stat/last-update`
+        );
+        if (response.status === 200) {
+          const lastUpdatedDate = new Date(response.data.data.timestamp).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+          });
+          setLastUpdated(lastUpdatedDate);
+        }
+      } catch (error) {
+        console.error("Error fetching last updated scraping date:", error);
+      }
+    }
     fetchStats();
+    fetchLastUpdated();
   }, []);
 
   const handleSearch = () => {
@@ -95,7 +115,7 @@ const Home = () => {
             {/* Statistics Section */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
               <Stat
-                info="Total Jobs Available"
+                info="Total Jobs"
                 number={stats.totalJobs}
                 Icon={<BriefcaseIcon className="w-8 h-8 text-white" />}
               />
@@ -203,18 +223,21 @@ const Home = () => {
         </div>
 
         {/* Job List Section - Separate Container */}
-        <div className="bg-white/50 backdrop-blur-sm py-10" id="job-list">
-          <div className="max-w-7xl lg:max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <JobList
-              isSearching={isSearching}
-              setIsSearching={setIsSearching}
-              searchQuery={searchQuery}
-              sortByValue={sortBy}
-            />
+          <div className="bg-white/50 backdrop-blur-sm py-10" id="job-list">
+            <div className="max-w-7xl lg:max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+              <JobList
+                isSearching={isSearching}
+                setIsSearching={setIsSearching}
+                searchQuery={searchQuery}
+                sortByValue={sortBy}
+              />
+            </div>
+            <div className="flex justify-end px-4 sm:px-6 lg:px-8 m-2">
+              <span className="text-gray-800 bg-slate-400 italic text-xs p-0.5 sm:text-xs">Last Updated: {lastUpdated || "Not Available"}</span>
+            </div>
           </div>
-        </div>
 
-        {/* Newsletter section */}
+          {/* Newsletter section */}
         <EmailCard />
       </div>
     </div>

@@ -6,7 +6,7 @@ const JobCard = ({ job }) => {
     const currentDate = new Date();
     const diffTime = currentDate - jobDate;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
-    return diffDays <= 5;
+    return diffDays <= 3;
   };
 
   const deadline = new Date(job.deadline).toLocaleDateString("en-US", {
