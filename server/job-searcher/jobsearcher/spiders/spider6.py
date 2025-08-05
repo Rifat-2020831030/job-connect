@@ -4,7 +4,7 @@ import hashlib
 import json
 from datetime import datetime, timedelta
 
-class Spider6(scrapy.Spider):
+class JobSpider(scrapy.Spider):
     name = 'spider6'
     allowed_domains = ['jobs.ollyo.com']
     start_urls = ['https://jobs.ollyo.com/']

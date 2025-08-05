@@ -1,4 +1,6 @@
 const { getDB } = require("../db/database.js");
+const { get } = require("../routers/jobs.js");
+const {getLocalTime} = require("../utils/local-time.js");
 
 const serverHealth = async (_, res) => {
   try {
@@ -7,7 +9,7 @@ const serverHealth = async (_, res) => {
       return res.status(503).json({
         status: 0,
         message: "Database instance not available",
-        timestamp: new Date().toISOString()
+        timestamp: getLocalTime()
       });
     const serverStatus = await db.command({ ping: 1 });
     if (serverStatus.ok !== 1) {
@@ -16,14 +18,14 @@ const serverHealth = async (_, res) => {
         .json({
           status: 0,
           message: "Database ping failed",
-          timestamp: new Date().toISOString()
+          timestamp: getLocalTime()
         });
     }
 
     const healthCheck = {
       status: 1,
       message: "Server is healthy",
-      timestamp: new Date().toISOString(),
+      timestamp: getLocalTime()
     };
 
     res.status(200).json(healthCheck);
@@ -31,7 +33,7 @@ const serverHealth = async (_, res) => {
     console.error("Error checking server health:", error);
     return res
       .status(503)
-      .json({ status: 0, message: 'Error: '+error.message, timestamp: new Date().toISOString() });
+      .json({ status: 0, message: 'Error: '+error.message, timestamp: getLocalTime() });
   }
 };
 

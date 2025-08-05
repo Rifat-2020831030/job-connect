@@ -40,6 +40,14 @@ const limiter = rateLimit({
   max: 200,
   message: "Too many requests, please try again later.",
   standardHeaders: true,
+  skip: (req) => req.path === '/health', // exclude health checks
+});
+
+const healthLimit = rateLimit({
+  windowMs: 60*1000, // 1 minute
+  max: 200,
+  message: "Too many requests, please try again later.",
+  standardHeaders: true,
 });
 
 app.use(cors(corsOption));
@@ -51,7 +59,7 @@ app.get("/", (req, res, next) => {
   res.send("The server is running");
 });
 
-app.get("/health", serverHealth);
+app.get("/health", healthLimit, serverHealth);
 
 app.use("/api/jobs", jobsRouter);
 app.use("/api/stat", jobsStat);
