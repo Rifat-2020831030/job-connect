@@ -73,14 +73,14 @@ const healthLimit = rateLimit({
   standardHeaders: true,
 });
 
-app.use(cors(corsOption));
-app.use(limiter);
-app.use(express.json());
-app.use(compression());
-
 app.get("/", (req, res, next) => {
   res.send("The server is running");
 });
+
+app.use("/api", cors(corsOption));
+app.use(limiter);
+app.use(express.json());
+app.use(compression());
 
 app.get("/health", healthLimit, serverHealth);
 
