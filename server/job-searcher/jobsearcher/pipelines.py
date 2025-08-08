@@ -7,6 +7,7 @@
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 import pymongo
+from datetime import datetime, timedelta
 
 
 class JobsearcherPipeline:
@@ -42,10 +43,14 @@ class JobsearcherPipeline:
             if existing_item:
                 # If the item already exists, update it
                 spider.logger.info(f"Item already exists: {item['hashValue']}, updating isUpdated status.")
-                self.mongo_collection.update_one(
-                    {'hashValue': item['hashValue']},
-                    {'$set': {'isUpdated': False}}
-                )
+                # Update isUpdated status to False if 24 hours have passed since scraping
+                timestamp = existing_item.get('timestamp')
+                last_updated = datetime.fromisoformat(timestamp)
+                if datetime.now() - last_updated > timedelta(hours=24):
+                    self.mongo_collection.update_one(
+                        {'hashValue': item['hashValue']},
+                        {'$set': {'isUpdated': False}}
+                    )
             else:
                 # If the item does not exist, insert it
                 self.mongo_collection.insert_one(item_dict)
