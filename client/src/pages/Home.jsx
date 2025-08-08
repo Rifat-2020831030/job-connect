@@ -75,7 +75,7 @@ const Home = () => {
       {/* Header Section */}
       <div className="relative overflow-hidden w-full">
         {/* Background Pattern */}
-        <div className="absolute inset-0 bg-grid-pattern opacity-5 z-0"></div>
+        <div className="absolute inset-0 bg-grid-pattern opacity-10 z-0"></div>
 
         {/* Main Content Container */}
         <div className="relative z-10">
@@ -83,13 +83,16 @@ const Home = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-16">
             {/* Site Name with Gradient */}
             <div className="text-center mb-16">
-              <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
+              <h1
+                className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-3 py-2"
+                style={{ lineHeight: "1.1" }}
+              >
                 ChakriLagbe
               </h1>
-              {/* <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Discover your dream job from thousands of opportunities across top
-                companies worldwide
-              </p> */}
+              <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Discover your dream job from thousands of opportunities across
+                top companies nationwide
+              </p>
             </div>
 
             {/* Statistics Section */}
