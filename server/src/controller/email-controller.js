@@ -226,14 +226,11 @@ export const verifyCode = async (req, res) => {
 const getNewJobs = async () => {
   try {
     const db = await getDB();
-    const jobList = await db.collection("jobs").find({}).toArray();
+    // Get jobs that are updated in the last 24 hours
+    const jobList = await db.collection("jobs").find({'isUpdated': true}).toArray();
 
     const newJobs = jobList.filter((job) => {
-      const jobDate = new Date(job.timestamp);
-      const currentDate = new Date();
-      const arg1 = currentDate - jobDate <= 24 * 60 * 60 * 1000; // last 24 hours
-      const arg2 = new Date(job.deadline) >= currentDate; // deadline not passed
-      return arg1 && arg2;
+      return new Date(job.deadline) >= currentDate; // deadline not passed
     });
 
     return newJobs;

@@ -40,6 +40,8 @@ class JobSpider(scrapy.Spider):
             "//div[contains(@class, 'elementor-widget-text-editor')]//p[contains(text(), '-')]/text()").get()
         if deadline:
             deadline = deadline.strip()
+            # deadline = datetime.strptime(deadline, '%d %b, %Y').isoformat() if deadline else None
+            deadline = datetime.strptime(deadline, '%d-%m-%Y').strftime('%Y-%m-%dT%H:%M:%S')
 
         salary = response.xpath(
             "//div[contains(text(), 'Salary')]/following::div[contains(@class, 'elementor-widget-container')][1]//text()[normalize-space() and contains(., 'k') and contains(., '-')]").get()

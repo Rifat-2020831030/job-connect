@@ -39,7 +39,7 @@ export const runScraper = () => {
 export const getLastScrapeTime = async (req, res) => {
   try {
     const db = await getDB();
-    const lastScrape = await db.collection("scraper-log").findOne({}, { sort: { timestamp: -1 } });
+    const lastScrape = await db.collection("scraper-log").findOne({'run_status': 'success'}, { sort: { timestamp: -1 } });
     if(!lastScrape) {
       return res.status(404).json({status: 0, message: "No data found"})
     }

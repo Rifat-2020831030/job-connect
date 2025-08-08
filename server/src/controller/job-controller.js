@@ -17,7 +17,7 @@ export const getJobs = async (req, res) => {
       .skip(Number(offset))
       .limit(Number(limit))
       .toArray();
-
+      
     // Filter jobs based on deadline
     const filteredJobs = jobs.filter((job) => {
       if (!job.deadline) return true; // If no deadline, include the job
