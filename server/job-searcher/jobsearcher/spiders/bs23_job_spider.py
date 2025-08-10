@@ -81,9 +81,9 @@ class JobSpider(scrapy.Spider):
 
         item['logo'] = 'https://jpafrpxxjrkqeemswaqr.supabase.co/storage/v1/object/sign/image-storage/Brain-Station-Logo.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jMDEwMWQzYS04MTNmLTQxZDQtYjAwNC04ZDlkMWY2OTVhM2EiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZS1zdG9yYWdlL0JyYWluLVN0YXRpb24tTG9nby53ZWJwIiwiaWF0IjoxNzUzNjg2MTYwLCJleHAiOjE4MTY3NTgxNjB9.v492lC4pO1LHbitTd9EpYX2PLaW5M4y3ZvexFImKSZg'
         item['hashValue'] = hashValue
-        # item['isUpdated'] = True
+        item['isUpdated'] = True
         # setting timestamp after hashvalue to stop the timestamp from changing the hash value
-        # item['timestamp'] = datetime.now().isoformat()
+        item['timestamp'] = datetime.now().isoformat()
 
         yield item
 

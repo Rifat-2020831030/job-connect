@@ -93,17 +93,15 @@ class JobsearcherPipeline:
     
     def set_value(self, output, item):
         if output:
-            item['title'] = output.get('title', item.get('title'))
-            item['languages'] = output.get('languages')
-            item['skills'] = output.get('skills')
-            item['experience'] = output.get('experience')
-            item['experience_level'] = output.get('experience_level')
-            item['salary_min'] = output.get('salary_min')
-            item['salary_max'] = output.get('salary_max')
-            item['deadline'] = output.get('deadline')
-            item['location'] = output.get('location')
-            item['job_type'] = output.get('job_type')
-            item['vacancy'] = 0 if output.get('vacancy') == -1 else output.get('vacancy')
-            item['benefits'] = output.get('benefits')
+            # Updating fields only if they don't already exist or are empty
+            fields_to_update = [
+                'title', 'languages', 'skills', 'experience', 'experience_level',
+                'salary_min', 'salary_max', 'deadline', 'location', 'job_type',
+                'vacancy', 'benefits'
+            ]
+            
+            for field in fields_to_update:
+                if not item.get(field) and output.get(field):
+                    item[field] = output[field]
 
 
