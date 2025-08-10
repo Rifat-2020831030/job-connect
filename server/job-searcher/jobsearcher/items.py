@@ -17,6 +17,7 @@ class JobsearcherItem(scrapy.Item):
     location = scrapy.Field()
     job_type = scrapy.Field()
     deadline = scrapy.Field()
+    salary = scrapy.Field()
     salary_min = scrapy.Field()
     salary_max = scrapy.Field()
     company = scrapy.Field()

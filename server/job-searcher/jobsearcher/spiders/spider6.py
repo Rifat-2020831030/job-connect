@@ -23,47 +23,44 @@ class JobSpider(scrapy.Spider):
         title = ' '.join([text.strip() for text in title if text.strip()])
         salary = response.css('h2.heading4.job-salary::text').get().strip()
         location = response.css('div.job-details__top-quick-info--item:contains("Location") span::text').get().strip()
+        job_type = response.css('div.job-details__top-quick-info--item:contains("Job Type") span::text').get().strip()
         experience = response.css('div.job-details__top-quick-info--item:contains("Experience") span::text').get().strip()
         # Extract all text content including headings from job details
-        details_section = response.css('div.job-details__content-desc')
-        details_parts = []
-        
-        for element in details_section.css('p, h3, ul'):
-            if element.css('h3'):
-            # Extract heading text
-                heading = element.css('::text').get()
-                details_parts.append(heading.strip())
-            elif element.css('p'):
-            # Extract paragraph text
-                paragraph = ' '.join(element.css('::text').getall())
-                if paragraph.strip():
-                    details_parts.append(paragraph.strip())
-            elif element.css('ul'):
-            # Extract list items
-                list_items = element.css('li::text').getall()
-                if list_items:
-                    list_text = ' '.join([item.strip() for item in list_items if item.strip()])
-                    details_parts.append(list_text)
-        
-        details = '; '.join(details_parts)
+        details = response.css('div.job-details__content *::text').getall()
+        details = [text.strip() for text in details if text.strip()][:-1]
+        details[0] += f"; Title: {title}; Salary: {salary}; Location: {location}; Job Type: {job_type}; Experience: {experience}"
+        details = ' '.join(details)
 
-        benefits = response.css('div.basics-benefits span::text').getall()
-        benefits = [benefit.strip() for benefit in benefits if benefit.strip()]
-        details += '; Benefits: ' + ', '.join(benefits)
-        logo = 'https://jpafrpxxjrkqeemswaqr.supabase.co/storage/v1/object/sign/image-storage/ollyo.svg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jMDEwMWQzYS04MTNmLTQxZDQtYjAwNC04ZDlkMWY2OTVhM2EiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZS1zdG9yYWdlL29sbHlvLnN2ZyIsImlhdCI6MTc1NDI2MDIzOSwiZXhwIjoxODE3MzMyMjM5fQ.cQiKQ3GCSIKdwLnXiemLeabEMrqG_ubjdOUgeBILZpw'
+        # for element in details_section.css('p, h3, ul'):
+        #     if element.css('h3'):
+        #     # Extract heading text
+        #         heading = element.css('::text').get()
+        #         details_parts.append(heading.strip())
+        #     elif element.css('p'):
+        #     # Extract paragraph text
+        #         paragraph = ' '.join(element.css('::text').getall())
+        #         if paragraph.strip():
+        #             details_parts.append(paragraph.strip())
+        #     elif element.css('ul'):
+        #     # Extract list items
+        #         list_items = element.css('li::text').getall()
+        #         if list_items:
+        #             list_text = ' '.join([item.strip() for item in list_items if item.strip()])
+        #             details_parts.append(list_text)
+        
+        # details = '; '.join(details_parts)
 
-        vacancy = "Not specified"
-        company = "Ollyo"
-        # add 15 days to the current date for the deadline
+        # benefits = response.css('div.basics-benefits span::text').getall()
+        # benefits = [benefit.strip() for benefit in benefits if benefit.strip()]
+        # details += '; Benefits: ' + ', '.join(benefits)
+
 
         item = items.JobsearcherItem()
         item['title'] = title
         item['url'] = response.url
-        item['company'] = company
-        item['logo'] = logo
-        item['location'] = location
-        item['vacancy'] = vacancy
-        item['salary'] = salary
+        item['company'] = "Ollyo"
+        item['location'] = location 
+        item['salary'] = salary or 'Not specified'
         item['experience'] = experience
         item['details'] = details
 
@@ -71,9 +68,8 @@ class JobSpider(scrapy.Spider):
         hashValue = json.dumps(payload, sort_keys=True).encode('utf-8')
         item['hashValue'] = hashlib.sha256(hashValue).hexdigest()
 
+        logo = 'https://jpafrpxxjrkqeemswaqr.supabase.co/storage/v1/object/sign/image-storage/ollyo.svg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jMDEwMWQzYS04MTNmLTQxZDQtYjAwNC04ZDlkMWY2OTVhM2EiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZS1zdG9yYWdlL29sbHlvLnN2ZyIsImlhdCI6MTc1NDI2MDIzOSwiZXhwIjoxODE3MzMyMjM5fQ.cQiKQ3GCSIKdwLnXiemLeabEMrqG_ubjdOUgeBILZpw'
         # as the deadline is not fixed, so keep it away from hashing to avoid changes
-        deadline = (datetime.now() + timedelta(days=15)).strftime('%Y-%m-%dT%H:%M:%S')
-        item['deadline'] = deadline
         item['timestamp'] = datetime.now().isoformat()
         item['isUpdated'] = True
         yield item
