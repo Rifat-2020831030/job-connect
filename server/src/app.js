@@ -46,7 +46,7 @@ const corsOption = {
       console.error(`CORS blocked origin: ${origin}`);
       callback(
         new Error(
-          `Access denied: Origin '${origin}' not allowed by CORS policy`
+          `Access denied: Origin '${origin}' not allowed.`
         ),
         false
       );

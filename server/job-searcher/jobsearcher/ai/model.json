@@ -1,0 +1,77 @@
+{
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Title of the job post"
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of programming languages and frameworks required for the job"
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of skills required for the job. Ignore same type skills."
+    },
+    "experience": {
+      "type": "number",
+      "description": "Experience level required for the job (in years)"
+    },
+    "experience_level": {
+      "type": "string",
+      "description": "Experience level required for the job (e.g., Junior{0-2y}, Mid{3-5y}, Senior{5+y})"
+    },
+    "salary_min": {
+      "type": "number",
+      "description": "Minimum salary offered for the job"
+    },
+    "salary_max": {
+      "type": "number",
+      "description": "Maximum salary offered for the job"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Deadline for the job application in ISO 8601 format (YYYY-MM-DD). If not directly found, look for any date in the job post."
+    },
+    "location": {
+      "type": "string",
+      "description": "Location of the job"
+    },
+    "job_type": {
+      "type": "string",
+      "enum": ["Onsite", "Remote", "Hybrid", "Not Specified"],
+      "description": "Type of job (e.g., Onsite, Remote, Hybrid)"
+    },
+    "vacancy": {
+      "type": "number",
+      "description": "Number of vacancies available for the job. Directly mentioned in the job posting."
+    },
+    "benefits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of benefits offered for the job in short form. No need to include generic one like 'Other facilities'."
+    }
+  },
+  "required": [
+    "title",
+    "languages",
+    "skills",
+    "experience",
+    "experience_level",
+    "salary_min",
+    "salary_max",
+    "deadline",
+    "location",
+    "job_type",
+    "vacancy"
+  ]
+}
