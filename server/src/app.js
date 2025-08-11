@@ -13,6 +13,7 @@ const scrapeRouter = require("./routers/scrape");
 const { jobSearcherCron } = require("../spider-runner");
 const { jobAlertSchedule } = require("./services/job-alert");
 const serverHealth = require("./controller/server-health");
+const {source} = require('./utils/source');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -84,7 +85,13 @@ app.use(compression());
 
 app.get("/health", healthLimit, serverHealth);
 
-app.use("/api/jobs", jobsRouter);
+app.use(limiter);
+app.use(express.json());
+app.use(compression());
+
+app.get("/health", healthLimit, serverHealth);
+
+app.use("/api/jobs", source, jobsRouter);
 app.use("/api/stat", jobsStat);
 app.use("/api/email", emailRouter);
 app.use("/api/scrape", scrapeRouter);
