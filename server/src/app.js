@@ -34,8 +34,9 @@ const corsOption = {
     // Disallow requests with no origin 
     if (!origin) {
       callback(
-        new Error("CORS Error: No origin provided"),
-        false
+        // new Error("CORS Error: No origin provided"),
+        null,
+        true
       );
       return;
     }
@@ -54,7 +55,7 @@ const corsOption = {
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true, // Allow cookies if needed
   optionsSuccessStatus: 200,
 };
@@ -78,7 +79,7 @@ app.get("/", (req, res, next) => {
   res.send("The server is running");
 });
 
-app.use("/api", cors(corsOption));
+// app.use("/api", cors(corsOption));
 app.use(limiter);
 app.use(express.json());
 app.use(compression());
