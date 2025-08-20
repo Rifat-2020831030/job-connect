@@ -38,7 +38,7 @@ const VerificationCard = ({
       setAlertMessage(errorMessage);
       setAlertType("error");
       setShowAlert(true);
-      // Keep the verification modal open so they can try again
+      // Keep the verification modal open so can try again
       setShowVerification(true);
     }
   };

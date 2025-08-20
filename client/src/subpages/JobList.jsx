@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import JobCard from "../components/JobCard";
+import ModernJobCard from "../components/job/JobCard";
 import Pagination from "../components/Pagination";
 
 const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue }) => {
@@ -23,12 +23,25 @@ const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue }) => {
       const utm_source = searchParams.get("utm_source");
       searchParams.delete("utm_source");
       setSearchParams(searchParams);
-      const response = await axios.get(
-        import.meta.env.VITE_BACKEND_URL + `/jobs?utm_source=${utm_source}`
-      );
+      // build the url
+      let url = import.meta.env.VITE_BACKEND_URL + `/jobs?limit=10`;
+      utm_source && (url += `?utm_source=${utm_source}`);
+      if (!searchQuery && sortByValue === "relevance") {
+        setFilteredJobs(jobs.slice(0, 12));
+        setCurrentPage(1);
+        setTotalPages(Math.ceil(totalJobs / jobsPerPage) || 1);
+        return;
+      } else if (isSearching && searchQuery) {
+        const query = searchQuery.toLowerCase();
+        url += `&search=${query}`;
+        setIsSearching(false); // Reset search state after setting URL
+      }
+
+      // Fetch result
+      const response = await axios.get(url);
       if (response.status == 200) {
         setJobs(response.data.data);
-        setFilteredJobs(response.data.data.slice(0, 12)); // Initialize with first 12 jobs
+        setFilteredJobs(response.data.data); // Initialize with all jobs
         setTotalJobs(response.data.total);
         setTotalPages(Math.ceil(response.data.total / jobsPerPage) || 1); // total pages to show = totaljobs / jobsPerPage
       }
@@ -136,10 +149,10 @@ const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue }) => {
   return (
     <div className="space-y-8">
       {/* Jobs Grid */}
-      <div className="grid grid-cols-1 mx-auto md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-md:place-items-center max-md:justify-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-md:place-items-center max-md:justify-center">
         {loading ? (
-            // Loading skeleton
-            Array.from({ length: 4 }).map((_, index) => (
+          // Loading skeleton
+          Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
               className="bg-white p-6 rounded-lg shadow-md animate-pulse w-full max-w-sm"
@@ -149,24 +162,26 @@ const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue }) => {
               <div className="h-3 bg-gray-400 rounded mb-4"></div>
               <div className="h-8 bg-gray-400 rounded"></div>
             </div>
-            ))
-          ) : filteredJobs.length > 0 ? (
-            filteredJobs.map((job, index) => <JobCard key={index} job={job} />)
-          ) : (
-            <div className="col-span-full text-center text-gray-600 text-lg py-12">
+          ))
+        ) : filteredJobs.length > 0 ? (
+          filteredJobs.map((job, index) => (
+            <ModernJobCard key={index} job={job} />
+          ))
+        ) : (
+          <div className="col-span-full text-center text-gray-600 text-lg py-12">
             <div className="mb-4">
               <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+                className="mx-auto h-12 w-12 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
             </div>
             <h3 className="text-xl font-medium text-gray-900 mb-2">
