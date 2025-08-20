@@ -1,125 +1,78 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import ModernJobCard from "../components/job/JobCard";
+import JobCard from "../components/job/JobCard";
 import Pagination from "../components/Pagination";
 
-const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue }) => {
-  const [jobs, setJobs] = useState([]);
+const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue, selectedCompany }) => {
   const [totalJobs, setTotalJobs] = useState(1);
-  const [queriedJobs, setQueriedJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const jobsPerPage = 12;
-  // extracting and removing utm_source
+  const jobsPerPage = 9;
+  // for extracting and removing utm_source
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const getAlljobs = async () => {
+  const getAlljobs = useCallback(async () => {
     try {
       setLoading(true);
       const utm_source = searchParams.get("utm_source");
       searchParams.delete("utm_source");
       setSearchParams(searchParams);
-      // build the url
-      let url = import.meta.env.VITE_BACKEND_URL + `/jobs?limit=10`;
-      utm_source && (url += `?utm_source=${utm_source}`);
-      if (!searchQuery && sortByValue === "relevance") {
-        setFilteredJobs(jobs.slice(0, 12));
-        setCurrentPage(1);
-        setTotalPages(Math.ceil(totalJobs / jobsPerPage) || 1);
-        return;
-      } else if (isSearching && searchQuery) {
-        const query = searchQuery.toLowerCase();
-        url += `&search=${query}`;
-        setIsSearching(false); // Reset search state after setting URL
+
+      // Build the URL with current page and search parameters
+      let url = `${
+        import.meta.env.VITE_BACKEND_URL
+      }/jobs?limit=${jobsPerPage}&page=${currentPage}`;
+
+      // Add UTM source if exists
+      if (utm_source) {
+        url += `&utm_source=${utm_source}`;
+      }
+
+      // Add search query if exists
+      if (searchQuery && searchQuery.trim()) {
+        url += `&search=${encodeURIComponent(searchQuery.trim())}`;
+      }
+
+      // Add sort parameter if specified
+      if (sortByValue && sortByValue !== "relevance") {
+        url += `&sort=${sortByValue}`;
+      }
+
+      // Add company filter if exists
+      if (selectedCompany.length > 0) {
+        selectedCompany.forEach(company => {
+          url += `&companies=${encodeURIComponent(company)}`;
+        });
       }
 
       // Fetch result
       const response = await axios.get(url);
-      if (response.status == 200) {
-        setJobs(response.data.data);
-        setFilteredJobs(response.data.data); // Initialize with all jobs
+      if (response.status === 200) {
+        setFilteredJobs(response.data.data);
         setTotalJobs(response.data.total);
-        setTotalPages(Math.ceil(response.data.total / jobsPerPage) || 1); // total pages to show = totaljobs / jobsPerPage
+        setTotalPages(Math.ceil(response.data.total / jobsPerPage) || 1);
       }
       setLoading(false);
+
+      // Reset search state
+      if (isSearching) {
+        setIsSearching(false);
+      }
     } catch (error) {
-      console.error("Error fetching all jobs:", error);
+      console.error("Error fetching jobs:", error);
       setLoading(false);
     }
-  };
-
-  const setJobsbyPage = (page = 1, isQuery = false) => {
-    const startIndex = (page - 1) * jobsPerPage;
-    const endIndex = startIndex + jobsPerPage;
-    // if seaching, show from quired jobs
-    if (isQuery) {
-      setFilteredJobs(queriedJobs.slice(startIndex, endIndex));
-      return;
-    }
-    const paginatedJobs = jobs.slice(startIndex, endIndex);
-    setFilteredJobs(paginatedJobs);
-  };
-
-  const handleSort = (value) => {
-    const copyOfJobs = [...jobs];
-    switch (value) {
-      case "company":
-        copyOfJobs.sort((a, b) => a.company.localeCompare(b.company));
-        break;
-      case "location":
-        copyOfJobs.sort((a, b) => a.location.localeCompare(b.location));
-        break;
-      case "date":
-        copyOfJobs.sort((a, b) => new Date(b.date) - new Date(a.date));
-        break;
-      case "salary":
-        copyOfJobs.sort((a, b) => {
-          const salaryA = parseInt(a.salary.replace(/[^0-9]/g, ""));
-          const salaryB = parseInt(b.salary.replace(/[^0-9]/g, ""));
-          return salaryB - salaryA; // Sort by descending salary
-        });
-        break;
-    }
-    setQueriedJobs(copyOfJobs);
-  };
-
-  const handleSearch = () => {
-    if (!searchQuery && sortByValue === "relevance") {
-      // Reset queried jobs if no search query
-      setQueriedJobs([]);
-      setFilteredJobs(jobs.slice(0, 12));
-      setCurrentPage(1);
-      setTotalPages(Math.ceil(totalJobs / jobsPerPage) || 1);
-      return;
-    }
-    // if search button clicked
-    if (isSearching) {
-      const query = searchQuery.toLowerCase();
-      // Search from all jobs set
-      const copyOfJobs = [...jobs];
-      const filtered = copyOfJobs.filter((job) => {
-        if (
-          job.title.toLowerCase().includes(query) ||
-          job.company.toLowerCase().includes(query)
-        )
-          return true;
-      });
-      setQueriedJobs(filtered);
-      setIsSearching(false); // Reset search state after filtering
-      // Reset pagination data
-      setCurrentPage(1);
-      setTotalPages(Math.ceil(filtered.length / jobsPerPage) || 1);
-      // setJobsbyPage(1, true); // Set jobs for first page based on search
-      setFilteredJobs(filtered);
-    } else if (sortByValue !== "relevance") {
-      // If sorting is applied without search
-      handleSort(sortByValue);
-    }
-  };
+  }, [
+    currentPage,
+    sortByValue,
+    isSearching,
+    jobsPerPage,
+    selectedCompany
+  ]);
 
   // Handle page change with smooth scroll to top
   const handlePageChange = (page) => {
@@ -131,20 +84,10 @@ const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue }) => {
     });
   };
 
-  // fetch all jobs on page load
+  // Fetch jobs when component mounts or when search/sort/page parameters change
   useEffect(() => {
     getAlljobs();
-  }, []);
-
-  // set jobs for each page
-  useEffect(() => {
-    setJobsbyPage(currentPage);
-  }, [currentPage]);
-
-  // Filter jobs based on search query and sort by value
-  useEffect(() => {
-    handleSearch();
-  }, [isSearching, searchQuery, sortByValue]);
+  }, [getAlljobs]);
 
   return (
     <div className="space-y-8">
@@ -165,7 +108,7 @@ const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue }) => {
           ))
         ) : filteredJobs.length > 0 ? (
           filteredJobs.map((job, index) => (
-            <ModernJobCard key={index} job={job} />
+            <JobCard key={index} job={job} />
           ))
         ) : (
           <div className="col-span-full text-center text-gray-600 text-lg py-12">

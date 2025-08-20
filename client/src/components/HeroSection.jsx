@@ -43,7 +43,7 @@ const HeroSection = ({ stats }) => {
           <EmailCard />
 
           {/* Stats Section */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto px-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto px-4 @max-sm:justify-items-center">
             <StatCard label="Active Jobs" value={stats?.totalJobs} delay={0} />
             <StatCard
               label="Companies"
@@ -64,10 +64,10 @@ const HeroSection = ({ stats }) => {
               className="group flex flex-col items-center text-gray-600 hover:text-gray-900 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 rounded-lg p-3"
               aria-label="Scroll to job search section"
             >
-              <span className="text-sm font-medium mb-2 group-hover:text-gray-900 transition-colors duration-300">
+              <span className="text-xl sm:text-3xl font-medium mb-2 group-hover:text-gray-900 transition-colors duration-300">
                 Search Jobs
               </span>
-              <ChevronDownIcon className="w-6 h-6 animate-bounce group-hover:scale-110 transition-transform duration-300" />
+              <ChevronDownIcon className="w-6 h-6 sm:w-10 sm:h-10 animate-bounce group-hover:scale-110 transition-transform duration-300" />
             </button>
           </div>
         </div>

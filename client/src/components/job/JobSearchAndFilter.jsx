@@ -2,17 +2,16 @@ import {
   AdjustmentsHorizontalIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
+import { Check } from "lucide-react";
 
 const JobSearchAndFilter = ({
   searchQuery,
-  setSearchQuery,
-  setIsSearching,
+  handleQueryChange,
   handleSearch,
   sortBy,
   setSortBy,
   companies,
   selectedCompany,
-  setSelectedCompany,
   handleCompanySelection,
 }) => {
   return (
@@ -32,8 +31,7 @@ const JobSearchAndFilter = ({
                       placeholder="Job title, keywords, or company"
                       value={searchQuery}
                       onChange={(e) => {
-                        setSearchQuery(e.target.value);
-                        setIsSearching(false); // Reset search state on input change
+                        handleQueryChange(e.target.value);
                       }}
                       className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 text-gray-700 placeholder-gray-400"
                     />
@@ -83,21 +81,18 @@ const JobSearchAndFilter = ({
                     <span
                       key={index}
                       onClick={(e) => {
-                        if (selectedCompany === company) {
-                          setSelectedCompany("");
-                          setSearchQuery("");
-                          setIsSearching(false);
-                        } else {
                           handleCompanySelection(e.target.innerText);
-                        }
                       }}
-                      className={`px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors duration-200 cursor-pointer ${
-                        selectedCompany === company
+                      className={`flex flex-row items-center gap-0.5 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors duration-200 cursor-pointer ${
+                        selectedCompany.includes(company)
                           ? "bg-blue-500 text-white font-bold"
                           : ""
                       }`}
                     >
                       {company}
+                      {selectedCompany.includes(company) && (
+                        <Check />
+                      )}
                     </span>
                   ))}
                 </div>

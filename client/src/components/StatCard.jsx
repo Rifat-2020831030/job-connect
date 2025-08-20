@@ -70,7 +70,7 @@ const StatCard = ({ label, value = 0, delay = 0 }) => {
       className="animate-fade-in-up w-full"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="bg-white rounded-xl p-4 sm:p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group">
+      <div className="max-w-44 sm:max-w-52 bg-white rounded-xl p-4 sm:p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group">
         {/* Number */}
         <div className="text-center">
           {value != 0 ? (

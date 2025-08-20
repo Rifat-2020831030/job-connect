@@ -10,7 +10,7 @@ const Home = () => {
   const [sortBy, setSortBy] = useState("relevance");
   const [isSearching, setIsSearching] = useState(false);
   const [companies, setCompanies] = useState([]);
-  const [selectedCompany, setSelectedCompany] = useState("");
+  const [selectedCompany, setSelectedCompany] = useState([]);
   const [stats, setStats] = useState({
     totalJobs: "0",
     totalCompanies: "0",
@@ -42,11 +42,22 @@ const Home = () => {
     fetchStats();
   }, []);
 
+  const handleQueryChange = (query) => {
+    // handle search query changes to null state
+    if(!query) {
+      setSearchQuery(query);
+      setIsSearching(true);
+      return;
+    }
+    setSearchQuery(query);
+    setIsSearching(false);
+  };
+
   const handleSearch = () => {
-    setIsSearching(true);
-    setSelectedCompany("");
-    setSearchQuery(searchQuery.trim());
+    setSearchQuery(searchQuery.trim().toLowerCase());
     setSortBy("relevance"); // Reset sort to relevance on new search
+    setIsSearching(true);
+    setSelectedCompany([]);
     window.scrollTo({
       top: document.getElementById("job-list").offsetTop,
       behavior: "smooth",
@@ -54,9 +65,15 @@ const Home = () => {
   };
 
   const handleCompanySelection = (company) => {
+    if (selectedCompany.includes(company)) {
+      const updatedCompanies = selectedCompany.filter((c) => c !== company);
+      setSelectedCompany(updatedCompanies);
+    } else {
+      setSelectedCompany((prev) => [...prev, company]);
+    }
+    // trigger searching
+    // console.log("Selected Companies:", selectedCompany);
     setIsSearching(true);
-    setSelectedCompany(company);
-    setSearchQuery(company);
     window.scrollTo({
       top: document.getElementById("job-list").offsetTop,
       behavior: "smooth",
@@ -73,13 +90,13 @@ const Home = () => {
         <JobSearchAndFilter
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
+          handleQueryChange={handleQueryChange}
           setIsSearching={setIsSearching}
           handleSearch={handleSearch}
           sortBy={sortBy}
           setSortBy={setSortBy}
           companies={companies}
           selectedCompany={selectedCompany}
-          setSelectedCompany={setSelectedCompany}
           handleCompanySelection={handleCompanySelection}
         />
 
@@ -93,6 +110,7 @@ const Home = () => {
             setIsSearching={setIsSearching}
             searchQuery={searchQuery}
             sortByValue={sortBy}
+            selectedCompany={selectedCompany}
           />
         </div>
       </div>
