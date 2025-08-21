@@ -4,7 +4,7 @@ const JobCardDetails = ({ job, formatSalary, formatDeadline, isUrgent }) => {
   return (
     <div className="px-6 py-4 border-b border-gray-100">
       {/* Salary and Positions Row */}
-      <div className="flex items-center justify-between mb-4 p-4 rounded-xl">
+      <div className="flex items-center justify-between mb-4 rounded-xl">
         <div className="flex justify-between items-center space-x-6">
           {/* Salary */}
           <div className="flex items-center space-x-2">

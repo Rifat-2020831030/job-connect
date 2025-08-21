@@ -102,7 +102,7 @@ const Home = () => {
 
         {/* Job List Section */}
         <div
-          className="xl:max-w-full lg:max-w-[1350px] mx-20 px-4 sm:px-6 lg:px-8 pb-10"
+          // className="xl:max-w-full lg:max-w-[1350px] mx-20 px-4 sm:px-6 lg:px-8 pb-10"
           id="job-list"
         >
           <JobList

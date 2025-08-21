@@ -2,10 +2,17 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
+import NotfoundImg from "../assets/browser.png";
 import JobCard from "../components/job/JobCard";
 import Pagination from "../components/Pagination";
 
-const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue, selectedCompany }) => {
+const JobList = ({
+  isSearching,
+  setIsSearching,
+  searchQuery,
+  sortByValue,
+  selectedCompany,
+}) => {
   const [totalJobs, setTotalJobs] = useState(1);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +51,7 @@ const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue, select
 
       // Add company filter if exists
       if (selectedCompany.length > 0) {
-        selectedCompany.forEach(company => {
+        selectedCompany.forEach((company) => {
           url += `&companies=${encodeURIComponent(company)}`;
         });
       }
@@ -66,13 +73,7 @@ const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue, select
       console.error("Error fetching jobs:", error);
       setLoading(false);
     }
-  }, [
-    currentPage,
-    sortByValue,
-    isSearching,
-    jobsPerPage,
-    selectedCompany
-  ]);
+  }, [currentPage, sortByValue, isSearching, jobsPerPage, selectedCompany]);
 
   // Handle page change with smooth scroll to top
   const handlePageChange = (page) => {
@@ -91,49 +92,58 @@ const JobList = ({ isSearching, setIsSearching, searchQuery, sortByValue, select
 
   return (
     <div className="space-y-8">
-      {/* Jobs Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-md:place-items-center max-md:justify-center">
-        {loading ? (
+      <h3 className="text-lg font-semibold text-gray-900 text-center">Seeing {currentPage * jobsPerPage - jobsPerPage + 1} to {Math.min(currentPage * jobsPerPage, totalJobs)} Jobs out of {totalJobs}</h3>
+      {/* /* Jobs Grid */}
+        <div className="flex flex-wrap justify-center align-middle content-center gap-8 max-w-full mx-8">
+          {loading ? (
           // Loading skeleton
           Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
-              className="bg-white p-6 rounded-lg shadow-md animate-pulse w-full max-w-sm"
+              className="bg-white p-8 rounded-xl shadow-lg animate-pulse w-full max-w-[350px] min-w-[280px]"
             >
-              <div className="h-4 bg-gray-400 rounded mb-4"></div>
-              <div className="h-3 bg-gray-400 rounded mb-2"></div>
-              <div className="h-3 bg-gray-400 rounded mb-4"></div>
-              <div className="h-8 bg-gray-400 rounded"></div>
+              <div className="h-6 bg-gray-400 rounded mb-6"></div>
+              <div className="h-4 bg-gray-400 rounded mb-3"></div>
+              <div className="h-4 bg-gray-400 rounded mb-3"></div>
+              <div className="h-4 bg-gray-400 rounded mb-6"></div>
+              <div className="h-10 bg-gray-400 rounded"></div>
             </div>
           ))
         ) : filteredJobs.length > 0 ? (
-          filteredJobs.map((job, index) => (
-            <JobCard key={index} job={job} />
-          ))
+          filteredJobs.map((job, index) => <JobCard key={index} job={job} />)
         ) : (
-          <div className="col-span-full text-center text-gray-600 text-lg py-12">
-            <div className="mb-4">
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+          <div className="col-span-full flex flex-col items-center justify-center py-8 px-8">
+            <div className="p-6 mb-3">
+              <img
+                src={NotfoundImg}
+                alt="No Jobs Found"
+                className="h-16 w-16 text-blue-500"
+              />
             </div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">
-              No jobs found
-            </h3>
-            <p className="text-gray-500">
-              Try adjusting your search criteria or check back later for new
-              opportunities.
-            </p>
+
+            <div className="text-center max-w-md">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                No Jobs Found
+              </h3>
+              <p className="text-gray-600 text-base leading-relaxed mb-6">
+                We couldn't find any jobs for you. <br />
+                Don't worry, new opportunities are added regularly!
+              </p>
+
+              <div className="space-y-3">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-900 mb-2 text-sm">
+                    💡 Try these suggestions for searching:
+                  </h4>
+                  <ul className="text-blue-800 text-sm space-y-1 text-left">
+                    <li>• Broaden your search terms</li>
+                    <li>• Remove some filters</li>
+                    <li>• Check for typos in your search</li>
+                    <li>• Try different keywords</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

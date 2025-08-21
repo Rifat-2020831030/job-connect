@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useState } from "react";
 import ExpandableSection from "./ExpandableSection";
 import JobCardDetails from "./JobCardDetails";
@@ -81,8 +82,17 @@ const ModernJobCard = ({ job }) => {
     return colors[level] || "bg-gray-100 text-gray-800";
   };
 
+  const handleJobClick = async () => {
+    try {
+      await axios.get(
+        import.meta.env.VITE_BACKEND_URL + `/stat/jobs/clicks?jobID=${job._id}`
+      );
+    } catch (error) {}
+    window.open(job.url, "_blank", "noopener,noreferrer");
+  };
+
   return (
-    <div className="flex flex-col bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden min-h-[500px] min-w-[300px] max-w-sm w-full">
+    <div className="flex flex-col bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden min-w-[350px] max-w-[400px] w-full">
       {/* Header Section */}
       <JobCardHeader job={job} isRecent={isRecent} isUrgent={isUrgent} />
 
@@ -183,7 +193,7 @@ const ModernJobCard = ({ job }) => {
       <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
         <button
           className="w-full bg-[#1d1160] hover:bg-[#1d1160c6] text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg"
-          onClick={() => console.log(`Applying for job: ${job.title}`)}
+          onClick={() => handleJobClick()}
         >
           <span>Apply Now</span>
           <svg
