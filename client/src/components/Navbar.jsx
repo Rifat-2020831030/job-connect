@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import coffeeMug from "../assets/coffee.png";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -62,6 +63,10 @@ const Navbar = () => {
     };
   }, [isMenuOpen]);
 
+  const linkClickHandler = ()=>{
+    window.location = ""
+  }
+
   return (
     <>
       <nav className="relative z-50 px-4 sm:px-6 lg:px-8 py-4 bg-white/95 backdrop-blur-sm border-b border-gray-100">
@@ -75,36 +80,31 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center space-x-8">
-            <a
-              href="#jobs"
-              className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
-            >
-              Find Jobs
-            </a>
-            <a
-              href="#companies"
+          <div className="hidden md:flex items-center space-x-8 font-sans">
+            <Link to="/#data-job-search" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">Find Jobs</Link>
+            <Link
+              to="#companies"
               className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
             >
               Companies
-            </a>
-            <a
-              href="#salary"
+            </Link>
+            <Link
+              to="#salary"
               className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
             >
               Salary Guide
-            </a>
-            <a
-              href="#blog"
+            </Link>
+            <Link
+              to="#blog"
               className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
             >
               Blog
-            </a>
+            </Link>
           </div>
 
           {/* Desktop Buy Me Coffee Button */}
           <div className="hidden md:flex items-center space-x-4">
-            <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium px-6 py-2.5 rounded-lg transition-all duration-200 flex items-center space-x-2 shadow-md hover:shadow-lg">
+            <button className="bg-gradient-to-r from-blue-400 to-blue-700 hover:from-blue-500 hover:to-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-all duration-200 flex items-center space-x-2 shadow-md hover:shadow-lg">
               <img src={coffeeMug} alt="Coffee Mug" className="w-4 h-4" />
               <span>Buy me coffee</span>
             </button>

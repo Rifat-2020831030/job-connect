@@ -78,6 +78,7 @@ const EmailCard = () => {
       {showVerification && (
         <VerificationCard
           setEmail={setEmail}
+          showVerification={showVerification}
           setShowVerification={setShowVerification}
           email={email}
           setAlertMessage={setAlertMessage}

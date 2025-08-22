@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import HeroSection from "../components/HeroSection";
 import JobSearchAndFilter from "../components/job/JobSearchAndFilter";
 import JobList from "../subpages/JobList";
+import ShareComponent from "../components/ShareComponent";
+import Footer from "../components/Footer";
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -86,7 +88,7 @@ const Home = () => {
       <HeroSection stats={stats} />
 
       {/* Search And Job List */}
-      <div className="bg-[#f5fff5]">
+      <div className="bg-[#f5fff5] pb-10">
         <JobSearchAndFilter
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -114,6 +116,11 @@ const Home = () => {
           />
         </div>
       </div>
+      {/* Share Component */}
+      <ShareComponent />
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

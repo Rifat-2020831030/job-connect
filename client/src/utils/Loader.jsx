@@ -1,12 +1,7 @@
-import { useEffect } from "react";
+import { useScrollLock } from "../hooks/useScrollLock";
 
 const Loader = () => {
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, []);
+  useScrollLock(true);
 
   return (
     <>

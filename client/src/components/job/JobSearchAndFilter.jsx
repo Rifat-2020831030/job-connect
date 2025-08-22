@@ -15,7 +15,7 @@ const JobSearchAndFilter = ({
   handleCompanySelection,
 }) => {
   return (
-    <div className="py-10" data-job-search>
+    <div className="py-10" data-job-search id="data-job-search">
       {/* Search and Filter Section */}
       <div className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,7 +39,7 @@ const JobSearchAndFilter = ({
                   <button
                     type="submit"
                     onClick={handleSearch}
-                    className={`w-full sm:w-auto bg-primary-gradient .bg-primary-gradient:hover text-white font-semibold py-4 px-12 rounded-xl transition-all duration-200`}
+                    className={`w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-12 rounded-xl transition-all duration-200`}
                   >
                     Search Jobs
                   </button>

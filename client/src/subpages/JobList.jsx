@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import NotfoundImg from "../assets/browser.png";
 import JobCard from "../components/job/JobCard";
 import Pagination from "../components/Pagination";
+import ShareComponent from "../components/ShareComponent";
 
 const JobList = ({
   isSearching,
@@ -73,7 +74,17 @@ const JobList = ({
       console.error("Error fetching jobs:", error);
       setLoading(false);
     }
-  }, [currentPage, sortByValue, isSearching, jobsPerPage, selectedCompany]);
+  }, [
+    currentPage,
+    sortByValue,
+    isSearching,
+    jobsPerPage,
+    selectedCompany,
+    searchParams,
+    searchQuery,
+    setIsSearching,
+    setSearchParams,
+  ]);
 
   // Handle page change with smooth scroll to top
   const handlePageChange = (page) => {
@@ -92,10 +103,13 @@ const JobList = ({
 
   return (
     <div className="space-y-8">
-      <h3 className="text-lg font-semibold text-gray-900 text-center">Seeing {currentPage * jobsPerPage - jobsPerPage + 1} to {Math.min(currentPage * jobsPerPage, totalJobs)} Jobs out of {totalJobs}</h3>
+      <h3 className="text-lg font-semibold text-gray-900 text-center">
+        Seeing {currentPage * jobsPerPage - jobsPerPage + 1} to{" "}
+        {Math.min(currentPage * jobsPerPage, totalJobs)} Jobs out of {totalJobs}
+      </h3>
       {/* /* Jobs Grid */}
-        <div className="flex flex-wrap justify-center align-middle content-center gap-8 max-w-full mx-8">
-          {loading ? (
+      <div className="flex flex-wrap justify-center align-middle content-center gap-8 max-w-full mx-8">
+        {loading ? (
           // Loading skeleton
           Array.from({ length: 4 }).map((_, index) => (
             <div
@@ -147,6 +161,7 @@ const JobList = ({
           </div>
         )}
       </div>
+
       {/* Pagination */}
       <div className="flex justify-center mt-8">
         <Pagination

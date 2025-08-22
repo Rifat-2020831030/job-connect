@@ -1,4 +1,5 @@
 import { CheckCircleIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 const Popup = ({ 
   isOpen, 
@@ -7,6 +8,7 @@ const Popup = ({
   message = '', 
   title = '' 
 }) => {
+  useScrollLock(isOpen);
   if (!isOpen) return null;
 
   const configs = {
@@ -38,12 +40,12 @@ const Popup = ({
   return (
     <>
       {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity z-40"
-        onClick={onClose}
-      />
-      
-      {/* Popup */}
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 transition-opacity z-40 overflow-hidden"
+          onClick={onClose}
+        />
+        
+        {/* Popup */}
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
         <div 
           className={`
