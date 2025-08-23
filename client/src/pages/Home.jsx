@@ -118,9 +118,6 @@ const Home = () => {
       </div>
       {/* Share Component */}
       <ShareComponent />
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

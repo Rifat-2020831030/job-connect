@@ -19,9 +19,6 @@ const HeroSection = ({ stats }) => {
       {/* Grid Background Pattern with gradient fade */}
       <div className="absolute inset-0 bg-grid-pattern opacity-40"></div>
 
-      {/* Navigation */}
-      <Navbar />
-
       {/* Hero Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-16 pb-16 sm:pb-20">
         <div className="text-center">

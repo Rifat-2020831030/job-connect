@@ -5,7 +5,7 @@ const ShareComponent = () => {
 
   const handleCopyLink = async () => {
     try {
-      const currentUrl = window.location.href;
+      const currentUrl = window.location.href + "?utm_source=share";
       await navigator.clipboard.writeText(currentUrl);
       setCopied(true);
 
@@ -48,7 +48,7 @@ const ShareComponent = () => {
             />
           </svg>
           <span className="text-2xl md:text-3xl font-bold text-center">
-            Got benefitted? Share with others
+            Got benefited? Share with others
           </span>
         </div>
 

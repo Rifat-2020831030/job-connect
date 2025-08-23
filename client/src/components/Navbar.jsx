@@ -63,40 +63,36 @@ const Navbar = () => {
     };
   }, [isMenuOpen]);
 
-  const linkClickHandler = ()=>{
-    window.location = ""
-  }
-
   return (
     <>
-      <nav className="relative z-50 px-4 sm:px-6 lg:px-8 py-4 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+      <nav className="relative z-50 px-4 sm:px-6 lg:px-8 py-4 bg-gray-900 backdrop-blur-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-2">
             <div className="text-2xl font-bold">
               <span className="text-blue-600">&lt;//&gt;</span>
-              <span className="text-gray-800 ml-1">ChakriLagbe</span>
+              <span className="text-white ml-1">ChakriLagbe</span>
             </div>
           </div>
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center space-x-8 font-sans">
-            <Link to="/#data-job-search" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">Find Jobs</Link>
+            <Link to="/#data-job-search" className="text-white hover:text-blue-600 transition-colors font-medium">Find Jobs</Link>
             <Link
-              to="#companies"
-              className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
+              to="/companies"
+              className="text-white hover:text-blue-600 transition-colors font-medium"
             >
               Companies
             </Link>
             <Link
               to="#salary"
-              className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
+              className="text-white hover:text-blue-600 transition-colors font-medium"
             >
               Salary Guide
             </Link>
             <Link
               to="#blog"
-              className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
+              className="text-white hover:text-blue-600 transition-colors font-medium"
             >
               Blog
             </Link>
