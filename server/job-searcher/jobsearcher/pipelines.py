@@ -48,42 +48,35 @@ class JobsearcherPipeline:
         try:
             item_dict = ItemAdapter(item).asdict()
             # check if the current item matched with the existing item in the database
-            output = text_extractor(item['details'])  # Define output variable
-            self.set_value(output, item_dict)
-            self.mongo_collection.update_one(
-                {'url': item['url']},
-                {'$set': item_dict},
-                upsert=True
-            )
-            # existing_item = self.mongo_collection.find_one({'hashValue': item['hashValue']})
-            # if existing_item:
-            #     # If the item already exists, update it
-            #     spider.logger.info(f"Item already exists: {item['hashValue']}, updating isUpdated status.")
-            #     # Update isUpdated status to False if 24 hours have passed since scraping
-            #     timestamp = existing_item.get('timestamp')
-            #     last_updated = datetime.fromisoformat(timestamp)
-            #     if datetime.now() - last_updated > timedelta(hours=24):
-            #         self.mongo_collection.update_one(
-            #             {'hashValue': item['hashValue']},
-            #             {'$set': {'isUpdated': False}}
-            #         )
-            # else:
-            #     # Check based on url
-            #     db_response = self.mongo_collection.find_one({'url': item['url']})
-            #     if db_response:
-            #         # Move existing item to archived collection
-            #         archived_collection = self.db['archived']
-            #         archived_collection.insert_one(db_response)
-            #         # Remove from main collection
-            #         self.mongo_collection.delete_one({'url': item['url']})
-            #         # Updated one
-            #         output = text_extractor(item['details'])
-            #         self.set_value(output, item_dict)
-            #         self.mongo_collection.insert_one(item_dict)  # Use item_dict instead of item
-            #     else:
-            #         output = text_extractor(item['details'])  # Define output variable
-            #         self.set_value(output, item_dict)
-            #         self.mongo_collection.insert_one(item_dict)
+            existing_item = self.mongo_collection.find_one({'hashValue': item['hashValue']})
+            if existing_item:
+                # If the item already exists, update it
+                spider.logger.info(f"Item already exists: {item['hashValue']}, updating isUpdated status.")
+                # Update isUpdated status to False if 24 hours have passed since scraping
+                timestamp = existing_item.get('timestamp')
+                last_updated = datetime.fromisoformat(timestamp)
+                if datetime.now() - last_updated > timedelta(hours=24):
+                    self.mongo_collection.update_one(
+                        {'hashValue': item['hashValue']},
+                        {'$set': {'isUpdated': False}}
+                    )
+            else:
+                # Check based on url
+                db_response = self.mongo_collection.find_one({'url': item['url']})
+                if db_response:
+                    # Move existing item to archived collection
+                    archived_collection = self.db['archived']
+                    archived_collection.insert_one(db_response)
+                    # Remove from main collection
+                    self.mongo_collection.delete_one({'url': item['url']})
+                    # Updated one
+                    output = text_extractor(item['details'])
+                    self.set_value(output, item_dict)
+                    self.mongo_collection.insert_one(item_dict)  # Use item_dict instead of item
+                else:
+                    output = text_extractor(item['details'])  # Define output variable
+                    self.set_value(output, item_dict)
+                    self.mongo_collection.insert_one(item_dict)
 
         except pymongo.errors.DuplicateKeyError:
             spider.logger.info(f"Duplicate item found: {item['url']}, skipping.")

@@ -9,7 +9,7 @@ export const getJobs = async (req, res) => {
     const offset = (page - 1) * limit;
 
     // Get current date to compare with deadlines
-    const currentDate = new Date();
+    // const currentDate = new Date();
 
     const jobs = await db
       .collection("jobs")
@@ -22,7 +22,7 @@ export const getJobs = async (req, res) => {
     const filteredJobs = jobs.filter((job) => {
       if (!job.deadline) return true; // If no deadline, include the job
       const deadlineDate = new Date(job.deadline);
-      return deadlineDate >= currentDate; // Include only jobs with future deadlines
+      return deadlineDate >= new Date(); // Include only jobs with future deadlines
     });
 
     // get jobs count
