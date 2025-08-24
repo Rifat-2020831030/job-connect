@@ -37,6 +37,7 @@ const Companies = () => {
         );
         if (response.status === 200) {
           setCompanies(response.data.data || []); // Fallback to empty array
+          console.log("Fetched companies:", response.data.data);
         } else {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

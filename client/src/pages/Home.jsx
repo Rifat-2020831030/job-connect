@@ -5,14 +5,15 @@ import HeroSection from "../components/HeroSection";
 import JobSearchAndFilter from "../components/job/JobSearchAndFilter";
 import JobList from "../subpages/JobList";
 import ShareComponent from "../components/ShareComponent";
-import Footer from "../components/Footer";
+import { useParams } from "react-router-dom";
 
 const Home = () => {
+  const { companyName } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("relevance");
   const [isSearching, setIsSearching] = useState(false);
   const [companies, setCompanies] = useState([]);
-  const [selectedCompany, setSelectedCompany] = useState([]);
+  const [selectedCompany, setSelectedCompany] = useState([ companyName ? companyName : [] ]);
   const [stats, setStats] = useState({
     totalJobs: "0",
     totalCompanies: "0",

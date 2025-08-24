@@ -18,7 +18,7 @@ const CompanyCard = ({ company }) => {
     office_locations = [],
     website,
     current_open_jobs,
-    total_listed_jobs,
+    total_job_posts,
     monthly_job_posting_avg,
     establishment_date,
     description,
@@ -129,7 +129,7 @@ const CompanyCard = ({ company }) => {
               <Users className="w-5 h-5 text-purple-600" />
             </div>
             <div className="text-2xl font-bold text-gray-900">
-              {total_listed_jobs || 0}
+              {total_job_posts || 0}
             </div>
             <div className="text-xs text-gray-500 mt-1">Total Jobs</div>
           </div>
@@ -151,7 +151,7 @@ const CompanyCard = ({ company }) => {
         {/* View Open Jobs */}
         {current_open_jobs > 0 ? (
           <button
-          onClick={() => navigate(`/companies/${name}/jobs`)}
+          onClick={() => navigate(`/${name}#data-job-search`)}
           className="mt-4 text-center bg-purple-600 hover:bg-purple-700 text-white transition-colors px-5 py-2 w-full rounded-md"
         >
           View Open Jobs
