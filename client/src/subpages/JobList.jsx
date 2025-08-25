@@ -5,7 +5,6 @@ import { useSearchParams } from "react-router-dom";
 import NotfoundImg from "../assets/browser.png";
 import JobCard from "../components/job/JobCard";
 import Pagination from "../components/Pagination";
-import ShareComponent from "../components/ShareComponent";
 
 const JobList = ({
   isSearching,
@@ -14,7 +13,7 @@ const JobList = ({
   sortByValue,
   selectedCompany,
 }) => {
-  const [totalJobs, setTotalJobs] = useState(1);
+  const [totalJobs, setTotalJobs] = useState(0);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,9 +51,11 @@ const JobList = ({
 
       // Add company filter if exists
       if (selectedCompany.length > 0) {
-        selectedCompany.forEach((company) => {
-          url += `&companies=${encodeURIComponent(company)}`;
-        });
+        selectedCompany
+          .filter(Boolean) // removes undefined, null, empty string
+          .forEach((company) => {
+            url += `&companies=${encodeURIComponent(company)}`;
+          });
       }
 
       // Fetch result
@@ -81,7 +82,7 @@ const JobList = ({
     jobsPerPage,
     selectedCompany,
     searchParams,
-    searchQuery,
+    // searchQuery,
     setIsSearching,
     setSearchParams,
   ]);
@@ -103,12 +104,15 @@ const JobList = ({
 
   return (
     <div className="space-y-8">
-      <h3 className="text-lg font-semibold text-gray-900 text-center">
-        Seeing {currentPage * jobsPerPage - jobsPerPage + 1} to{" "}
-        {Math.min(currentPage * jobsPerPage, totalJobs)} Jobs out of {totalJobs}
-      </h3>
+      {Math.min(currentPage * jobsPerPage, totalJobs) > 0 && (
+        <h3 className="text-lg font-semibold text-gray-900 text-center">
+          Seeing {currentPage * jobsPerPage - jobsPerPage + 1} to{" "}
+          {Math.min(currentPage * jobsPerPage, totalJobs)} Jobs out of{" "}
+          {totalJobs}
+        </h3>
+      )}
       {/* /* Jobs Grid */}
-      <div className="flex flex-wrap justify-center align-middle content-center gap-8 max-w-full mx-8">
+      <div className="flex flex-wrap justify-center items-start gap-8 max-w-full mx-8">
         {loading ? (
           // Loading skeleton
           Array.from({ length: 4 }).map((_, index) => (

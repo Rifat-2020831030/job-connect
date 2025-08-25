@@ -13,7 +13,7 @@ const Home = () => {
   const [sortBy, setSortBy] = useState("relevance");
   const [isSearching, setIsSearching] = useState(false);
   const [companies, setCompanies] = useState([]);
-  const [selectedCompany, setSelectedCompany] = useState([ companyName ? companyName : [] ]);
+  const [selectedCompany, setSelectedCompany] = useState(companyName ? [companyName] : []);
   const [stats, setStats] = useState({
     totalJobs: "0",
     totalCompanies: "0",
@@ -75,7 +75,6 @@ const Home = () => {
       setSelectedCompany((prev) => [...prev, company]);
     }
     // trigger searching
-    // console.log("Selected Companies:", selectedCompany);
     setIsSearching(true);
     window.scrollTo({
       top: document.getElementById("job-list").offsetTop,

@@ -71,32 +71,33 @@ const JobSearchAndFilter = ({
                 </div>
               </div>
 
-              {/* Company list */}
-              {companies.length > 0 && (
-                <div className="flex flex-wrap gap-2 my-6">
-                  <p className="text-lg font-semibold mb-3 w-full">
-                    Top Companies Hiring
-                  </p>
-                  {companies.map((company, index) => (
-                    <span
-                      key={index}
-                      onClick={(e) => {
-                          handleCompanySelection(e.target.innerText);
-                      }}
-                      className={`flex flex-row items-center gap-0.5 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors duration-200 cursor-pointer ${
-                        selectedCompany.includes(company)
-                          ? "bg-blue-500 text-white font-bold"
-                          : ""
-                      }`}
-                    >
-                      {company}
-                      {selectedCompany.includes(company) && (
-                        <Check />
-                      )}
-                    </span>
-                  ))}
-                </div>
-              )}
+              {/* Company list or skeleton */}
+              <div className="flex flex-wrap gap-2 my-6">
+                <p className="text-lg font-semibold mb-3 w-full">
+                  Top Companies Hiring
+                </p>
+                {companies.length > 0
+                  ? companies.map((company, index) => (
+                      <span
+                        key={index}
+                        onClick={() => handleCompanySelection(company)}
+                        className={`flex flex-row items-center gap-0.5 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors duration-200 cursor-pointer ${
+                          selectedCompany.includes(company)
+                            ? "bg-blue-500 text-white font-bold"
+                            : ""
+                        }`}
+                      >
+                        {company}
+                        {selectedCompany.includes(company) && <Check />}
+                      </span>
+                    ))
+                  : Array.from({ length: 6 }).map((_, idx) => (
+                      <span
+                        key={idx}
+                        className="h-8 w-28 bg-gray-200 animate-pulse rounded-full"
+                      ></span>
+                    ))}
+              </div>
             </div>
           </div>
         </div>

@@ -37,13 +37,12 @@ const ExpandableSection = ({
       </button>
 
       <div
-        className={`mt-2 overflow-hidden transition-all duration-400 ease-linear ${
-          isExpanded ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
-        }`}
+        className={`mt-2 overflow-hidden transition-all duration-400 ease-linear opacity-${
+          isExpanded ? "100" : "0"
+        }}`}
         style={{
-          transitionProperty: "max-height, opacity",
-          transitionDuration: "400ms, 400ms",
-          transitionTimingFunction: "linear, linear",
+          maxHeight: isExpanded ? `${items.length * 60}px` : "0px",
+          transition: "max-height 0.4s ease, opacity 0.4s ease",
         }}
       >
         <div className="flex flex-wrap gap-2">
@@ -56,7 +55,7 @@ const ExpandableSection = ({
               >
                 {item}
               </span>
-            ))} 
+            ))}
           {!isExpanded && items.length > previewCount && (
             <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md font-medium">
               +{items.length - previewCount} more
