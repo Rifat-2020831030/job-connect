@@ -26,7 +26,8 @@ jobAlertSchedule.start();
 const allowedOrigins = [
   "https://chakrilagbe.vercel.app",
   "https://server-health-tau.vercel.app",
-  "http://localhost:5173", // For local development
+  "https://chakrilagbe-client-admin.vercel.app",
+  // "http://localhost:5173", // For local development
 ];
 
 const corsOption = {
