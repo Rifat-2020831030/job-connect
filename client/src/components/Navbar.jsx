@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import coffeeMug from "../assets/coffee.png";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -63,6 +63,25 @@ const Navbar = () => {
     };
   }, [isMenuOpen]);
 
+  const navLinks = [
+    {
+      to: "/#data-job-search",
+      label: "Find Jobs"
+    },
+    {
+      to: "/companies",
+      label: "Companies"
+    },
+    {
+      to: "/salary",
+      label: "Salary Guide"
+    },
+    {
+      to: "/experience",
+      label: "Interview Experience"
+    }
+  ];
+
   return (
     <>
       <nav className="relative z-50 px-4 sm:px-6 lg:px-8 py-4 bg-gray-900 backdrop-blur-sm border-b border-gray-100">
@@ -77,25 +96,21 @@ const Navbar = () => {
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center space-x-8 font-sans">
-            <Link to="/#data-job-search" className="text-white hover:text-blue-600 transition-colors font-medium">Find Jobs</Link>
-            <Link
-              to="/companies"
-              className="text-white hover:text-blue-600 transition-colors font-medium"
-            >
-              Companies
-            </Link>
-            <Link
-              to="#salary"
-              className="text-white hover:text-blue-600 transition-colors font-medium"
-            >
-              Salary Guide
-            </Link>
-            <Link
-              to="#blog"
-              className="text-white hover:text-blue-600 transition-colors font-medium"
-            >
-              Blog
-            </Link>
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  `font-medium transition-colors ${
+                    isActive
+                      ? "text-blue-300"
+                      : "text-white hover:text-blue-600"
+                  }`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
           </div>
 
           {/* Desktop Buy Me Coffee Button */}
@@ -197,92 +212,24 @@ const Navbar = () => {
               {/* Navigation Links */}
               <div className="flex-1 px-6 py-8">
                 <div className="space-y-2">
-                  <a
-                    href="#jobs"
-                    className="flex items-center text-gray-700 hover:text-white hover:bg-blue-300 transition-all duration-200 py-4 px-4 text-lg font-medium rounded-lg group"
-                    onClick={toggleMenu}
-                  >
-                    <svg
-                      className="w-5 h-5 mr-3 text-gray-400 group-hover:text-white transition-colors"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  {navLinks.map((link) => (
+                    <NavLink
+                      key={link.to}
+                      to={link.to}
+                      className={({ isActive }) =>
+                        `flex items-center text-gray-700 hover:text-white hover:bg-blue-300 transition-all duration-200 py-4 px-4 text-lg font-medium rounded-lg group ${
+                          isActive ? "bg-blue-300 text-white" : ""
+                        }`
+                      }
+                      onClick={toggleMenu}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0H8m8 0v6a2 2 0 01-2 2H10a2 2 0 01-2-2V6m8 0H8"
-                      />
-                    </svg>
-                    Find Jobs
-                  </a>
-                  <a
-                    href="#companies"
-                    className="flex items-center text-gray-700 hover:text-white hover:bg-blue-300 transition-all duration-200 py-4 px-4 text-lg font-medium rounded-lg group"
-                    onClick={toggleMenu}
-                  >
-                    <svg
-                      className="w-5 h-5 mr-3 text-gray-400 group-hover:text-white transition-colors"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                      />
-                    </svg>
-                    Companies
-                  </a>
-                  <a
-                    href="#salary"
-                    className="flex items-center text-gray-700 hover:text-white hover:bg-blue-300 transition-all duration-200 py-4 px-4 text-lg font-medium rounded-lg group"
-                    onClick={toggleMenu}
-                  >
-                    <svg
-                      className="w-5 h-5 mr-3 text-gray-400 group-hover:text-white transition-colors"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                      />
-                    </svg>
-                    Salary Guide
-                  </a>
-                  <a
-                    href="#blog"
-                    className="flex items-center text-gray-700 hover:text-white hover:bg-blue-300 transition-all duration-200 py-4 px-4 text-lg font-medium rounded-lg group"
-                    onClick={toggleMenu}
-                  >
-                    <svg
-                      className="w-5 h-5 mr-3 text-gray-400 group-hover:text-white transition-colors"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
-                      />
-                    </svg>
-                    Blog
-                  </a>
+                      {link.label}
+                    </NavLink>
+                  ))}
                 </div>
               </div>
-
-              {/* Footer with full-width Buy Me Coffee button */}
               <div className="p-6 border-t border-gray-200 bg-gray-50">
-                <button className="w-full bg-blue-300 hover:bg-blue-500 text-white font-medium px-6 py-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                <button className="w-full bg-gradient-to-r from-blue-400 to-blue-700 hover:from-blue-500 hover:to-blue-800 text-white font-medium px-6 py-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
                   <img src={coffeeMug} alt="Coffee Mug" className="w-5 h-5" />
                   <span>Buy me coffee</span>
                 </button>

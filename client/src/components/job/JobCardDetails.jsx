@@ -1,4 +1,5 @@
-import { CurrencyDollarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import { UserGroupIcon } from "@heroicons/react/24/outline";
+import taka from '../../assets/taka.png';
 
 const JobCardDetails = ({ job, formatSalary, formatDeadline, isUrgent }) => {
   return (
@@ -9,14 +10,7 @@ const JobCardDetails = ({ job, formatSalary, formatDeadline, isUrgent }) => {
           {/* Salary */}
           <div className="flex items-center space-x-2">
             <div className="p-2 bg-green-100 rounded-lg">
-              <svg
-                className="w-5 h-5 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <CurrencyDollarIcon />
-              </svg>
+              <img src={taka} alt="" className="w-5 h-5 text-green-600" />
             </div>
             <div>
               <p className="text-xs text-gray-500 font-medium">Salary</p>

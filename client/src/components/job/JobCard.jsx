@@ -54,7 +54,7 @@ const ModernJobCard = ({ job }) => {
     if ((!salaryMin || salaryMin === -1) && (!salaryMax || salaryMax === -1))
       return "Not Specified";
     if (salaryMin && salaryMin !== -1 && salaryMax && salaryMax !== -1)
-      return `$${salaryMin} - $${salaryMax}`;
+      return `${salaryMin} - ${salaryMax}`;
     if (salaryMin && salaryMin !== -1) return `From $${salaryMin}`;
     if (salaryMax && salaryMax !== -1) return `Up to $${salaryMax}`;
   };

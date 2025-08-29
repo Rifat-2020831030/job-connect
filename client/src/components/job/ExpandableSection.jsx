@@ -9,6 +9,9 @@ const ExpandableSection = ({
 }) => {
   if (!items || items.length === 0) return null;
 
+  // Ensure items is always an array before using map
+  const itemsArray = Array.isArray(items) ? items : [items];
+
   return (
     <div>
       <button
@@ -17,7 +20,7 @@ const ExpandableSection = ({
       >
         <span className="flex items-center">
           {icon}
-          {title} ({items.length})
+          {title} ({itemsArray.length})
         </span>
         <svg
           className={`w-4 h-4 transition-transform ${
@@ -41,13 +44,13 @@ const ExpandableSection = ({
           isExpanded ? "100" : "0"
         }}`}
         style={{
-          maxHeight: isExpanded ? `${items.length * 60}px` : "0px",
+          maxHeight: isExpanded ? `${itemsArray.length * 60}px` : "0px",
           transition: "max-height 0.4s ease, opacity 0.4s ease",
         }}
       >
         <div className="flex flex-wrap gap-2">
-          {items
-            .slice(0, isExpanded ? items.length : previewCount)
+          {itemsArray
+            .slice(0, isExpanded ? itemsArray.length : previewCount)
             .map((item, index) => (
               <span
                 key={index}
@@ -56,9 +59,9 @@ const ExpandableSection = ({
                 {item}
               </span>
             ))}
-          {!isExpanded && items.length > previewCount && (
+          {!isExpanded && itemsArray.length > previewCount && (
             <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md font-medium">
-              +{items.length - previewCount} more
+              +{itemsArray.length - previewCount} more
             </span>
           )}
         </div>
