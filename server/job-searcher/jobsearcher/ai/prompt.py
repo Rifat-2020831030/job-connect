@@ -9,7 +9,7 @@ Extraction Rules:
     - For string fields: use "Not Specified"
     - For array fields: use empty arrays []
 3. Dates must be in `YYYY-MM-DD` format if found. If no date is found, return `"Not Specified"`.
-4. In the languages field, list all specific programming languages and associated frameworks mentioned in the text accurately.
+4. In the languages field, list all specific programming languages (e.g., Python, JavaScript) and associated frameworks (e.g., Django, React, NodeJs) mentioned in the text accurately.
 5. In the skills field, list only specific, practical, and demonstrable technical skills that can be directly applied on the job — exclude soft skills, general traits, or abstract qualities. Exclude same type skills.
 6. Salary values must be numeric without currency symbols. If a range is given, set `salary_min` to the lower bound and `salary_max` to the upper bound. Use 0 if not specified.
 7. The `experience` field must be a number representing years of experience if explicitly stated; otherwise -1.

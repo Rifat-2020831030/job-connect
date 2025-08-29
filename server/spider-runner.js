@@ -10,8 +10,8 @@ const SCRAPER_DIR = path.join(__dirname, "job-searcher");
 
 
 const jobSearcherCron = new CronJob(
-  "0 0-23/4 * * *", // cronTime
-  // "45 10,12,14,16 * * *", // cronTime
+  // "0 0-23/4 * * *", // cronTime
+  "45 10,12,14,16 * * *", // cronTime
   async () => {
     runScraper();
   },
