@@ -65,7 +65,7 @@ const limiter = rateLimit({
   windowMs: 30 * 60 * 1000, // 30 minutes
   max: 200,
   message: "Too many requests, please try again later.",
-  standardHeaders: true,
+  // standardHeaders: true,
   skip: (req) => req.path === "/health", // exclude health checks
 });
 
@@ -73,7 +73,7 @@ const healthLimit = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 200,
   message: "Too many requests, please try again later.",
-  standardHeaders: true,
+  // standardHeaders: true,
 });
 
 app.get("/", (req, res, next) => {
