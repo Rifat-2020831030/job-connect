@@ -228,7 +228,7 @@ const getNewJobs = async () => {
     const db = await getDB();
     // Get jobs that are updated in the last 24 hours
     const jobList = await db.collection("jobs").find({'isUpdated': true}).toArray();
-
+    const currentDate = new Date(getLocalTime());
     const newJobs = jobList.filter((job) => {
       return new Date(job.deadline) >= currentDate; // deadline not passed
     });
@@ -435,7 +435,6 @@ export const sendJobAlert = async () => {
       jobCount: jobCount,
       companyCount: companyCount,
     };
-
     // build job card html
     const jobCards = newJobs.map((job) => jobCardBuilder(job)).join("");
     const subject = "Job Alerts From ChakriLagbe";

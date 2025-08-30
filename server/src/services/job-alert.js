@@ -4,7 +4,7 @@ import { sendJobAlert } from "../controller/email-controller.js";
 import { getLocalTime } from "../utils/local-time.js"; 
 
 const jobAlertSchedule = new CronJob(
-  "59 10 * * *",
+  "0 21 * * *",
   async () => {
     console.log("Start sending job alert to mailing list at ", getLocalTime());
     await sendJobAlert()
