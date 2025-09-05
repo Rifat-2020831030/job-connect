@@ -1,4 +1,5 @@
 const scrapeRunner = require("../controller/scrape-controller");
+const { runScraper } = require("../../spider-runner");
 const dotenv = require("dotenv");
 dotenv.config();
 const express = require("express");
@@ -15,7 +16,7 @@ const auth = (req, res, next) => {
 router.get("/", auth, async (req, res) => {
   try {
     console.log("Starting scrape process...");
-    const output = await scrapeRunner.runScraper();
+    const output = await runScraper();
     console.log("Scrape process completed successfully.");
     res
       .status(200)

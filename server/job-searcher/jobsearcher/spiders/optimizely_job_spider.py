@@ -32,7 +32,6 @@ class JobSpider(scrapy.Spider):
         # details = ' '.join(details_content)
         details = response.css('div.jobDisplay *::text').getall()
         details = ' '.join([text.strip() for text in details if text.strip()])
-        print("Details:", details)
 
 
         item = items.JobsearcherItem()

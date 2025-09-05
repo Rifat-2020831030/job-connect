@@ -3,3 +3,5 @@ pymongo==4.3.3
 python-dotenv
 pydantic==2.11.7
 google-genai
+scrapy-selenium
+selenium==4.35.0
