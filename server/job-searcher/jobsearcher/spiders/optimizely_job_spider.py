@@ -27,9 +27,12 @@ class JobSpider(scrapy.Spider):
         # deadline = datetime.strptime(deadline, '%b %d, %Y').isoformat() if deadline else None
         # details_elements = response.css('div[style*="padding:10.0px 0.0px;border:1.0px solid transparent"] ::text').getall()
         # details = ' '.join([text.strip() for text in details_elements if text.strip()])
-        details_content = response.css('span.jobdescription *::text').getall()
-        details_content = [text.strip() for text in details_content if text.strip()]
-        details = ' '.join(details_content)
+        # details_content = response.css('span.jobdescription *::text').getall()
+        # details_content = [text.strip() for text in details_content if text.strip()]
+        # details = ' '.join(details_content)
+        details = response.css('div.jobDisplay *::text').getall()
+        details = ' '.join([text.strip() for text in details if text.strip()])
+        print("Details:", details)
 
 
         item = items.JobsearcherItem()
