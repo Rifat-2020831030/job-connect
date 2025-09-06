@@ -13,7 +13,8 @@ const LOG_FILE = path.join(SCRAPER_DIR, "spider_runner.log");
 // Configure the cron job schedule
 const jobSearcherCron = new CronJob(
   // "0 0-23/4 * * *", // Run every 4 hours
-  "0 3,10,14,20 * * *", // Run at specific hours
+  // "0 3,10,14,20 * * *", // Run at specific hours
+  "52 12 * * *", // Run at 12:40 PM every day
   async () => {
     try {
       await runScraper();
@@ -38,16 +39,7 @@ const getPythonExecutable = () => {
   // Check if we're in a production environment 
   if (process.env.NODE_ENV === "production") {
     return "python3";
-  }
-
-  // For local development, try to use python3 first, fall back to python
-  try {
-    // Check if python3 is available
-    spawn("python3", ["-V"]).on("error", () => {
-      return "python";
-    });
-    return "python3";
-  } catch (e) {
+  } else {
     return "python";
   }
 };
@@ -117,11 +109,11 @@ export const runScraper = async () => {
         }
 
         // Send error notification
-        await mailer(
-          "hasan1096@protonmail.com",
-          "Job Searcher Script Failed",
-          `The job searcher script failed with code ${code}.\nError: ${errorOutput}\nServer Time: ${new Date().toLocaleString()}`
-        );
+        // await mailer(
+        //   "hasan1096@protonmail.com",
+        //   "Job Searcher Script Failed",
+        //   `The job searcher script failed with code ${code}.\nError: ${errorOutput}\nServer Time: ${new Date().toLocaleString()}`
+        // );
 
         reject(new Error(errorMsg));
       } else {
