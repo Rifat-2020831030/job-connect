@@ -130,6 +130,7 @@ from jobsearcher.spiders.bs23_job_spider import JobSpider as BS23JobSpider
 from jobsearcher.spiders.dsi_job_spider import JobSpider as DSIJobSpider
 from jobsearcher.spiders.optimizely_job_spider import JobSpider as OptimizelyJobSpider
 from jobsearcher.spiders.spider4 import JobSpider as CefaloJobSpider
+from jobsearcher.spiders.spider5 import JobSpider as VivasoftJobSpider
 from jobsearcher.spiders.spider6 import JobSpider as OllyoJobSpider
 
 try:
@@ -157,6 +158,9 @@ try:
     logging.info("Adding Cefalo job spider to the queue")
     process.crawl(CefaloJobSpider)
                     
+    logging.info("Adding Vivasoft job spider to the queue")
+    process.crawl(VivasoftJobSpider)
+                    
     logging.info("Adding Ollyo job spider to the queue")
     process.crawl(OllyoJobSpider)
 
@@ -174,8 +178,9 @@ try:
     log_collection = db['scraper-log']
                     
     try:
+        utc_plus_6 = datetime.timezone(datetime.timedelta(hours=6))
         log_entry = {
-            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "timestamp": datetime.datetime.now(utc_plus_6),
             "run_status": "success"
         }
         
@@ -189,8 +194,9 @@ except Exception as e:
     client = MongoClient(mongo_uri)
     db = client[mongo_db]
     log_collection = db['scraper-log']
+    utc_plus_6 = datetime.timezone(datetime.timedelta(hours=6))
     log_entry = {
-        "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "timestamp": datetime.datetime.now(utc_plus_6),
         "run_status": "fail",
         "error": str(e)
     }
@@ -222,6 +228,7 @@ finally:
             from jobsearcher.spiders.dsi_job_spider import JobSpider as DSIJobSpider
             from jobsearcher.spiders.optimizely_job_spider import JobSpider as OptimizelyJobSpider
             from jobsearcher.spiders.spider4 import JobSpider as CefaloJobSpider
+            from jobsearcher.spiders.spider5 import JobSpider as VivasoftJobSpider
             from jobsearcher.spiders.spider6 import JobSpider as OllyoJobSpider
             dotenv_path = Path(__file__).resolve(
             ).parent.parent / '.env'
@@ -244,6 +251,9 @@ finally:
             logging.info("Adding Cefalo job spider to the queue")
             process.crawl(CefaloJobSpider)
 
+            logging.info("Adding Vivasoft job spider to the queue")
+            process.crawl(VivasoftJobSpider)
+
             logging.info("Adding Ollyo job spider to the queue")
             process.crawl(OllyoJobSpider)
 
@@ -261,9 +271,9 @@ finally:
                 client = MongoClient(mongo_uri)
                 db = client[mongo_db]
                 log_collection = db['scraper-log']
-
+                utc_plus_6 = datetime.timezone(datetime.timedelta(hours=6))
                 log_entry = {
-                    "timestamp": datetime.datetime.now(),
+                    "timestamp": datetime.datetime.now(utc_plus_6),
                     "run_status": "success"
                 }
 

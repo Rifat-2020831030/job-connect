@@ -4,7 +4,7 @@ import hashlib
 import json
 from datetime import datetime, timedelta
 
-class Spider6(scrapy.Spider):
+class JobSpider(scrapy.Spider):
     name = 'spider6'
     allowed_domains = ['jobs.ollyo.com']
     start_urls = ['https://jobs.ollyo.com/']
@@ -55,7 +55,6 @@ class Spider6(scrapy.Spider):
         vacancy = "Not specified"
         company = "Ollyo"
         # add 15 days to the current date for the deadline
-        deadline = (datetime.now() + timedelta(days=15)).strftime('%Y-%m-%dT%H:%M:%S')
 
         item = items.JobsearcherItem()
         item['title'] = title
@@ -65,7 +64,6 @@ class Spider6(scrapy.Spider):
         item['location'] = location
         item['vacancy'] = vacancy
         item['salary'] = salary
-        item['deadline'] = deadline
         item['experience'] = experience
         item['details'] = details
 
@@ -73,6 +71,9 @@ class Spider6(scrapy.Spider):
         hashValue = json.dumps(payload, sort_keys=True).encode('utf-8')
         item['hashValue'] = hashlib.sha256(hashValue).hexdigest()
 
+        # as the deadline is not fixed, so keep it away from hashing to avoid changes
+        deadline = (datetime.now() + timedelta(days=15)).strftime('%Y-%m-%dT%H:%M:%S')
+        item['deadline'] = deadline
         item['timestamp'] = datetime.now().isoformat()
         item['isUpdated'] = True
         yield item

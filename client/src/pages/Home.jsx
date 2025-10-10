@@ -23,6 +23,7 @@ const Home = () => {
     totalCompanies: "0",
     totalLocations: "0",
   });
+  const [lastUpdated, setLastUpdated] = useState("");
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -46,7 +47,26 @@ const Home = () => {
         });
       }
     };
+    const fetchLastUpdated = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/stat/last-update`
+        );
+        if (response.status === 200) {
+          const lastUpdatedDate = new Date(response.data.data.timestamp).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+          });
+          setLastUpdated(lastUpdatedDate);
+        }
+      } catch (error) {
+        console.error("Error fetching last updated scraping date:", error);
+      }
+    }
     fetchStats();
+    fetchLastUpdated();
   }, []);
 
   const handleSearch = () => {
@@ -75,7 +95,7 @@ const Home = () => {
       {/* Header Section */}
       <div className="relative overflow-hidden w-full">
         {/* Background Pattern */}
-        <div className="absolute inset-0 bg-grid-pattern opacity-5 z-0"></div>
+        <div className="absolute inset-0 bg-grid-pattern opacity-10 z-0"></div>
 
         {/* Main Content Container */}
         <div className="relative z-10">
@@ -83,19 +103,22 @@ const Home = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-16">
             {/* Site Name with Gradient */}
             <div className="text-center mb-16">
-              <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
+              <h1
+                className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-3 py-2"
+                style={{ lineHeight: "1.1" }}
+              >
                 ChakriLagbe
               </h1>
-              {/* <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Discover your dream job from thousands of opportunities across top
-                companies worldwide
-              </p> */}
+              <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Discover your dream job from thousands of opportunities across
+                top companies nationwide
+              </p>
             </div>
 
             {/* Statistics Section */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
               <Stat
-                info="Total Jobs Available"
+                info="Total Jobs"
                 number={stats.totalJobs}
                 Icon={<BriefcaseIcon className="w-8 h-8 text-white" />}
               />
@@ -203,18 +226,21 @@ const Home = () => {
         </div>
 
         {/* Job List Section - Separate Container */}
-        <div className="bg-white/50 backdrop-blur-sm py-10" id="job-list">
-          <div className="max-w-7xl lg:max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <JobList
-              isSearching={isSearching}
-              setIsSearching={setIsSearching}
-              searchQuery={searchQuery}
-              sortByValue={sortBy}
-            />
+          <div className="bg-white/50 backdrop-blur-sm py-10" id="job-list">
+            <div className="max-w-7xl lg:max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+              <JobList
+                isSearching={isSearching}
+                setIsSearching={setIsSearching}
+                searchQuery={searchQuery}
+                sortByValue={sortBy}
+              />
+            </div>
+            <div className="flex justify-end px-4 sm:px-6 lg:px-8 m-2">
+              <span className="text-gray-800 bg-slate-400 italic text-xs p-0.5 sm:text-xs">Last Updated: {lastUpdated || "Not Available"}</span>
+            </div>
           </div>
-        </div>
 
-        {/* Newsletter section */}
+          {/* Newsletter section */}
         <EmailCard />
       </div>
     </div>
