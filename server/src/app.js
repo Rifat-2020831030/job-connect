@@ -14,6 +14,10 @@ const { jobSearcherCron } = require("../spider-runner");
 const { jobAlertSchedule } = require("./services/job-alert");
 const serverHealth = require("./controller/server-health");
 const {source} = require('./utils/source');
+// const dns = require("node:dns/promises");
+
+// dns.setServers(["1.1.1.1", "1.0.0.1"]);
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;

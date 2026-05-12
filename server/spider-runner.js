@@ -14,6 +14,7 @@ const LOG_FILE = path.join(SCRAPER_DIR, "spider_runner.log");
 const jobSearcherCron = new CronJob(
   // "0 0-23/4 * * *", // Run every 4 hours
   "0 3,10,14,20 * * *", // Run at specific hours
+  // "48 0 * * *", // Run daily at 12:12 PM
   async () => {
     try {
       await runScraper();
