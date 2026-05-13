@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 import coffeeMug from "../assets/coffee.png";
-import { Link, NavLink } from "react-router-dom";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -66,20 +66,20 @@ const Navbar = () => {
   const navLinks = [
     {
       to: "/#data-job-search",
-      label: "Find Jobs"
+      label: "Find Jobs",
     },
     {
       to: "/companies",
-      label: "Companies"
+      label: "Companies",
     },
     {
       to: "/salary",
-      label: "Salary Guide"
+      label: "Salary Guide",
     },
     {
       to: "/experience",
-      label: "Interview Experience"
-    }
+      label: "Interview Experience",
+    },
   ];
 
   return (
@@ -115,18 +115,24 @@ const Navbar = () => {
 
           {/* Desktop Buy Me Coffee Button */}
           <div className="hidden md:flex items-center space-x-4">
-            <button className="bg-gradient-to-r from-blue-400 to-blue-700 hover:from-blue-500 hover:to-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-all duration-200 flex items-center space-x-2 shadow-md hover:shadow-lg">
+            <NavLink
+              to="/coming-soon"
+              className="bg-gradient-to-r from-blue-400 to-blue-700 hover:from-blue-500 hover:to-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-all duration-200 flex items-center space-x-2 shadow-md hover:shadow-lg"
+            >
               <img src={coffeeMug} alt="Coffee Mug" className="w-4 h-4" />
               <span>Buy me coffee</span>
-            </button>
+            </NavLink>
           </div>
 
           {/* Mobile: Buy Me Coffee Button + Menu Button */}
           <div className="md:hidden flex items-center space-x-3">
             {/* Mobile Buy Me Coffee Button */}
-            <button className="bg-blue-300 hover:bg-blue-500 text-white font-medium px-3 py-2 rounded-lg transition-all duration-200 flex items-center shadow-md">
+            <NavLink
+              to="/coming-soon"
+              className="bg-blue-300 hover:bg-blue-500 text-white font-medium px-3 py-2 rounded-lg transition-all duration-200 flex items-center shadow-md"
+            >
               <img src={coffeeMug} alt="Coffee Mug" className="w-4 h-4" />
-            </button>
+            </NavLink>
 
             {/* Mobile Menu Button */}
             <button
@@ -229,10 +235,14 @@ const Navbar = () => {
                 </div>
               </div>
               <div className="p-6 border-t border-gray-200 bg-gray-50">
-                <button className="w-full bg-gradient-to-r from-blue-400 to-blue-700 hover:from-blue-500 hover:to-blue-800 text-white font-medium px-6 py-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                <NavLink
+                  to="/coming-soon"
+                  onClick={toggleMenu}
+                  className="w-full bg-gradient-to-r from-blue-400 to-blue-700 hover:from-blue-500 hover:to-blue-800 text-white font-medium px-6 py-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
                   <img src={coffeeMug} alt="Coffee Mug" className="w-5 h-5" />
                   <span>Buy me coffee</span>
-                </button>
+                </NavLink>
               </div>
             </div>
           </div>
