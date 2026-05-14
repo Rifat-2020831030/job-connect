@@ -1,6 +1,6 @@
-import { getDB } from "../db/database.js";
+const { getDB } = require("../db/database");
 
-export const getJobStats = async (req, res) => {
+const getJobStats = async (req, res) => {
   try {
     const db = await getDB();
     const stats = await db
@@ -38,4 +38,8 @@ export const getJobStats = async (req, res) => {
     console.error("Error fetching job stats:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
+};
+
+module.exports = {
+  getJobStats,
 };

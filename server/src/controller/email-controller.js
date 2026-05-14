@@ -1,11 +1,11 @@
-import crypto from "crypto";
-import { ObjectId } from "mongodb";
+const crypto = require("crypto");
+const { ObjectId } = require("mongodb");
 
-import { getDB } from "../db/database.js";
-import mailer from "../services/mail-service.js";
-import { getLocalTime } from "../utils/local-time.js";
+const { getDB } = require("../db/database");
+const mailer = require("../services/mail-service");
+const { getLocalTime } = require("../utils/local-time");
 
-export const subscribeEmail = async (req, res) => {
+const subscribeEmail = async (req, res) => {
   try {
     const db = await getDB();
     const {
@@ -81,7 +81,7 @@ export const subscribeEmail = async (req, res) => {
   }
 };
 
-export const unsubscribeEmail = async (req, res) => {
+const unsubscribeEmail = async (req, res) => {
   try {
     const db = await getDB();
     const { id } = req.query;
@@ -108,7 +108,7 @@ export const unsubscribeEmail = async (req, res) => {
   }
 };
 
-export const getEmailList = async () => {
+const getEmailList = async () => {
   try {
     const db = await getDB();
     const emails = await db
@@ -118,6 +118,7 @@ export const getEmailList = async () => {
     return emails;
   } catch (error) {
     console.error("Error fetching email list:", error);
+    throw error;
   }
 };
 
@@ -166,7 +167,7 @@ const welcomeMailTemplate = () => {
   `;
 };
 
-export const verifyCode = async (req, res) => {
+const verifyCode = async (req, res) => {
   const { email, code } = req.body;
 
   if (!email || !code) {
@@ -226,6 +227,7 @@ export const verifyCode = async (req, res) => {
 const getNewJobs = async () => {
   try {
     const db = await getDB();
+    const currentDate = new Date();
     // Get jobs that are updated in the last 24 hours
     const jobList = await db.collection("jobs").find({'isUpdated': true}).toArray();
 
@@ -236,7 +238,7 @@ const getNewJobs = async () => {
     return newJobs;
   } catch (error) {
     console.error("Error fetching new jobs:", error);
-    return [];
+    throw error;
   }
 };
 
@@ -412,19 +414,29 @@ const createEmailTemplate = (jobList, unsubscribeUrl, data) => {
   `;
 };
 
-export const sendJobAlert = async () => {
+const sendJobAlert = async () => {
   try {
     const db = await getDB();
     const mailingList = await getEmailList();
     if (mailingList.length === 0) {
       console.log("No Verified Mail subscriber found.");
-      return;
+      return {
+        failedEmails: [],
+        receiverEmails: [],
+        totalJobs: 0,
+        totalSubscribers: 0,
+      };
     }
 
     const newJobs = await getNewJobs();
     if (newJobs.length === 0) {
       console.log("No new jobs found to send alert.");
-      return;
+      return {
+        failedEmails: [],
+        receiverEmails: [],
+        totalJobs: 0,
+        totalSubscribers: mailingList.length,
+      };
     }
 
     // Get the count of new jobs and companies
@@ -455,8 +467,12 @@ export const sendJobAlert = async () => {
       );
       // sending mail
       try {
-        await mailer(subscriber.email, subject, "", html);
-        recieverEmails.push(subscriber.email);
+        const sent = await mailer(subscriber.email, subject, "", html);
+        if (sent) {
+          recieverEmails.push(subscriber.email);
+        } else {
+          failedEmails.push(subscriber.email);
+        }
       } catch (error) {
         console.error(`Error sending job alert to ${subscriber.email}:`, error);
         failedEmails.push(subscriber.email);
@@ -473,7 +489,23 @@ export const sendJobAlert = async () => {
       recieverEmails: recieverEmails,
       jobsID: jobsID,
     });
+
+    return {
+      failedEmails,
+      receiverEmails: recieverEmails,
+      totalJobs: newJobs.length,
+      totalSubscribers: mailingList.length,
+    };
   } catch (error) {
     console.error("Error sending job alert:", error);
+    throw error;
   }
+};
+
+module.exports = {
+  getEmailList,
+  sendJobAlert,
+  subscribeEmail,
+  unsubscribeEmail,
+  verifyCode,
 };

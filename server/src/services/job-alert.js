@@ -1,18 +1,20 @@
-import { CronJob } from "cron";
+const { CronJob } = require("cron");
 
-import { sendJobAlert } from "../controller/email-controller.js";
-import { getLocalTime } from "../utils/local-time.js"; 
+const { sendJobAlert } = require("../controller/email-controller");
+const { getLocalTime } = require("../utils/local-time");
 
 const jobAlertSchedule = new CronJob(
   "0 20 * * *",
   async () => {
     console.log("Start sending job alert to mailing list at ", getLocalTime());
-    await sendJobAlert()
+    await sendJobAlert();
     console.log("Finished sending job alert at ", getLocalTime());
   },
   null,
   false,
-  "UTC+6"
+  "Asia/Dhaka"
 );
 
-export { jobAlertSchedule };
+module.exports = {
+  jobAlertSchedule,
+};

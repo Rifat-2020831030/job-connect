@@ -44,7 +44,16 @@ const getDB = async () => {
   return cachedDb;
 };
 
+const closeDB = async () => {
+  if (cachedClient) {
+    await cachedClient.close();
+  }
+  cachedClient = null;
+  cachedDb = null;
+};
+
 module.exports = {
+  closeDB,
   connectDB,
   getDB,
 };

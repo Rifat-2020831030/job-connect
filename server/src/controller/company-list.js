@@ -1,6 +1,6 @@
-import { getDB } from "../db/database.js";
+const { getDB } = require("../db/database");
 
-export const getCompanies = async (req, res) => {
+const getCompanies = async (req, res) => {
   try {
     const db = await getDB();
     const response = await db.collection("jobs").find({}).toArray();
@@ -18,4 +18,8 @@ export const getCompanies = async (req, res) => {
     console.error("Error fetching companies:", error);
     res.status(500).json({ error: "Error when fetching company list" });
   }
+};
+
+module.exports = {
+  getCompanies,
 };
