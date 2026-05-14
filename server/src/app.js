@@ -10,16 +10,17 @@ const jobsRouter = require("./routers/jobs");
 const jobsStat = require("./routers/stat");
 const emailRouter = require("./routers/email");
 const scrapeRouter = require("./routers/scrape");
-const { jobSearcherCron } = require("../spider-runner");
 const { jobAlertSchedule } = require("./services/job-alert");
 const serverHealth = require("./controller/server-health");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isVercelRuntime = Boolean(process.env.VERCEL);
 
-// Start the scheduled cron job
-jobSearcherCron.start();
-jobAlertSchedule.start();
+// Job scraping is scheduled externally by GitHub Actions.
+if (!isVercelRuntime) {
+  jobAlertSchedule.start();
+}
 
 // Allowed origins
 const allowedOrigins = [

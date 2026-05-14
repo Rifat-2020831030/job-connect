@@ -15,6 +15,7 @@ class JobsearcherPipeline:
         self.mongo_uri = mongo_uri
         self.mongo_db = mongo_db
         self.mongo_collection = mongo_collection
+        self.client = None
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -25,14 +26,24 @@ class JobsearcherPipeline:
         )
     
     def open_spider(self, spider):
-        self.client = pymongo.MongoClient(self.mongo_uri)
+        if not self.mongo_uri:
+            raise RuntimeError("MongoDB connection string 'db_uri' is not configured")
+
+        self.client = pymongo.MongoClient(
+            self.mongo_uri,
+            serverSelectionTimeoutMS=10000,
+            connectTimeoutMS=10000,
+            socketTimeoutMS=45000,
+        )
+        self.client.admin.command("ping")
         self.db = self.client[self.mongo_db]
         self.mongo_collection = self.db[self.mongo_collection]
 
         self.mongo_collection.create_index('hashValue', unique=True)
 
     def close_spider(self, spider):
-        self.client.close()
+        if self.client is not None:
+            self.client.close()
 
     def process_item(self, item, spider):
         try:
