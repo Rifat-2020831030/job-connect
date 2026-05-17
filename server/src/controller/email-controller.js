@@ -230,7 +230,7 @@ const getNewJobs = async () => {
     const currentDate = new Date();
     // Get jobs that are updated in the last 24 hours
     const jobList = await db.collection("jobs").find({'isUpdated': true}).toArray();
-
+    const currentDate = new Date(getLocalTime());
     const newJobs = jobList.filter((job) => {
       return new Date(job.deadline) >= currentDate; // deadline not passed
     });
@@ -297,15 +297,14 @@ const jobCardBuilder = (job) => {
                     <tr>
                         <td style="width: 33.33%; padding-right: 10px; vertical-align: top;">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">SALARY</p>
-                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">${
-                              job.salary
-                            }</p>
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">
+                            ${(job.salary_min ? `${job.salary_min} to ${job.salary_max}` : `${job.salary ? job.salary : 'Not specified'}`)}
+                            </p>
                         </td>
                         <td style="width: 33.33%; padding-right: 10px; vertical-align: top;">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">VACANCY</p>
-                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">${
-                              job.vacancy
-                            }</p>
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">
+                            ${job.vacancy != -1 ? job.vacancy : 'Not specified'}</p>
                         </td>
                         <td style="width: 33.33%; vertical-align: top;">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">DEADLINE</p>
@@ -417,6 +416,7 @@ const createEmailTemplate = (jobList, unsubscribeUrl, data) => {
 const sendJobAlert = async () => {
   try {
     const db = await getDB();
+    // gather mailing list
     const mailingList = await getEmailList();
     if (mailingList.length === 0) {
       console.log("No Verified Mail subscriber found.");
@@ -427,7 +427,7 @@ const sendJobAlert = async () => {
         totalSubscribers: 0,
       };
     }
-
+    // gather new jobs
     const newJobs = await getNewJobs();
     if (newJobs.length === 0) {
       console.log("No new jobs found to send alert.");
@@ -438,6 +438,11 @@ const sendJobAlert = async () => {
         totalSubscribers: mailingList.length,
       };
     }
+    // update new jobs status to - sent
+    await db.collection("jobs").updateMany(
+      { _id: { $in: newJobs.map((job) => job._id) } },
+      { $set: { isUpdated: false } }
+    );
 
     // Get the count of new jobs and companies
     const jobCount = newJobs.length;
@@ -447,7 +452,6 @@ const sendJobAlert = async () => {
       jobCount: jobCount,
       companyCount: companyCount,
     };
-
     // build job card html
     const jobCards = newJobs.map((job) => jobCardBuilder(job)).join("");
     const subject = "Job Alerts From ChakriLagbe";

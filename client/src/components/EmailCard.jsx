@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useState } from "react";
 
+import Loader from "../utils/Loader";
+import Popup from "./PopUp";
 import VerificationCard from "./VerificationCard";
 
 const EmailCard = () => {
@@ -51,10 +53,11 @@ const EmailCard = () => {
     } catch (error) {
       console.error("Subscription error:", error);
       setLoading(false);
-      
       // Handle 409 Conflict (email already exists)
       if (error.response && error.response.status === 409) {
-        setAlertMessage("This email is already registered. Please use a different email.");
+        setAlertMessage(
+          "This email is already registered. Please use a different email."
+        );
         setAlertType("error");
         setShowAlert(true);
       } else {
@@ -70,79 +73,49 @@ const EmailCard = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-purple-400 py-10 z-10 relative">
-      {loading && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md mx-auto text-center">
-            <p className="text-lg font-semibold text-gray-800">
-              Subscribing...
-            </p>
-          </div>
-        </div>
+    <>
+      {loading && <Loader />}
+      {showVerification && (
+        <VerificationCard
+          setEmail={setEmail}
+          showVerification={showVerification}
+          setShowVerification={setShowVerification}
+          email={email}
+          setAlertMessage={setAlertMessage}
+          setAlertType={setAlertType}
+          setShowAlert={setShowAlert}
+        />
       )}
-      {showVerification && <VerificationCard setEmail={setEmail} setShowVerification={setShowVerification} email={email} setAlertMessage={setAlertMessage} setAlertType={setAlertType} setShowAlert={setShowAlert} />}
       {showAlert && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div
-            className={`bg-white p-6 rounded-lg shadow-xl max-w-md mx-auto text-center ${
-              alertType === "success"
-                ? "border-l-4 border-green-500"
-                : "border-l-4 border-red-500"
-            }`}
-          >
-            <p
-              className={`text-lg font-semibold ${
-                alertType === "success" ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {alertMessage}
-            </p>
+        <>
+          <Popup isOpen={showAlert} message={alertMessage} type={alertType} onClose={closeAlert} />
+        </>
+      )}
+
+      <div className="max-w-2xl mx-auto mb-10 sm:mb-12 px-4">
+        <form onSubmit={handleSubmittion} className="relative">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-0">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email address"
+              className="w-full sm:flex-1 px-4 sm:px-6 py-4 text-gray-700 border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none placeholder-gray-400 rounded-xl sm:rounded-r-none transition-all duration-200"
+              required
+            />
             <button
-              onClick={closeAlert}
-              className="mt-4 bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded"
+              type="submit"
+              className={`w-full sm:w-auto bg-[#2563eb] text-white font-semibold px-6 sm:px-8 py-4 rounded-xl sm:rounded-l-none transition-all duration-200`}
             >
-              Close
+              Get Job Alerts
             </button>
           </div>
-        </div>
-      )}
-     
-      <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-center justify-center md:space-x-8">
-          <div className="w-full md:w-1/2 mb-8 md:mb-0 text-center md:text-left">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Stay Updated with Job Alerts
-            </h2>
-            <p className="text-lg text-white">
-              Subscribe to our newsletter for the latest job openings.
-            </p>
-          </div>
-          <div className="w-full md:w-1/2 max-w-md mx-auto md:mx-0">
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <form
-                className="flex flex-col space-y-3"
-                onSubmit={handleSubmittion}
-              >
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <button
-                  type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-full shadow-md"
-                >
-                  Subscribe
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
+        </form>
+        <p className="text-sm text-gray-500 mt-3">
+          Receive job updates the same day they're posted. No spam, ever.
+        </p>
       </div>
-    </div>
+    </>
   );
 };
 

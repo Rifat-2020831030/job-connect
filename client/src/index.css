@@ -1,12 +1,46 @@
+@import 'utils/loader.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom background grid pattern */
+
+/* Custom background grid pattern with gradient fade */
 .bg-grid-pattern {
-  background-image: linear-gradient(to right, #f1f5f9 1px, transparent 1px),
-    linear-gradient(to bottom, #f1f5f9 1px, transparent 1px);
-  background-size: 30px 30px;
+  background-image: linear-gradient(to right, #bfc4c8 1px, transparent 1px),
+    linear-gradient(to bottom, #babdc1 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.bg-grid-pattern::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.1) 40%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  pointer-events: none;
+}
+
+/* CSS custom properties for gradient colors */
+:root {
+  --primary-color: #2563eb;
+  --secondary-color: #9333ea;
+  --primary-gradient: linear-gradient(to right, #2563eb, #9333ea);
+  --primary-gradient-hover: linear-gradient(to right, #1d4ed8, #7c3aed);
+}
+
+.bg-primary-gradient {
+  background: var(--primary-gradient);
+}
+
+.bg-primary-gradient:hover {
+  background: var(--primary-gradient-hover);
 }
 
 /* Custom scrollbar for webkit browsers */
@@ -27,8 +61,12 @@
   background: linear-gradient(to bottom, #2563eb, #7c3aed);
 }
 
-/* Smooth transitions for all elements */
-* {
+/* Smooth transitions for common interactive elements */
+a,
+button,
+input,
+select,
+textarea {
   transition: all 0.2s ease-in-out;
 }
 
@@ -53,4 +91,18 @@ button:focus {
 
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 640px) {
+  .bg-grid-pattern {
+    background-size: 15px 15px;
+  }
+}
+
+/* Prevent scroll when mobile menu is open */
+.no-scroll {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
 }

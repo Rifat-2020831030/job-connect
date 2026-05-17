@@ -1,16 +1,20 @@
 import axios from "axios";
 import { useState } from "react";
+import { useScrollLock } from "../hooks/useScrollLock";
 
 const VerificationCard = ({
   setEmail,
+  showVerification,
   setShowVerification,
   email,
   setAlertType,
   setAlertMessage,
   setShowAlert,
 }) => {
+  useScrollLock(showVerification);
   const [code, setCode] = useState("");
   const handleVerification = async () => {
+    if (!code) return;
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/email/verify-code`,
@@ -38,11 +42,13 @@ const VerificationCard = ({
       setAlertMessage(errorMessage);
       setAlertType("error");
       setShowAlert(true);
-      // Keep the verification modal open so they can try again
+      // Keep the verification modal open so can try again
       setShowVerification(true);
     }
   };
   return (
+    <>
+    {/* <ScrollLock active={showVerification} /> */}
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 p-4">
       <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg mx-auto text-center">
         <p className="text-gray-600 mb-4 text-lg">
@@ -73,6 +79,7 @@ const VerificationCard = ({
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -12,6 +12,11 @@ const emailRouter = require("./routers/email");
 const scrapeRouter = require("./routers/scrape");
 const { jobAlertSchedule } = require("./services/job-alert");
 const serverHealth = require("./controller/server-health");
+const {source} = require('./utils/source');
+// const dns = require("node:dns/promises");
+
+// dns.setServers(["1.1.1.1", "1.0.0.1"]);
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,7 +31,8 @@ if (!isVercelRuntime) {
 const allowedOrigins = [
   "https://chakrilagbe.vercel.app",
   "https://server-health-tau.vercel.app",
-  "http://localhost:5173", // For local development
+  "https://chakrilagbe-client-admin.vercel.app",
+  // "http://localhost:5173", // For local development
 ];
 
 const corsOption = {
@@ -34,8 +40,9 @@ const corsOption = {
     // Disallow requests with no origin 
     if (!origin) {
       callback(
-        new Error("CORS Error: No origin provided"),
-        false
+        // new Error("CORS Error: No origin provided"),
+        null,
+        true
       );
       return;
     }
@@ -47,14 +54,14 @@ const corsOption = {
       console.error(`CORS blocked origin: ${origin}`);
       callback(
         new Error(
-          `Access denied: Origin '${origin}' not allowed by CORS policy`
+          `Access denied: Origin '${origin}' not allowed.`
         ),
         false
       );
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true, // Allow cookies if needed
   optionsSuccessStatus: 200,
 };
@@ -63,7 +70,7 @@ const limiter = rateLimit({
   windowMs: 30 * 60 * 1000, // 30 minutes
   max: 200,
   message: "Too many requests, please try again later.",
-  standardHeaders: true,
+  // standardHeaders: true,
   skip: (req) => req.path === "/health", // exclude health checks
 });
 
@@ -71,21 +78,27 @@ const healthLimit = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 200,
   message: "Too many requests, please try again later.",
-  standardHeaders: true,
+  // standardHeaders: true,
 });
 
 app.get("/", (req, res, next) => {
   res.send("The server is running");
 });
 
-app.use("/api", cors(corsOption));
+// app.use("/api", cors(corsOption));
 app.use(limiter);
 app.use(express.json());
 app.use(compression());
 
 app.get("/health", healthLimit, serverHealth);
 
-app.use("/api/jobs", jobsRouter);
+app.use(limiter);
+app.use(express.json());
+app.use(compression());
+
+app.get("/health", healthLimit, serverHealth);
+
+app.use("/api/jobs", source, jobsRouter);
 app.use("/api/stat", jobsStat);
 app.use("/api/email", emailRouter);
 app.use("/api/scrape", scrapeRouter);

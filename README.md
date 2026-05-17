@@ -2,7 +2,7 @@
 
 Chakri Lagbe is a comprehensive job aggregator platform designed to help users discover job opportunities across multiple tech companies in a single place. The platform enables users to stay updated with the latest job postings in a faster and simplified manner, eliminating unproductive scrolling on social sites. The platform features automated job scraping, personalized job alerts, detailed job listings, and company profiles. With future plan of adding user accounts, resume quality checks, interview preparation, and many more. Chakri Lagbe aims to be the go-to destination for job seekers in the tech industry.
 
-<!-- ![Chakri Lagbe Platform](client/src/assets/taka.png) -->
+![Chakri Lagbe Platform](client/src/assets/taka.png)
 
 ## 🌟 Features
 
