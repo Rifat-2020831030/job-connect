@@ -1,5 +1,5 @@
-const { MongoClient } = require("mongodb");
-const dotenv = require("dotenv");
+import dotenv from "dotenv";
+import { MongoClient } from "mongodb";
 dotenv.config();
 const url = process.env.db_uri;
 const dbName = "job-collection";
@@ -44,7 +44,4 @@ const getDB = async () => {
   return cachedDb;
 };
 
-module.exports = {
-  connectDB,
-  getDB,
-};
+export { connectDB, getDB };
