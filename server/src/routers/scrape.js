@@ -1,8 +1,8 @@
-const scrapeRunner = require("../controller/scrape-controller");
-const { runScraper } = require("../../spider-runner");
-const dotenv = require("dotenv");
+// const { runScraper } = require("../../spider-runner"); // spider-runner exporting correctly isn't checked
+import dotenv from "dotenv";
+import express from "express";
+import { runScraper } from "../../spider-runner.js";
 dotenv.config();
-const express = require("express");
 const router = express.Router();
 
 const auth = (req, res, next) => {
@@ -41,4 +41,4 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

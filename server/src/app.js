@@ -1,22 +1,21 @@
-const express = require("express");
-const cors = require("cors");
-const compression = require("compression");
-const { rateLimit } = require("express-rate-limit");
-const { connectDB } = require("./db/database");
-const dotenv = require("dotenv");
+import compression from "compression";
+import dotenv from "dotenv";
+import express from "express";
+import { rateLimit } from "express-rate-limit";
+import { connectDB } from "./db/database.js";
 dotenv.config();
 
-const jobsRouter = require("./routers/jobs");
-const jobsStat = require("./routers/stat");
-const emailRouter = require("./routers/email");
-const scrapeRouter = require("./routers/scrape");
-const { jobAlertSchedule } = require("./services/job-alert");
-const serverHealth = require("./controller/server-health");
-const {source} = require('./utils/source');
-// const dns = require("node:dns/promises");
+import dns from "dns";
+import { jobSearcherCron } from "../spider-runner.js";
+import serverHealth from "./controller/server-health.js";
+import emailRouter from "./routers/email.js";
+import jobsRouter from "./routers/jobs.js";
+import scrapeRouter from "./routers/scrape.js";
+import jobsStat from "./routers/stat.js";
+import { jobAlertSchedule } from "./services/job-alert.js";
+import { source } from "./utils/source.js";
 
-// dns.setServers(["1.1.1.1", "1.0.0.1"]);
-
+dns.setServers(["1.1.1.1", "1.0.0.1"]);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -37,7 +36,7 @@ const allowedOrigins = [
 
 const corsOption = {
   origin: (origin, callback) => {
-    // Disallow requests with no origin 
+    // Disallow requests with no origin
     if (!origin) {
       callback(
         // new Error("CORS Error: No origin provided"),
@@ -53,9 +52,7 @@ const corsOption = {
     } else {
       console.error(`CORS blocked origin: ${origin}`);
       callback(
-        new Error(
-          `Access denied: Origin '${origin}' not allowed.`
-        ),
+        new Error(`Access denied: Origin '${origin}' not allowed.`),
         false
       );
     }
@@ -105,7 +102,7 @@ app.use("/api/scrape", scrapeRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  // Handle CORS errors 
+  // Handle CORS errors
   if (err.message.includes("Origin") && err.message.includes("not allowed")) {
     return res.status(403).json({
       status: 0,
