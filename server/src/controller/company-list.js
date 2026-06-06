@@ -1,4 +1,4 @@
-const { getDB } = require("../db/database");
+import { getDB } from "../db/database.js";
 
 const getCompanies = async (req, res) => {
   try {
@@ -20,6 +20,6 @@ const getCompanies = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
   getCompanies,
 };

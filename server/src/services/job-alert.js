@@ -1,7 +1,7 @@
-const { CronJob } = require("cron");
+import { CronJob } from "cron";
 
-const { sendJobAlert } = require("../controller/email-controller");
-const { getLocalTime } = require("../utils/local-time");
+import { sendJobAlert } from "../controller/email-controller.js";
+import { getLocalTime } from "../utils/local-time.js";
 
 const jobAlertSchedule = new CronJob(
   "0 20 * * *",
@@ -15,6 +15,6 @@ const jobAlertSchedule = new CronJob(
   "Asia/Dhaka"
 );
 
-module.exports = {
+export {
   jobAlertSchedule,
 };

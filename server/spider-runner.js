@@ -34,6 +34,6 @@ const jobSearcherCron = new CronJob(
   "Asia/Dhaka"
 );
 
-module.exports = {
+export {
   jobSearcherCron,
 };

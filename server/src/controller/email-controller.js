@@ -1,9 +1,9 @@
-const crypto = require("crypto");
-const { ObjectId } = require("mongodb");
+import crypto from "crypto";
+import { ObjectId } from "mongodb";
 
-const { getDB } = require("../db/database");
-const mailer = require("../services/mail-service");
-const { getLocalTime } = require("../utils/local-time");
+import { getDB } from "../db/database.js";
+import mailer from "../services/mail-service.js";
+import { getLocalTime } from "../utils/local-time.js";
 
 const subscribeEmail = async (req, res) => {
   try {
@@ -92,7 +92,10 @@ const unsubscribeEmail = async (req, res) => {
     }
     const response = await db
       .collection("emails")
-      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { verify: false, unsubscriptionTime: getLocalTime() } });
+      .findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: { verify: false, unsubscriptionTime: getLocalTime() } }
+      );
 
     if (!response) {
       return res.status(404).json({ status: 0, message: "Email not found" });
@@ -100,7 +103,7 @@ const unsubscribeEmail = async (req, res) => {
     res.status(200).json({
       status: 1,
       message: "Email unsubscribed successfully",
-      data: response.email ,
+      data: response.email,
     });
   } catch (error) {
     console.error("Error unsubscribing email:", error);
@@ -194,17 +197,26 @@ const verifyCode = async (req, res) => {
         .status(400)
         .json({ status: 0, message: "Email already verified" });
     }
-    const response = await db
-      .collection("emails")
-      .updateOne(
+    const response = await db.collection("emails").updateOne(
       { email: email },
-      { $set: { verify: true, code: null, exp: null, subscriptionTime: getLocalTime() } }
-      );
-    if(response.acknowledged) {
-      res.status(200).json({ status: 1, message: "Email verified successfully" });
-    }
-    else {
-      res.status(500).json({ status: 0, message: "Failed to verify email. Please try again later." });
+      {
+        $set: {
+          verify: true,
+          code: null,
+          exp: null,
+          subscriptionTime: getLocalTime(),
+        },
+      }
+    );
+    if (response.acknowledged) {
+      res
+        .status(200)
+        .json({ status: 1, message: "Email verified successfully" });
+    } else {
+      res.status(500).json({
+        status: 0,
+        message: "Failed to verify email. Please try again later.",
+      });
     }
 
     // send welcome mail (async operation after response)
@@ -229,8 +241,10 @@ const getNewJobs = async () => {
     const db = await getDB();
     const currentDate = new Date();
     // Get jobs that are updated in the last 24 hours
-    const jobList = await db.collection("jobs").find({'isUpdated': true}).toArray();
-    const currentDate = new Date(getLocalTime());
+    const jobList = await db
+      .collection("jobs")
+      .find({ isUpdated: true })
+      .toArray();
     const newJobs = jobList.filter((job) => {
       return new Date(job.deadline) >= currentDate; // deadline not passed
     });
@@ -249,7 +263,9 @@ const jobCardBuilder = (job) => {
         <!-- Image Header -->
         <tr>
             <td align="center" style="padding: 0; text-align: center; background-color: #6BAAE8; border-radius: 8px 8px 0 0;">
-                <img src="${job.logo}" alt="${job.company} Logo" width="150" height="auto" style="display: block; max-width: 150px; height: auto; min-height: 50px; padding: 20px 0; border: 0; object-fit: cover;">
+                <img src="${job.logo}" alt="${
+    job.company
+  } Logo" width="150" height="auto" style="display: block; max-width: 150px; height: auto; min-height: 50px; padding: 20px 0; border: 0; object-fit: cover;">
             </td>
         </tr>
         
@@ -298,13 +314,19 @@ const jobCardBuilder = (job) => {
                         <td style="width: 33.33%; padding-right: 10px; vertical-align: top;">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">SALARY</p>
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">
-                            ${(job.salary_min ? `${job.salary_min} to ${job.salary_max}` : `${job.salary ? job.salary : 'Not specified'}`)}
+                            ${
+                              job.salary_min
+                                ? `${job.salary_min} to ${job.salary_max}`
+                                : `${job.salary ? job.salary : "Not specified"}`
+                            }
                             </p>
                         </td>
                         <td style="width: 33.33%; padding-right: 10px; vertical-align: top;">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">VACANCY</p>
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">
-                            ${job.vacancy != -1 ? job.vacancy : 'Not specified'}</p>
+                            ${
+                              job.vacancy != -1 ? job.vacancy : "Not specified"
+                            }</p>
                         </td>
                         <td style="width: 33.33%; vertical-align: top;">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">DEADLINE</p>
@@ -439,10 +461,12 @@ const sendJobAlert = async () => {
       };
     }
     // update new jobs status to - sent
-    await db.collection("jobs").updateMany(
-      { _id: { $in: newJobs.map((job) => job._id) } },
-      { $set: { isUpdated: false } }
-    );
+    await db
+      .collection("jobs")
+      .updateMany(
+        { _id: { $in: newJobs.map((job) => job._id) } },
+        { $set: { isUpdated: false } }
+      );
 
     // Get the count of new jobs and companies
     const jobCount = newJobs.length;
@@ -506,7 +530,7 @@ const sendJobAlert = async () => {
   }
 };
 
-module.exports = {
+export {
   getEmailList,
   sendJobAlert,
   subscribeEmail,

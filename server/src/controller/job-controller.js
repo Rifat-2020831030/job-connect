@@ -1,5 +1,5 @@
-const { ObjectId } = require("mongodb");
-const { getDB } = require("../db/database");
+import { ObjectId } from "mongodb";
+import { getDB } from "../db/database.js";
 
 const getJobs = async (req, res) => {
   try {
@@ -17,7 +17,7 @@ const getJobs = async (req, res) => {
       .skip(Number(offset))
       .limit(Number(limit))
       .toArray();
-      
+
     // Filter jobs based on deadline
     const filteredJobs = jobs.filter((job) => {
       if (!job.deadline) return true; // If no deadline, include the job
@@ -67,7 +67,4 @@ const getJobById = async (req, res) => {
   }
 };
 
-module.exports = {
-  getJobById,
-  getJobs,
-};
+export { getJobById, getJobs };

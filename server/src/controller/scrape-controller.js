@@ -1,5 +1,5 @@
-const { getDB } = require("../db/database");
-const { runScraper } = require("../services/scraper-runner");
+import { getDB } from "../db/database.js";
+import { runScraper } from "../services/scraper-runner.js";
 
 const getLastScrapeTime = async (req, res) => {
   try {
@@ -22,7 +22,7 @@ const getLastScrapeTime = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
   getLastScrapeTime,
   runScraper,
 };

@@ -1,7 +1,7 @@
-const dotenv = require("dotenv");
+import dotenv from "dotenv";
 
-const { closeDB, connectDB } = require("../src/db/database");
-const { sendJobAlert } = require("../src/controller/email-controller");
+import { closeDB, connectDB } from "../src/db/database.js";
+import { sendJobAlert } from "../src/controller/email-controller.js";
 
 dotenv.config();
 

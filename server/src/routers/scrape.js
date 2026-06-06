@@ -1,7 +1,7 @@
-// const { runScraper } = require("../../spider-runner"); // spider-runner exporting correctly isn't checked
+// import { runScraper } from "../services/scraper-runner.js"; // spider-runner exporting correctly isn't checked
 import dotenv from "dotenv";
 import express from "express";
-import { runScraper } from "../../spider-runner.js";
+import { runScraper } from "../services/scraper-runner.js";
 dotenv.config();
 const router = express.Router();
 
