@@ -29,113 +29,11 @@ const jobSearcherCron = new CronJob(
       );
     }
   },
-  null, // onComplete
-  false, // start
-  "UTC+6" // timeZone
+  null,
+  false,
+  "Asia/Dhaka"
 );
 
-// Determine the Python executable path based on the environment
-const getPythonExecutable = () => {
-  // Check if we're in a production environment 
-  if (process.env.NODE_ENV === "production") {
-    return "python3";
-  } else {
-    return "python";
-  }
+export {
+  jobSearcherCron,
 };
-
-// Function to run the scraper
-export const runScraper = async () => {
-  console.log("Starting job searcher script...");
-
-  // Send start notification email
-  await mailer(
-    "hasan1096@protonmail.com",
-    `Job Searcher Script Started at ${new Date().toLocaleString()}`,
-    `The job searcher script has started running. Server Time: ${new Date().toLocaleString()}`
-  );
-  return new Promise((resolve, reject) => {
-    const scriptPath = path.join(SCRAPER_DIR, "script-runner.py");
-
-    // Ensure the script exists
-    if (!fs.existsSync(scriptPath)) {
-      return reject(new Error(`Script not found at path: ${scriptPath}`));
-    }
-
-    // Get the appropriate Python executable
-    const pythonExecutable = getPythonExecutable();
-
-    // Spawn the Python process with improved error handling
-    const pythonProcess = spawn(pythonExecutable, [scriptPath], {
-      cwd: SCRAPER_DIR,
-      env: {
-        ...process.env,
-        PYTHONUNBUFFERED: "1", // Ensure Python output is not buffered
-      },
-    });
-
-    let output = "";
-    let errorOutput = "";
-
-    // Capture standard output
-    pythonProcess.stdout.on("data", (data) => {
-      const chunk = data.toString();
-      output += chunk;
-      console.log(`[Python stdout]: ${chunk.trim()}`);
-    });
-
-    // Capture error output
-    pythonProcess.stderr.on("data", (data) => {
-      const chunk = data.toString();
-      errorOutput += chunk;
-      console.error(`[Python stderr]: ${chunk.trim()}`);
-    });
-
-    // Handle process completion
-    pythonProcess.on("close", async (code) => {
-      if (code !== 0) {
-        const errorMsg = `Script exited with code ${code}: ${errorOutput}`;
-        console.error(errorMsg);
-
-        // Read the log file for additional context if available
-        try {
-          if (fs.existsSync(LOG_FILE)) {
-            const logContents = fs.readFileSync(LOG_FILE, "utf8");
-            const lastLines = logContents.split("\n").slice(-20).join("\n"); // Get last 20 lines
-            console.error("Log file last lines:", lastLines);
-          }
-        } catch (logErr) {
-          console.error("Failed to read log file:", logErr);
-        }
-
-        // Send error notification
-        // await mailer(
-        //   "hasan1096@protonmail.com",
-        //   "Job Searcher Script Failed",
-        //   `The job searcher script failed with code ${code}.\nError: ${errorOutput}\nServer Time: ${new Date().toLocaleString()}`
-        // );
-
-        reject(new Error(errorMsg));
-      } else {
-        console.log("Python script completed successfully");
-
-        // Send success notification
-        await mailer(
-          "hasan1096@protonmail.com",
-          `Job Searcher Script Completed at ${new Date().toLocaleString()}`,
-          `The job searcher script has completed successfully.\nServer Time: ${new Date().toLocaleString()}`
-        );
-
-        resolve(output);
-      }
-    });
-
-    // Handle process errors (e.g., if Python executable not found)
-    pythonProcess.on("error", (err) => {
-      console.error("Failed to start Python process:", err);
-      reject(new Error(`Failed to start Python process: ${err.message}`));
-    });
-  });
-};
-
-export { jobSearcherCron };

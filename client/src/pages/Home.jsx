@@ -19,6 +19,7 @@ const Home = () => {
     totalCompanies: "0",
     totalLocations: "0",
   });
+  const [lastUpdated, setLastUpdated] = useState("");
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -42,7 +43,26 @@ const Home = () => {
         });
       }
     };
+    const fetchLastUpdated = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/stat/last-update`
+        );
+        if (response.status === 200) {
+          const lastUpdatedDate = new Date(response.data.data.timestamp).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+          });
+          setLastUpdated(lastUpdatedDate);
+        }
+      } catch (error) {
+        console.error("Error fetching last updated scraping date:", error);
+      }
+    }
     fetchStats();
+    fetchLastUpdated();
   }, []);
 
   const handleQueryChange = (query) => {

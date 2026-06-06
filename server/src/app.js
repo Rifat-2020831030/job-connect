@@ -19,10 +19,12 @@ dns.setServers(["1.1.1.1", "1.0.0.1"]);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isVercelRuntime = Boolean(process.env.VERCEL);
 
-// Start the scheduled cron job
-jobSearcherCron.start();
-jobAlertSchedule.start();
+// Job scraping is scheduled externally by GitHub Actions.
+if (!isVercelRuntime) {
+  jobAlertSchedule.start();
+}
 
 // Allowed origins
 const allowedOrigins = [

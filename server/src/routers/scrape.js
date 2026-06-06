@@ -1,13 +1,21 @@
-// const { runScraper } = require("../../spider-runner"); // spider-runner exporting correctly isn't checked
+// import { runScraper } from "../services/scraper-runner.js"; // spider-runner exporting correctly isn't checked
 import dotenv from "dotenv";
 import express from "express";
-import { runScraper } from "../../spider-runner.js";
+import { runScraper } from "../services/scraper-runner.js";
 dotenv.config();
 const router = express.Router();
 
 const auth = (req, res, next) => {
   const token = req.query.token;
-  if (!token || token !== process.env.SCRAPE_TOKEN) {
+  const authHeader = req.get("authorization");
+  const expectedCronAuth = process.env.CRON_SECRET
+    ? `Bearer ${process.env.CRON_SECRET}`
+    : null;
+  const tokenAuthorized =
+    process.env.SCRAPE_TOKEN && token === process.env.SCRAPE_TOKEN;
+  const cronAuthorized = expectedCronAuth && authHeader === expectedCronAuth;
+
+  if (!tokenAuthorized && !cronAuthorized) {
     return res.status(403).json({ message: "Unauthorized request" });
   }
   next();
@@ -22,6 +30,10 @@ router.get("/", auth, async (req, res) => {
       .status(200)
       .json({ message: "Scraping completed successfully", data: output });
   } catch (error) {
+    if (error.code === "SCRAPER_ALREADY_RUNNING") {
+      return res.status(409).json({ message: "Scraper is already running" });
+    }
+
     console.error("Error running scraper:", error);
     res
       .status(500)

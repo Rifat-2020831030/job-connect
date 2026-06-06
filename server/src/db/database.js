@@ -44,4 +44,12 @@ const getDB = async () => {
   return cachedDb;
 };
 
-export { connectDB, getDB };
+const closeDB = async () => {
+  if (cachedClient) {
+    await cachedClient.close();
+  }
+  cachedClient = null;
+  cachedDb = null;
+};
+
+export { closeDB, connectDB, getDB };

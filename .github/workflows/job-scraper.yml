@@ -1,0 +1,39 @@
+name: Job Scraper
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */4 * * *"
+
+concurrency:
+  group: job-scraper
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      db_uri: ${{ secrets.DB_URI }}
+      MONGO_DATABASE: ${{ vars.MONGO_DATABASE || 'job-collection' }}
+      MONGO_COLLECTION: ${{ vars.MONGO_COLLECTION || 'jobs' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: server/job-searcher/requirements.txt
+
+      - name: Install scraper dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r server/job-searcher/requirements.txt
+
+      - name: Run scraper
+        working-directory: server/job-searcher
+        run: python _run_spiders.py
