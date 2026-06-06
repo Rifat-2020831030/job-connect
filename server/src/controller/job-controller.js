@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { getDB } from "../db/database.js";
 
-export const getJobs = async (req, res) => {
+const getJobs = async (req, res) => {
   try {
     const db = await getDB();
 
@@ -9,7 +9,7 @@ export const getJobs = async (req, res) => {
     const offset = (page - 1) * limit;
 
     // Get current date to compare with deadlines
-    const currentDate = new Date();
+    // const currentDate = new Date();
 
     const jobs = await db
       .collection("jobs")
@@ -17,12 +17,12 @@ export const getJobs = async (req, res) => {
       .skip(Number(offset))
       .limit(Number(limit))
       .toArray();
-      
+
     // Filter jobs based on deadline
     const filteredJobs = jobs.filter((job) => {
       if (!job.deadline) return true; // If no deadline, include the job
       const deadlineDate = new Date(job.deadline);
-      return deadlineDate >= currentDate; // Include only jobs with future deadlines
+      return deadlineDate >= new Date(); // Include only jobs with future deadlines
     });
 
     // get jobs count
@@ -43,7 +43,7 @@ export const getJobs = async (req, res) => {
   }
 };
 
-export const getJobById = async (req, res) => {
+const getJobById = async (req, res) => {
   try {
     const db = await getDB();
     const jobId = req.params.id;
@@ -66,3 +66,5 @@ export const getJobById = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export { getJobById, getJobs };

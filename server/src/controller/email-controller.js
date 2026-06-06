@@ -5,7 +5,7 @@ import { getDB } from "../db/database.js";
 import mailer from "../services/mail-service.js";
 import { getLocalTime } from "../utils/local-time.js";
 
-export const subscribeEmail = async (req, res) => {
+const subscribeEmail = async (req, res) => {
   try {
     const db = await getDB();
     const {
@@ -81,7 +81,7 @@ export const subscribeEmail = async (req, res) => {
   }
 };
 
-export const unsubscribeEmail = async (req, res) => {
+const unsubscribeEmail = async (req, res) => {
   try {
     const db = await getDB();
     const { id } = req.query;
@@ -92,7 +92,10 @@ export const unsubscribeEmail = async (req, res) => {
     }
     const response = await db
       .collection("emails")
-      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { verify: false, unsubscriptionTime: getLocalTime() } });
+      .findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: { verify: false, unsubscriptionTime: getLocalTime() } }
+      );
 
     if (!response) {
       return res.status(404).json({ status: 0, message: "Email not found" });
@@ -100,7 +103,7 @@ export const unsubscribeEmail = async (req, res) => {
     res.status(200).json({
       status: 1,
       message: "Email unsubscribed successfully",
-      data: response.email ,
+      data: response.email,
     });
   } catch (error) {
     console.error("Error unsubscribing email:", error);
@@ -108,7 +111,7 @@ export const unsubscribeEmail = async (req, res) => {
   }
 };
 
-export const getEmailList = async () => {
+const getEmailList = async () => {
   try {
     const db = await getDB();
     const emails = await db
@@ -118,6 +121,7 @@ export const getEmailList = async () => {
     return emails;
   } catch (error) {
     console.error("Error fetching email list:", error);
+    throw error;
   }
 };
 
@@ -166,7 +170,7 @@ const welcomeMailTemplate = () => {
   `;
 };
 
-export const verifyCode = async (req, res) => {
+const verifyCode = async (req, res) => {
   const { email, code } = req.body;
 
   if (!email || !code) {
@@ -193,17 +197,26 @@ export const verifyCode = async (req, res) => {
         .status(400)
         .json({ status: 0, message: "Email already verified" });
     }
-    const response = await db
-      .collection("emails")
-      .updateOne(
+    const response = await db.collection("emails").updateOne(
       { email: email },
-      { $set: { verify: true, code: null, exp: null, subscriptionTime: getLocalTime() } }
-      );
-    if(response.acknowledged) {
-      res.status(200).json({ status: 1, message: "Email verified successfully" });
-    }
-    else {
-      res.status(500).json({ status: 0, message: "Failed to verify email. Please try again later." });
+      {
+        $set: {
+          verify: true,
+          code: null,
+          exp: null,
+          subscriptionTime: getLocalTime(),
+        },
+      }
+    );
+    if (response.acknowledged) {
+      res
+        .status(200)
+        .json({ status: 1, message: "Email verified successfully" });
+    } else {
+      res.status(500).json({
+        status: 0,
+        message: "Failed to verify email. Please try again later.",
+      });
     }
 
     // send welcome mail (async operation after response)
@@ -226,9 +239,12 @@ export const verifyCode = async (req, res) => {
 const getNewJobs = async () => {
   try {
     const db = await getDB();
+    const currentDate = new Date();
     // Get jobs that are updated in the last 24 hours
-    const jobList = await db.collection("jobs").find({'isUpdated': true}).toArray();
-
+    const jobList = await db
+      .collection("jobs")
+      .find({ isUpdated: true })
+      .toArray();
     const newJobs = jobList.filter((job) => {
       return new Date(job.deadline) >= currentDate; // deadline not passed
     });
@@ -236,7 +252,7 @@ const getNewJobs = async () => {
     return newJobs;
   } catch (error) {
     console.error("Error fetching new jobs:", error);
-    return [];
+    throw error;
   }
 };
 
@@ -247,7 +263,9 @@ const jobCardBuilder = (job) => {
         <!-- Image Header -->
         <tr>
             <td align="center" style="padding: 0; text-align: center; background-color: #6BAAE8; border-radius: 8px 8px 0 0;">
-                <img src="${job.logo}" alt="${job.company} Logo" width="150" height="auto" style="display: block; max-width: 150px; height: auto; min-height: 50px; padding: 20px 0; border: 0; object-fit: cover;">
+                <img src="${job.logo}" alt="${
+    job.company
+  } Logo" width="150" height="auto" style="display: block; max-width: 150px; height: auto; min-height: 50px; padding: 20px 0; border: 0; object-fit: cover;">
             </td>
         </tr>
         
@@ -295,14 +313,19 @@ const jobCardBuilder = (job) => {
                     <tr>
                         <td style="width: 33.33%; padding-right: 10px; vertical-align: top;">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">SALARY</p>
-                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">${
-                              job.salary
-                            }</p>
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">
+                            ${
+                              job.salary_min
+                                ? `${job.salary_min} to ${job.salary_max}`
+                                : `${job.salary ? job.salary : "Not specified"}`
+                            }
+                            </p>
                         </td>
                         <td style="width: 33.33%; padding-right: 10px; vertical-align: top;">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">VACANCY</p>
-                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">${
-                              job.vacancy
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">
+                            ${
+                              job.vacancy != -1 ? job.vacancy : "Not specified"
                             }</p>
                         </td>
                         <td style="width: 33.33%; vertical-align: top;">
@@ -412,20 +435,38 @@ const createEmailTemplate = (jobList, unsubscribeUrl, data) => {
   `;
 };
 
-export const sendJobAlert = async () => {
+const sendJobAlert = async () => {
   try {
     const db = await getDB();
+    // gather mailing list
     const mailingList = await getEmailList();
     if (mailingList.length === 0) {
       console.log("No Verified Mail subscriber found.");
-      return;
+      return {
+        failedEmails: [],
+        receiverEmails: [],
+        totalJobs: 0,
+        totalSubscribers: 0,
+      };
     }
-
+    // gather new jobs
     const newJobs = await getNewJobs();
     if (newJobs.length === 0) {
       console.log("No new jobs found to send alert.");
-      return;
+      return {
+        failedEmails: [],
+        receiverEmails: [],
+        totalJobs: 0,
+        totalSubscribers: mailingList.length,
+      };
     }
+    // update new jobs status to - sent
+    await db
+      .collection("jobs")
+      .updateMany(
+        { _id: { $in: newJobs.map((job) => job._id) } },
+        { $set: { isUpdated: false } }
+      );
 
     // Get the count of new jobs and companies
     const jobCount = newJobs.length;
@@ -435,7 +476,6 @@ export const sendJobAlert = async () => {
       jobCount: jobCount,
       companyCount: companyCount,
     };
-
     // build job card html
     const jobCards = newJobs.map((job) => jobCardBuilder(job)).join("");
     const subject = "Job Alerts From ChakriLagbe";
@@ -455,8 +495,12 @@ export const sendJobAlert = async () => {
       );
       // sending mail
       try {
-        await mailer(subscriber.email, subject, "", html);
-        recieverEmails.push(subscriber.email);
+        const sent = await mailer(subscriber.email, subject, "", html);
+        if (sent) {
+          recieverEmails.push(subscriber.email);
+        } else {
+          failedEmails.push(subscriber.email);
+        }
       } catch (error) {
         console.error(`Error sending job alert to ${subscriber.email}:`, error);
         failedEmails.push(subscriber.email);
@@ -473,7 +517,23 @@ export const sendJobAlert = async () => {
       recieverEmails: recieverEmails,
       jobsID: jobsID,
     });
+
+    return {
+      failedEmails,
+      receiverEmails: recieverEmails,
+      totalJobs: newJobs.length,
+      totalSubscribers: mailingList.length,
+    };
   } catch (error) {
     console.error("Error sending job alert:", error);
+    throw error;
   }
+};
+
+export {
+  getEmailList,
+  sendJobAlert,
+  subscribeEmail,
+  unsubscribeEmail,
+  verifyCode,
 };

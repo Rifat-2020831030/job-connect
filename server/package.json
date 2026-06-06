@@ -1,13 +1,15 @@
 {
   "name": "jobs-finder",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
   "main": "src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "build": "echo \"No build step required for backend\""
+    "build": "echo \"No build step required for backend\"",
+    "send-job-alert": "node scripts/send-job-alert.js"
   },
   "author": "",
   "license": "ISC",
@@ -19,7 +21,7 @@
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "express-rate-limit": "^8.0.1",
-    "mongodb": "^6.18.0",
+    "mongodb": "^7.2.0",
     "nodemailer": "^7.0.5"
   }
 }

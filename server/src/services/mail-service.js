@@ -1,4 +1,4 @@
-const nodemailer = require("nodemailer");
+import nodemailer from "nodemailer";
 
 const mailer = async (receiver, sub, msg = "", html = "") => {
   try {
@@ -46,4 +46,4 @@ const mailer = async (receiver, sub, msg = "", html = "") => {
   }
 };
 
-module.exports = mailer;
+export default mailer;

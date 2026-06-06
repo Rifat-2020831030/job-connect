@@ -1,0 +1,8 @@
+node_modules/
+.env
+
+job-searcher/venv/
+job-searcher/spider_runner.log
+
+__pycache__/
+*.py[cod]

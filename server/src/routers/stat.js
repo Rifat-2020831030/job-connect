@@ -1,12 +1,12 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
-const jobStat = require("../controller/job-stat");
-const companyList = require("../controller/company-list");
-const scrapeStat = require("../controller/scrape-controller");
+import { getCompanies } from "../controller/company-list.js";
+import { getJobStats } from "../controller/job-stat.js";
+import { getLastScrapeTime } from "../controller/scrape-controller.js";
 
-router.get("/", jobStat.getJobStats);
-router.get("/companies", companyList.getCompanies);
-router.get("/last-update", scrapeStat.getLastScrapeTime);
+router.get("/", getJobStats);
+router.get("/companies", getCompanies);
+router.get("/last-update", getLastScrapeTime);
 
-module.exports = router;
+export default router;

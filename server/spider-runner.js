@@ -1,5 +1,6 @@
-import { CronJob } from "cron";
 import { spawn } from "child_process";
+import { CronJob } from "cron";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import mailer from "./src/services/mail-service.js";
@@ -7,49 +8,32 @@ import mailer from "./src/services/mail-service.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SCRAPER_DIR = path.join(__dirname, "job-searcher");
+const LOG_FILE = path.join(SCRAPER_DIR, "spider_runner.log");
 
-
+// Configure the cron job schedule
 const jobSearcherCron = new CronJob(
-  "0 0-23/4 * * *", // cronTime
+  // "0 0-23/4 * * *", // Run every 4 hours
+  "0 3,10,14,20 * * *", // Run at specific hours
+  // "48 0 * * *", // Run daily at 12:12 PM
   async () => {
-    runScraper();
+    try {
+      await runScraper();
+    } catch (error) {
+      console.error("Error in cron job:", error);
+      await mailer(
+        "hasan1096@protonmail.com",
+        "Job Searcher Error",
+        `The job searcher script encountered an error: ${
+          error.message
+        }\nServer Time: ${new Date().toLocaleString()}`
+      );
+    }
   },
-  null, // onComplete
-  false, // start
-  "UTC+6" // timeZone
+  null,
+  false,
+  "Asia/Dhaka"
 );
 
-
-const runScraper = async () => {
-  console.log("Starting job searcher script...");
-  await mailer('hasan1096@protonmail.com', 'Job Searcher Script Started', `The job searcher script has started running. Server Time :${new Date().toLocaleString()}`);
-  return new Promise((resolve, reject) => {
-    const scriptPath = path.join(SCRAPER_DIR, "script-runner.py");
-    const pythonProcess = spawn("python", [scriptPath], {
-      cwd: SCRAPER_DIR,
-    });
-
-    let output = "";
-    let errorOutput = "";
-
-    pythonProcess.stdout.on("data", (data) => {
-      output += data.toString();
-    });
-
-    pythonProcess.stderr.on("data", (data) => {
-      errorOutput += data.toString();
-    });
-
-    pythonProcess.on("close", (code) => {
-      if (code !== 0) {
-        reject(new Error(`Script exited with code ${code}: ${errorOutput}`));
-      } else {
-        console.log(output);
-        resolve(output);
-      }
-    });
-  });
-}
-
-// export the jobser cron job
-export { jobSearcherCron };
+export {
+  jobSearcherCron,
+};

@@ -1,0 +1,41 @@
+name: Job Alert
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 14 * * *"
+
+concurrency:
+  group: job-alert
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      db_uri: ${{ secrets.DB_URI }}
+      FRONTEND_URL: ${{ vars.FRONTEND_URL || 'https://chakrilagbe.vercel.app' }}
+      MAIL_HOST: ${{ secrets.MAIL_HOST }}
+      MAIL_PORT: ${{ secrets.MAIL_PORT }}
+      MAIL_USER: ${{ secrets.MAIL_USER }}
+      MAIL_PASS: ${{ secrets.MAIL_PASS }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install API dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Send job alert
+        working-directory: server
+        run: npm run send-job-alert
