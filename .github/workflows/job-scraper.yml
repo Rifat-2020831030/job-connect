@@ -12,7 +12,7 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 59
     env:
       db_uri: ${{ secrets.DB_URI }}
       MONGO_DATABASE: ${{ vars.MONGO_DATABASE || 'job-collection' }}

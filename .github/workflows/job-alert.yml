@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 30
     env:
       db_uri: ${{ secrets.DB_URI }}
-      FRONTEND_URL: ${{ vars.FRONTEND_URL || 'https://chakrilagbe.vercel.app' }}
+      FRONTEND_URL: ${{ vars.FRONTEND_URL }}
       MAIL_HOST: ${{ secrets.MAIL_HOST }}
       MAIL_PORT: ${{ secrets.MAIL_PORT }}
       MAIL_USER: ${{ secrets.MAIL_USER }}
@@ -28,7 +28,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
           cache: "npm"
           cache-dependency-path: server/package-lock.json
 
