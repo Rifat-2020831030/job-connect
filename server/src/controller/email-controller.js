@@ -246,7 +246,15 @@ const getNewJobs = async () => {
       .find({ isUpdated: true })
       .toArray();
     const newJobs = jobList.filter((job) => {
+      if (!job.deadline) return true; // If no deadline, assume it's still active
       return new Date(job.deadline) >= currentDate; // deadline not passed
+    });
+
+    // Sort jobs by company name
+    newJobs.sort((a, b) => {
+      const compA = a.company || "";
+      const compB = b.company || "";
+      return compA.localeCompare(compB);
     });
 
     return newJobs;
@@ -315,9 +323,13 @@ const jobCardBuilder = (job) => {
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">SALARY</p>
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">
                             ${
-                              job.salary_min
+                              job.salary_min != null && job.salary_min !== ""
                                 ? `${job.salary_min} to ${job.salary_max}`
-                                : `${job.salary ? job.salary : "Not specified"}`
+                                : `${
+                                    job.salary && job.salary !== ""
+                                      ? job.salary
+                                      : "Not specified"
+                                  }`
                             }
                             </p>
                         </td>
@@ -330,13 +342,18 @@ const jobCardBuilder = (job) => {
                         </td>
                         <td style="width: 33.33%; vertical-align: top;">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">DEADLINE</p>
-                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">${new Date(
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">${
                               job.deadline
-                            ).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })}</p>
+                                ? new Date(job.deadline).toLocaleDateString(
+                                    "en-US",
+                                    {
+                                      month: "short",
+                                      day: "numeric",
+                                      year: "numeric",
+                                    }
+                                  )
+                                : "Not specified"
+                            }</p>
                         </td>
                     </tr>
                 </table>
