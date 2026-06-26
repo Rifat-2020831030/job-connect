@@ -240,24 +240,35 @@ const getNewJobs = async () => {
   try {
     const db = await getDB();
     const currentDate = new Date();
-    // Get jobs that are updated in the last 24 hours
+    const twentyFourHoursAgo = new Date(
+      currentDate.getTime() - 24 * 60 * 60 * 1000
+    );
+
+    // Filter at DB level:
+    // 1. Jobs with a future deadline
+    // 2. Jobs with null deadline, but first_seen within last 24 hours
     const jobList = await db
       .collection("jobs")
-      .find({ isUpdated: true })
+      .find({
+        isUpdated: true,
+        $or: [
+          { deadline: { $ne: null, $gte: currentDate.toISOString() } },
+          {
+            deadline: null,
+            first_seen: { $gte: twentyFourHoursAgo.toISOString() },
+          },
+        ],
+      })
       .toArray();
-    const newJobs = jobList.filter((job) => {
-      if (!job.deadline) return true; // If no deadline, assume it's still active
-      return new Date(job.deadline) >= currentDate; // deadline not passed
-    });
 
     // Sort jobs by company name
-    newJobs.sort((a, b) => {
+    jobList.sort((a, b) => {
       const compA = a.company || "";
       const compB = b.company || "";
       return compA.localeCompare(compB);
     });
 
-    return newJobs;
+    return jobList;
   } catch (error) {
     console.error("Error fetching new jobs:", error);
     throw error;

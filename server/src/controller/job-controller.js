@@ -5,37 +5,39 @@ const getJobs = async (req, res) => {
   try {
     const db = await getDB();
 
-    const { page = 1, limit } = req.query; // Default to page 1 and limit 10
+    const { page = 1, limit } = req.query;
     const offset = (page - 1) * limit;
 
-    // Get current date to compare with deadlines
-    // const currentDate = new Date();
+    const currentDate = new Date();
+    const thirtyDaysAgo = new Date(
+      currentDate.getTime() - 30 * 24 * 60 * 60 * 1000
+    );
 
-    const jobs = await db
-      .collection("jobs")
-      .find({})
-      .skip(Number(offset))
-      .limit(Number(limit))
-      .toArray();
+    // Filter:
+    // 1. Jobs with a future deadline
+    // 2. Jobs with null deadline, but first_seen within last 30 days
+    const filter = {
+      $or: [
+        { deadline: { $ne: null, $gte: currentDate.toISOString() } },
+        { deadline: null, first_seen: { $gte: thirtyDaysAgo.toISOString() } },
+      ],
+    };
 
-    // Filter jobs based on deadline
-    const filteredJobs = jobs.filter((job) => {
-      if (!job.deadline) return true; // If no deadline, include the job
-      const deadlineDate = new Date(job.deadline);
-      return deadlineDate >= new Date(); // Include only jobs with future deadlines
-    });
+    const [jobs, totalJobs] = await Promise.all([
+      db
+        .collection("jobs")
+        .find(filter)
+        .skip(Number(offset))
+        .limit(Number(limit))
+        .toArray(),
+      db.collection("jobs").countDocuments(filter),
+    ]);
 
-    // get jobs count
-    // const totalJobs = await db.collection("jobs").countDocuments({});
-
-    // if (jobs.length === 0) {
-    //   return res.status(404).json({ status: 0, message: "No jobs found" });
-    // }
     res.status(200).json({
       status: 1,
       message: "Jobs fetched successfully",
-      total: filteredJobs.length,
-      data: filteredJobs,
+      total: totalJobs,
+      data: jobs,
     });
   } catch (error) {
     console.error("Error fetching jobs:", error);
