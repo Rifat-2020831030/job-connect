@@ -27,6 +27,7 @@ const getJobs = async (req, res) => {
       db
         .collection("jobs")
         .find(filter)
+        .sort({ first_seen: -1 })
         .skip(Number(offset))
         .limit(Number(limit))
         .toArray(),
