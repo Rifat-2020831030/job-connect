@@ -1,10 +1,9 @@
-import HeroSection from "@/components/HeroSection";
-import SectionHeader from "@/components/SectionHeader";
-import JobCard from "@/components/JobCard";
-import FeaturedJobCard from "@/components/FeaturedJobCard";
-import EngineeringJobRow from "@/components/EngineeringJobRow";
 import CategoryCard from "@/components/CategoryCard";
 import Footer from "@/components/Footer";
+import HeroSection from "@/components/HeroSection";
+import JobCard from "@/components/JobCard";
+import EngineeringJobRow from "@/components/JobRow";
+import SectionHeader from "@/components/SectionHeader";
 
 export default function Home() {
   const featuredJobs = [
@@ -19,7 +18,7 @@ export default function Home() {
       experience: "5+ years",
       deadline: "Oct 15, 2026",
       postedAt: "2D AGO",
-      tags: ["C++", "Rust", "Distributed Systems"]
+      tags: ["C++", "Rust", "Distributed Systems"],
     },
     {
       title: "Data Scientist, ML",
@@ -31,7 +30,7 @@ export default function Home() {
       vacancy: "1",
       experience: "3+ years",
       postedAt: "5H AGO",
-      tags: ["Python", "PyTorch", "Machine Learning"]
+      tags: ["Python", "PyTorch", "Machine Learning"],
     },
     {
       title: "Frontend Architect",
@@ -44,8 +43,8 @@ export default function Home() {
       experience: "8+ years",
       deadline: "Oct 20, 2026",
       postedAt: "1D AGO",
-      tags: ["React", "TypeScript", "WebGL"]
-    }
+      tags: ["React", "TypeScript", "WebGL"],
+    },
   ];
 
   const engineeringJobs = [
@@ -56,7 +55,7 @@ export default function Home() {
       level: "STAFF (L6)",
       salary: "$190k - $250k",
       postedAt: "TODAY",
-      tags: ["Go", "Kubernetes", "AWS"]
+      tags: ["Go", "Kubernetes", "AWS"],
     },
     {
       title: "Senior Frontend Developer",
@@ -65,7 +64,7 @@ export default function Home() {
       level: "SENIOR (L5)",
       salary: "$155k - $185k",
       postedAt: "1D AGO",
-      tags: ["React", "Next.js", "TypeScript"]
+      tags: ["React", "Next.js", "TypeScript"],
     },
     {
       title: "Site Reliability Engineer",
@@ -74,7 +73,7 @@ export default function Home() {
       level: "SENIOR (L4)",
       salary: "$140k - $170k",
       postedAt: "3D AGO",
-      tags: ["Terraform", "Python", "Linux"]
+      tags: ["Terraform", "Python", "Linux"],
     },
     {
       title: "Distributed Systems Architect",
@@ -83,8 +82,8 @@ export default function Home() {
       level: "PRINCIPAL",
       salary: "$220k - $280k",
       postedAt: "4D AGO",
-      tags: ["Rust", "gRPC", "Kafka"]
-    }
+      tags: ["Rust", "gRPC", "Kafka"],
+    },
   ];
 
   const leadershipJobs = [
@@ -98,7 +97,7 @@ export default function Home() {
       vacancy: "1",
       experience: "5+ years",
       postedAt: "3D AGO",
-      tags: ["Management", "Agile", "System Design"]
+      tags: ["Management", "Agile", "System Design"],
     },
     {
       title: "Staff Product Manager",
@@ -110,7 +109,7 @@ export default function Home() {
       vacancy: "1",
       experience: "7+ years",
       postedAt: "1W AGO",
-      tags: ["Product", "Fintech", "Strategy"]
+      tags: ["Product", "Fintech", "Strategy"],
     },
     {
       title: "Senior Data Analyst",
@@ -122,8 +121,8 @@ export default function Home() {
       vacancy: "2",
       experience: "4+ years",
       postedAt: "2D AGO",
-      tags: ["SQL", "Tableau", "Analytics"]
-    }
+      tags: ["SQL", "Tableau", "Analytics"],
+    },
   ];
 
   const categories = [
@@ -134,20 +133,18 @@ export default function Home() {
     { title: "Product Management", icon: "📱", count: 145 },
     { title: "Design", icon: "🎨", count: 215 },
     { title: "Mobile", icon: "📱", count: 189 },
-    { title: "Security", icon: "🔒", count: 76 }
+    { title: "Security", icon: "🔒", count: 76 },
   ];
 
   return (
     <div className="flex flex-col w-full">
-
       <HeroSection />
 
       <main className="flex flex-col w-full max-w-7xl mx-auto px-6 md:px-12 py-16 gap-24">
-        
         {/* Featured Opportunities Section */}
         <section className="flex flex-col w-full">
-          <SectionHeader 
-            title="Featured Opportunities" 
+          <SectionHeader
+            title="Featured Opportunities"
             subtitle="Direct paths to elite roles. No gatekeepers, just code."
             viewAllLink="/jobs"
           />
@@ -160,8 +157,8 @@ export default function Home() {
 
         {/* Core Engineering Section (Linear Style Minimalist Table Rows) */}
         <section className="flex flex-col w-full">
-          <SectionHeader 
-            title="Core Engineering" 
+          <SectionHeader
+            title="Core Engineering"
             subtitle="High-traffic systems and frontend excellence."
             viewAllLink="/jobs/engineering"
           />
@@ -174,8 +171,8 @@ export default function Home() {
 
         {/* Leadership & Management Section */}
         <section className="flex flex-col w-full">
-          <SectionHeader 
-            title="Leadership & Management" 
+          <SectionHeader
+            title="Leadership & Management"
             subtitle="Guide teams to success and drive product vision."
             viewAllLink="/jobs/leadership"
           />
@@ -188,8 +185,8 @@ export default function Home() {
 
         {/* Explore by Category Section */}
         <section className="flex flex-col w-full">
-          <SectionHeader 
-            title="Explore by Category" 
+          <SectionHeader
+            title="Explore by Category"
             subtitle="Find roles that match your specific expertise."
             viewAllLink="/categories"
           />
@@ -199,7 +196,6 @@ export default function Home() {
             ))}
           </div>
         </section>
-
       </main>
 
       <Footer />
