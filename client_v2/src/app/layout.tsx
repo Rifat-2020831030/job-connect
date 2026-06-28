@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -24,7 +25,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased font-sans bg-gray-50 text-gray-900`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased font-sans bg-gray-50 text-gray-900 flex flex-col min-h-screen`}>
+        <Navbar />
         {children}
       </body>
     </html>

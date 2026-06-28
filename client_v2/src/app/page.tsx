@@ -4,7 +4,6 @@ import JobCard from "@/components/JobCard";
 import FeaturedJobCard from "@/components/FeaturedJobCard";
 import EngineeringJobRow from "@/components/EngineeringJobRow";
 import CategoryCard from "@/components/CategoryCard";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -139,8 +138,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-background font-sans">
-      <Navbar />
+    <div className="flex flex-col w-full">
 
       <HeroSection />
 

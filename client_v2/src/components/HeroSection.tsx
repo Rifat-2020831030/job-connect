@@ -1,4 +1,5 @@
 import React from 'react';
+import SubscribeForm from './SubscribeForm';
 
 export default function HeroSection() {
   return (
@@ -18,17 +19,8 @@ export default function HeroSection() {
         A one-stop platform to get all the latest job updates from leading companies and startups.
       </p>
       
-      <div className="flex flex-col w-full max-w-md gap-4 mb-12">
-        <div className="flex flex-col sm:flex-row bg-white border border-gray-300 rounded-lg p-1.5 shadow-sm">
-          <input 
-            type="email" 
-            placeholder="Enter your email address" 
-            className="flex-1 px-4 py-3 outline-none text-gray-700 bg-transparent"
-          />
-          <button className="bg-primary hover:bg-emerald-600 text-white font-bold px-8 py-3 rounded text-sm sm:text-base transition-colors mt-2 sm:mt-0">
-            Get Job Alerts
-          </button>
-        </div>
+      <div className="flex flex-col w-full max-w-md gap-4 mb-12 relative z-10">
+        <SubscribeForm />
         <p className="text-sm text-gray-500 text-center">
           Receive job updates the same day they're posted. No spam, ever.
         </p>
