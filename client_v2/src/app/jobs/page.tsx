@@ -3,6 +3,7 @@
 import JobFilters from "@/components/JobFilters";
 import JobRow from "@/components/JobRow";
 import JobSearchBar from "@/components/JobSearchBar";
+import JobDetailsModal, { JobDetail } from "@/components/JobDetailsModal";
 import { Filter, X } from "lucide-react";
 import { useState } from "react";
 
@@ -14,6 +15,7 @@ const DUMMY_JOBS = [
     location: "New York, NY",
     level: "Senior",
     salary: "$180k – $240k",
+    description: "We are building a next-generation distributed database. You will be responsible for optimizing consensus algorithms, reducing tail latency in high-throughput environments, and ensuring 99.999% availability across global clusters.",
     tags: ["Go", "Kubernetes", "gRPC", "Redis", "AWS", "Docker"],
     postedAt: "2 hours ago",
     experience: "5+ years",
@@ -29,6 +31,7 @@ const DUMMY_JOBS = [
     location: "San Francisco, CA",
     level: "Principal",
     salary: "$210k – $300k",
+    description: "Lead the architectural vision for our core frontend platform. You'll set standards for React development, establish robust CI/CD pipelines for frontend artifacts, and mentor senior engineers.",
     tags: ["React", "TypeScript", "Next.js", "Tailwind", "GraphQL"],
     postedAt: "5 hours ago",
     experience: "8+ years",
@@ -79,6 +82,7 @@ const DUMMY_JOBS = [
 
 export default function JobsPage() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<JobDetail | null>(null);
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -184,6 +188,7 @@ export default function JobsPage() {
                   experience={job.experience}
                   vacancy={job.vacancy}
                   deadline={job.deadline}
+                  onViewDetails={() => setSelectedJob(job)}
                 />
               ))}
             </div>
@@ -216,6 +221,14 @@ export default function JobsPage() {
           </main>
         </div>
       </section>
+
+      {/* Render Modal if a job is selected */}
+      {selectedJob && (
+        <JobDetailsModal 
+          job={selectedJob} 
+          onClose={() => setSelectedJob(null)} 
+        />
+      )}
     </div>
   );
 }

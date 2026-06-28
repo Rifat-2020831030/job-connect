@@ -1,11 +1,17 @@
+"use client";
+
 import CategoryCard from "@/components/CategoryCard";
 import Footer from "@/components/Footer";
 import HeroSection from "@/components/HeroSection";
 import JobCard from "@/components/JobCard";
 import EngineeringJobRow from "@/components/JobRow";
 import SectionHeader from "@/components/SectionHeader";
+import JobDetailsModal, { JobDetail } from "@/components/JobDetailsModal";
+import { useState } from "react";
 
 export default function Home() {
+  const [selectedJob, setSelectedJob] = useState<JobDetail | null>(null);
+
   const featuredJobs = [
     {
       title: "Senior Backend Engineer",
@@ -150,7 +156,7 @@ export default function Home() {
           />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredJobs.map((job, index) => (
-              <JobCard key={index} {...job} />
+              <JobCard key={index} {...job} onViewDetails={() => setSelectedJob(job)} />
             ))}
           </div>
         </section>
@@ -164,7 +170,7 @@ export default function Home() {
           />
           <div className="flex flex-col gap-3">
             {engineeringJobs.map((job, index) => (
-              <EngineeringJobRow key={index} {...job} />
+              <EngineeringJobRow key={index} {...job} onViewDetails={() => setSelectedJob(job)} />
             ))}
           </div>
         </section>
@@ -178,7 +184,7 @@ export default function Home() {
           />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {leadershipJobs.map((job, index) => (
-              <JobCard key={index} {...job} />
+              <JobCard key={index} {...job} onViewDetails={() => setSelectedJob(job)} />
             ))}
           </div>
         </section>
@@ -199,6 +205,14 @@ export default function Home() {
       </main>
 
       <Footer />
+
+      {/* Render Modal if a job is selected */}
+      {selectedJob && (
+        <JobDetailsModal 
+          job={selectedJob} 
+          onClose={() => setSelectedJob(null)} 
+        />
+      )}
     </div>
   );
 }
