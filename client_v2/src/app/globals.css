@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8f9fc;
+  --foreground: #111412;
+  --primary: #10b981;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@layer components {
+  /* Cards */
+  .card {
+    @apply bg-white border border-gray-300 rounded-lg p-6 transition-all hover:shadow-md;
+  }
+  
+  .card-hover {
+    @apply hover:border-primary/50;
+  }
+
+  /* Logos */
+  .logo-box {
+    @apply bg-gray-100 border border-gray-200 rounded flex items-center justify-center shrink-0 overflow-hidden;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply bg-primary hover:bg-emerald-600 text-white font-bold rounded transition-colors flex items-center justify-center;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-50 hover:bg-primary hover:text-white border border-gray-300 hover:border-primary text-gray-800 font-bold rounded transition-colors flex items-center justify-center;
+  }
+
+  /* Tags */
+  .tag-outline {
+    @apply border border-gray-300 text-gray-600 text-xs px-2 py-1 rounded;
+  }
+
+  .tag-solid {
+    @apply bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-[11px];
+  }
+  
+  /* Text Helpers */
+  .text-meta {
+    @apply font-mono text-xs text-gray-500 uppercase tracking-wider;
+  }
+}
