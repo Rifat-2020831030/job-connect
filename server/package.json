@@ -9,11 +9,14 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "build": "echo \"No build step required for backend\"",
-    "send-job-alert": "node scripts/send-job-alert.js"
+    "send-job-alert": "node scripts/send-job-alert.js",
+    "test:api": "node scripts/test-api.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "bcryptjs": "^3.0.3",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "cron": "^4.3.2",
@@ -21,7 +24,9 @@
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "express-rate-limit": "^8.0.1",
+    "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.2.0",
-    "nodemailer": "^7.0.5"
+    "nodemailer": "^7.0.5",
+    "zod": "^4.4.3"
   }
 }

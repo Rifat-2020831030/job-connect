@@ -59,6 +59,15 @@
         "type": "string"
       },
       "description": "List of benefits offered for the job in short form. No need to include generic one like 'Other facilities'."
+    },
+    "category": {
+      "type": "string",
+      "enum": ["web", "ai/ml", "data science", "devops", "PM", "design", "mobile", "security", "other"],
+      "description": "Category of the job based on the description"
+    },
+    "industry": {
+      "type": "string",
+      "description": "Broad industry name based on the content (e.g., engineering, business, finance, healthcare, education, retail, manufacturing). Keep it concise (1-2 words)."
     }
   },
   "required": [
@@ -72,6 +81,8 @@
     "deadline",
     "location",
     "job_type",
-    "vacancy"
+    "vacancy",
+    "category",
+    "industry"
   ]
 }

@@ -18,6 +18,8 @@ Extraction Rules:
 10. The `vacancy` field should be the number of open positions directly mentioned in the text. Use 1 if not specified.
 11. Use capital letter for first word or sentence in string values.
 12. Deadline is critical and must be perfectly extracted.
+13. The `category` must be one of the exact string values: "web", "ai/ml", "data science", "devops", "PM", "design", "mobile", "security", "other". Use "other" if it doesn't strongly fit.
+14. The `industry` should be a broad industry name based on the content (e.g., "engineering", "business", "finance", "healthcare", "education", "retail", "manufacturing"). Keep it concise (1-2 words).
 
 """
 
