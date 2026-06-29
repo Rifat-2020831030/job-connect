@@ -12,7 +12,7 @@ export type JobDetail = {
   salary?: string;
   level?: string;
   postedAt?: string;
-  tags?: string[];
+  skills?: string[];
   description?: string;
   vacancy?: string;
   experience?: string;
@@ -150,19 +150,7 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
             </div>
           </div>
 
-          {/* Technical Challenges / Description */}
-          <div className="flex flex-col gap-3">
-            <h3 className="text-sm font-mono font-bold tracking-wider text-foreground uppercase">
-              Job Description
-            </h3>
-            <div className="text-sm text-gray-600 leading-relaxed space-y-4 whitespace-pre-wrap">
-              {job.description ? (
-                <p>{job.description}</p>
-              ) : (
-                <p>We are building a next-generation platform. You will be responsible for optimizing complex systems, reducing tail latency in high-throughput environments, and ensuring 99.999% availability.</p>
-              )}
-            </div>
-          </div>
+
           
           {/* Benefits */}
           {job.benefits && job.benefits.length > 0 && (
@@ -181,20 +169,19 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
             </div>
           )}
 
-          {/* Requirements */}
-          {job.tags && job.tags.length > 0 && (
+          {/* Requirements / Skills */}
+          {job.skills && job.skills.length > 0 && (
             <div className="flex flex-col gap-3">
               <h3 className="text-sm font-mono font-bold tracking-wider text-foreground uppercase">
-                Requirements
+                Skills & Requirements
               </h3>
-              <ul className="flex flex-col gap-2">
-                {job.tags.map((tag, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-sm text-gray-600 leading-relaxed">
-                    <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2"></span>
-                    <span>Proficiency and deep understanding of <strong>{tag}</strong> in a production environment.</span>
-                  </li>
+              <div className="flex flex-wrap gap-2">
+                {job.skills.map((skill, idx) => (
+                  <span key={idx} className="px-3 py-1.5 text-xs font-mono border border-gray-200 bg-gray-50 text-gray-700 uppercase tracking-wide rounded-sm">
+                    {skill}
+                  </span>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
         </div>

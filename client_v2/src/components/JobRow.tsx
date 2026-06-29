@@ -124,14 +124,20 @@ export default function JobRow({
           </div>
         </div>
 
-        {/* Right: Seniority & Bookmark */}
-        <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto shrink-0 mt-2 sm:mt-0 border-t border-gray-100 sm:border-0 pt-3 sm:pt-0">
-          <span className="font-mono text-[11px] uppercase tracking-wider text-gray-400">
-            {mappedLevel}
-          </span>
-          <button className="text-gray-400 hover:text-primary transition-colors cursor-pointer" aria-label="Save Job">
-            <Bookmark className="size-5" />
-          </button>
+        {/* Right: Seniority & Bookmark & Posted */}
+        <div className="flex flex-col sm:items-end w-full sm:w-auto shrink-0 mt-2 sm:mt-0 border-t border-gray-100 sm:border-0 pt-3 sm:pt-0">
+          <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
+            <span className="font-mono text-[11px] uppercase tracking-wider text-gray-400">
+              {mappedLevel}
+            </span>
+            <button className="text-gray-400 hover:text-primary transition-colors cursor-pointer" aria-label="Save Job">
+              <Bookmark className="size-5" />
+            </button>
+          </div>
+          <div className="flex flex-col sm:items-end text-left sm:text-right mt-3 sm:mt-4">
+             <span className="text-[10px] text-gray-400 font-mono uppercase tracking-widest mb-0.5">Posted</span>
+             <span className="text-[11px] font-mono text-gray-600 uppercase tracking-widest">{displayTime}</span>
+          </div>
         </div>
 
       </div>
@@ -162,11 +168,6 @@ export default function JobRow({
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 lg:gap-6 shrink-0 border-t border-gray-100 sm:border-0 pt-4 sm:pt-0">
-           <div className="flex flex-col sm:items-end text-left sm:text-right">
-             <span className="text-[10px] text-gray-400 font-mono uppercase tracking-widest mb-0.5">Posted</span>
-             <span className="text-[11px] font-mono text-gray-600 uppercase tracking-widest">{displayTime}</span>
-           </div>
-           
            <div className="flex gap-3 mt-2 sm:mt-0 w-full sm:w-auto">
              {onViewDetails ? (
                <button 
