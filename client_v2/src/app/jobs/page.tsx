@@ -1,11 +1,11 @@
 "use client";
-
 import JobFilters from "@/components/JobFilters";
 import JobRow from "@/components/JobRow";
 import JobSearchBar from "@/components/JobSearchBar";
 import JobDetailsModal, { JobDetail } from "@/components/JobDetailsModal";
 import { Filter, X } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const DUMMY_JOBS = [
   {
@@ -13,55 +13,50 @@ const DUMMY_JOBS = [
     title: "Senior Distributed Systems Engineer",
     company: "CyberSync",
     location: "New York, NY",
-    level: "Senior",
+    experience_level: "Senior",
     salary: "$180k – $240k",
-    description: "We are building a next-generation distributed database. You will be responsible for optimizing consensus algorithms, reducing tail latency in high-throughput environments, and ensuring 99.999% availability across global clusters.",
-    tags: ["Go", "Kubernetes", "gRPC", "Redis", "AWS", "Docker"],
-    postedAt: "2 hours ago",
+    skills: ["Go", "Kubernetes", "gRPC", "Redis", "AWS", "Docker"],
+    first_seen: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     experience: "5+ years",
     vacancy: "2",
     deadline: "Oct 15, 2026",
-    logoUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/GitHub_Invertocat_Logo.svg/180px-GitHub_Invertocat_Logo.svg.png",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/GitHub_Invertocat_Logo.svg/180px-GitHub_Invertocat_Logo.svg.png",
   },
   {
     id: 2,
     title: "Principal React Architect",
     company: "Vertex Cloud",
     location: "San Francisco, CA",
-    level: "Principal",
+    experience_level: "Principal",
     salary: "$210k – $300k",
-    description: "Lead the architectural vision for our core frontend platform. You'll set standards for React development, establish robust CI/CD pipelines for frontend artifacts, and mentor senior engineers.",
-    tags: ["React", "TypeScript", "Next.js", "Tailwind", "GraphQL"],
-    postedAt: "5 hours ago",
+    skills: ["React", "TypeScript", "Next.js", "Tailwind", "GraphQL"],
+    first_seen: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
     experience: "8+ years",
     vacancy: "1",
-    logoUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/230px-React-icon.svg.png",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/230px-React-icon.svg.png",
   },
   {
     id: 3,
     title: "Machine Learning Engineer, Core AI",
     company: "CloudStream AI",
     location: "Remote",
-    level: "Mid-Level",
+    experience_level: "Mid-Level",
     salary: "$150k – $200k",
-    tags: ["Python", "PyTorch", "AWS", "CUDA", "TensorFlow"],
-    postedAt: "1 day ago",
+    skills: ["Python", "PyTorch", "AWS", "CUDA", "TensorFlow"],
+    first_seen: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     experience: "3+ years",
     deadline: "Nov 1, 2026",
-    logoUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/PyTorch_logo_icon.svg/210px-PyTorch_logo_icon.svg.png",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/PyTorch_logo_icon.svg/210px-PyTorch_logo_icon.svg.png",
   },
   {
     id: 4,
     title: "DevOps / SRE Lead",
     company: "Nexus Systems",
     location: "Austin, TX (Hybrid)",
-    level: "Lead",
+    experience_level: "Lead",
     salary: "$160k – $210k",
-    tags: ["Terraform", "AWS", "Docker", "CI/CD", "Linux"],
-    postedAt: "2 days ago",
+    skills: ["Terraform", "AWS", "Docker", "CI/CD", "Linux"],
+    first_seen: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
     experience: "6+ years",
     vacancy: "3",
   },
@@ -70,22 +65,58 @@ const DUMMY_JOBS = [
     title: "Frontend Developer (UI/UX Focus)",
     company: "DataFlow",
     location: "Remote",
-    level: "Junior",
+    experience_level: "Junior",
     salary: "$90k – $120k",
-    tags: ["Vue.js", "CSS", "Figma", "JavaScript"],
-    postedAt: "3 days ago",
+    skills: ["Vue.js", "CSS", "Figma", "JavaScript"],
+    first_seen: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(),
     experience: "1+ years",
-    logoUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Vue.js_Logo_2.svg/180px-Vue.js_Logo_2.svg.png",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Vue.js_Logo_2.svg/180px-Vue.js_Logo_2.svg.png",
   },
 ];
 
 export default function JobsPage() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [selectedJob, setSelectedJob] = useState<JobDetail | null>(null);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+
+  const handleViewDetails = async (jobId: string, fallbackJob: any) => {
+    if (!jobId) {
+      setSelectedJob(fallbackJob);
+      return;
+    }
+    
+    setIsLoadingDetails(true);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api";
+      const res = await fetch(`${apiUrl}/jobs/${jobId}`);
+      const data = await res.json();
+      
+      if (res.ok && data.status === 1) {
+        setSelectedJob(data.data);
+      } else {
+        toast.error("Failed to load job details. Showing cached data.");
+        setSelectedJob(fallbackJob); // Fallback if API fails
+      }
+    } catch (err) {
+      toast.error("Failed to fetch job details. Check your connection.");
+      setSelectedJob(fallbackJob);
+    } finally {
+      setIsLoadingDetails(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 relative">
+      {/* Loading Overlay for details fetch */}
+      {isLoadingDetails && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+          <div className="bg-white p-4 rounded-lg shadow-lg flex items-center gap-3">
+            <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary border-t-transparent"></div>
+            <span className="font-mono text-sm text-gray-700">Loading details...</span>
+          </div>
+        </div>
+      )}
+      
       {/* Header / Search Section */}
       <section className="border-b border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-8 md:py-12 flex flex-col items-center">
@@ -179,16 +210,16 @@ export default function JobsPage() {
                   title={job.title}
                   company={job.company}
                   location={job.location}
-                  level={job.level}
+                  experience_level={job.experience_level}
                   salary={job.salary}
-                  tags={job.tags}
-                  postedAt={job.postedAt}
-                  logoUrl={job.logoUrl}
+                  skills={job.skills}
+                  first_seen={job.first_seen}
+                  logo={job.logo}
                   url={`/jobs/${job.id}`}
                   experience={job.experience}
                   vacancy={job.vacancy}
                   deadline={job.deadline}
-                  onViewDetails={() => setSelectedJob(job)}
+                  onViewDetails={() => handleViewDetails(job.id.toString(), job)}
                 />
               ))}
             </div>

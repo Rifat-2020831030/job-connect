@@ -9,6 +9,9 @@ function VerificationContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [resendMessage, setResendMessage] = useState("");
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (index: number, value: string) => {
@@ -29,11 +32,58 @@ function VerificationContent() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleResend = async () => {
+    if (!email) return;
+    setResendMessage("");
+    setError("");
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api";
+      const response = await fetch(`${apiUrl}/auth/resend-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (response.ok && data.status === 1) {
+        setResendMessage("Verification code resent to your email.");
+      } else {
+        setError(data.message || "Failed to resend code.");
+      }
+    } catch (err) {
+      console.error("Resend error:", err);
+      setError("An unexpected error occurred.");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = otp.join("");
     if (code.length === 6) {
-      router.push("/set-password?email=" + encodeURIComponent(email));
+      setLoading(true);
+      setError("");
+      setResendMessage("");
+      
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api";
+        const response = await fetch(`${apiUrl}/auth/verify-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, code: code }),
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.status === 1) {
+          router.push("/set-password?email=" + encodeURIComponent(email));
+        } else {
+          setError(data.message || "Invalid or expired code.");
+        }
+      } catch (err) {
+        console.error("Verification error:", err);
+        setError("An unexpected error occurred.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -56,32 +106,46 @@ function VerificationContent() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-10">
-          <div className="flex justify-between gap-2">
-            {otp.map((digit, index) => (
-              <input
-                key={index}
-                ref={(el) => { inputsRef.current[index] = el; }}
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                className="w-12 h-14 md:w-14 md:h-16 text-center text-2xl font-bold border border-gray-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors bg-white text-foreground"
-                required
-              />
-            ))}
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between gap-2">
+              {otp.map((digit, index) => (
+                <input
+                  key={index}
+                  ref={(el) => { inputsRef.current[index] = el; }}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => handleChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  disabled={loading}
+                  className="w-12 h-14 md:w-14 md:h-16 text-center text-2xl font-bold border border-gray-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors bg-white text-foreground disabled:opacity-50"
+                  required
+                />
+              ))}
+            </div>
+            {error && <p className="text-red-500 text-sm text-center mt-2">{error}</p>}
+            {resendMessage && <p className="text-primary text-sm text-center mt-2">{resendMessage}</p>}
           </div>
 
           <div className="flex flex-col gap-4 w-full">
-            <button type="submit" className="w-full py-4 btn-primary text-base">
-              Verify & Continue
+            <button 
+              type="submit" 
+              disabled={loading || otp.join("").length < 6}
+              className="w-full py-4 btn-primary text-base disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {loading ? "Verifying..." : "Verify & Continue"}
             </button>
             
             <div className="flex items-center justify-center gap-2 text-sm">
               <span className="font-mono text-gray-500 font-semibold tracking-wide">Didn't receive the code?</span>
-              <button type="button" className="font-mono text-primary font-semibold tracking-wide hover:underline decoration-primary/30 underline-offset-4">
+              <button 
+                type="button" 
+                onClick={handleResend}
+                disabled={loading}
+                className="font-mono text-primary font-semibold tracking-wide hover:underline decoration-primary/30 underline-offset-4 disabled:opacity-50"
+              >
                 Resend code
               </button>
             </div>

@@ -2,8 +2,10 @@
 
 import React, { useEffect } from 'react';
 import { X, MapPin, DollarSign } from 'lucide-react';
+import { formatDate } from '../lib/utils';
 
 export type JobDetail = {
+  _id?: string;
   title: string;
   company: string;
   location: string;
@@ -16,6 +18,11 @@ export type JobDetail = {
   experience?: string;
   deadline?: string;
   logoUrl?: string;
+  benefits?: string[];
+  industry?: string;
+  job_type?: string;
+  category?: string;
+  url?: string;
 };
 
 interface JobDetailsModalProps {
@@ -31,6 +38,26 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
       document.body.style.overflow = 'auto';
     };
   }, []);
+  
+  const displayExp = (!job.experience || job.experience === "-1") ? "Not Mentioned" : job.experience;
+  const displayVacancy = (!job.vacancy || job.vacancy === "-1") ? "Not Mentioned" : job.vacancy;
+  const displayDeadline = formatDate(job.deadline);
+
+  const handleApplyClick = async () => {
+    if (job._id) {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api";
+        await fetch(`${apiUrl}/stat/jobs/clicks?jobID=${job._id}`);
+      } catch (error) {
+        console.error("Failed to register job click stat", error);
+      }
+    }
+    if (job.url) {
+      window.open(job.url, "_blank", "noopener,noreferrer");
+    } else {
+      alert("No application URL provided for this job.");
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
@@ -79,26 +106,27 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
                   {job.salary}
                 </div>
               )}
+              {job.job_type && (
+                <div className="flex items-center gap-1 text-sm text-blue-700 font-medium bg-blue-50 px-2 py-0.5 rounded-md">
+                  {job.job_type}
+                </div>
+              )}
             </div>
             
             {/* Additional Crucial Meta */}
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-2 pt-4 border-t border-gray-50">
-              {job.experience && (
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Experience</span>
-                  <span className="text-sm font-semibold text-gray-700">{job.experience}</span>
-                </div>
-              )}
-              {job.vacancy && (
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Vacancy</span>
-                  <span className="text-sm font-semibold text-gray-700">{job.vacancy}</span>
-                </div>
-              )}
-              {job.deadline && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-4 mt-2 pt-4 border-t border-gray-50">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Experience</span>
+                <span className="text-sm font-semibold text-gray-700">{displayExp}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Vacancy</span>
+                <span className="text-sm font-semibold text-gray-700">{displayVacancy}</span>
+              </div>
+              {displayDeadline && (
                 <div className="flex flex-col">
                   <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Deadline</span>
-                  <span className="text-sm font-semibold text-gray-700">{job.deadline}</span>
+                  <span className="text-sm font-semibold text-gray-700">{displayDeadline}</span>
                 </div>
               )}
               {job.level && (
@@ -107,15 +135,27 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
                   <span className="text-sm font-semibold text-gray-700">{job.level}</span>
                 </div>
               )}
+              {job.industry && (
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Industry</span>
+                  <span className="text-sm font-semibold text-gray-700">{job.industry}</span>
+                </div>
+              )}
+              {job.category && (
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Category</span>
+                  <span className="text-sm font-semibold text-gray-700">{job.category}</span>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Technical Challenges / Description */}
           <div className="flex flex-col gap-3">
             <h3 className="text-sm font-mono font-bold tracking-wider text-foreground uppercase">
-              Technical Challenges
+              Job Description
             </h3>
-            <div className="text-sm text-gray-600 leading-relaxed space-y-4">
+            <div className="text-sm text-gray-600 leading-relaxed space-y-4 whitespace-pre-wrap">
               {job.description ? (
                 <p>{job.description}</p>
               ) : (
@@ -123,6 +163,23 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
               )}
             </div>
           </div>
+          
+          {/* Benefits */}
+          {job.benefits && job.benefits.length > 0 && (
+            <div className="flex flex-col gap-3">
+              <h3 className="text-sm font-mono font-bold tracking-wider text-foreground uppercase">
+                Benefits & Perks
+              </h3>
+              <ul className="flex flex-col gap-2">
+                {job.benefits.map((benefit, idx) => (
+                  <li key={idx} className="flex items-start gap-3 text-sm text-gray-600 leading-relaxed">
+                    <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-primary mt-2"></span>
+                    <span>{benefit}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Requirements */}
           {job.tags && job.tags.length > 0 && (
@@ -146,10 +203,7 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
         <div className="bg-[#f2f3ff] px-6 py-5 border-t border-[#bbcabf33] shrink-0">
           <button 
             className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3.5 rounded-md transition-colors cursor-pointer text-lg tracking-wide shadow-sm"
-            onClick={() => {
-              console.log(`Applying for job: ${job.title}`);
-              alert("Application flow triggered for " + job.title);
-            }}
+            onClick={handleApplyClick}
           >
             Apply Now
           </button>

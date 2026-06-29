@@ -6,33 +6,71 @@ import { useState } from "react";
 export default function SubscribeForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      router.push("/verify?email=" + encodeURIComponent(email));
+    if (!email) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api";
+      const response = await fetch(`${apiUrl}/auth/subscribe`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.status === 1) {
+        if (data.alreadyVerified) {
+          router.push("/set-password?email=" + encodeURIComponent(email));
+        } else {
+          router.push("/verify?email=" + encodeURIComponent(email));
+        }
+      } else {
+        setError(data.message || "Failed to subscribe.");
+      }
+    } catch (err) {
+      console.error("Subscription error:", err);
+      setError("An unexpected error occurred.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form 
-      onSubmit={handleSubmit}
-      className="flex flex-col sm:flex-row bg-white border border-gray-300 rounded-lg p-1.5 shadow-sm w-full"
-    >
-      <input 
-        type="email" 
-        placeholder="Enter your email address" 
-        className="flex-1 px-4 py-3 outline-none text-gray-700 bg-transparent"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <button 
-        type="submit"
-        className="bg-primary hover:bg-emerald-600 text-white font-bold px-8 py-3 rounded text-sm sm:text-base transition-colors mt-2 sm:mt-0"
+    <div className="flex flex-col w-full">
+      <form 
+        onSubmit={handleSubmit}
+        className="flex flex-col sm:flex-row bg-white border border-gray-300 rounded-lg p-1.5 shadow-sm w-full relative"
       >
-        Get Job Alerts
-      </button>
-    </form>
+        <input 
+          type="email" 
+          placeholder="Enter your email address" 
+          className="flex-1 px-4 py-3 outline-none text-gray-700 bg-transparent"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          disabled={loading}
+        />
+        <button 
+          type="submit"
+          disabled={loading}
+          className="bg-primary hover:bg-emerald-600 text-white font-bold px-8 py-3 rounded text-sm sm:text-base transition-colors mt-2 sm:mt-0 disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          {loading ? "Please wait..." : "Get Job Alerts"}
+        </button>
+      </form>
+      {error && (
+        <p className="text-red-500 text-sm mt-2 px-1">{error}</p>
+      )}
+    </div>
   );
 }
