@@ -11,9 +11,9 @@ export interface JobCardProps {
   experience?: string;
   deadline?: string;
   postedAt: string;
-  tags: string[];
   logoUrl?: string;
   url?: string;
+  onViewDetails?: () => void;
 }
 
 export default function JobCard({
@@ -29,7 +29,8 @@ export default function JobCard({
   postedAt,
   tags,
   logoUrl,
-  url = "#"
+  url = "#",
+  onViewDetails
 }: JobCardProps) {
   return (
     <div className="card flex flex-col justify-between h-full">
@@ -75,12 +76,21 @@ export default function JobCard({
           ))}
         </div>
         
-        <a 
-          href={url} 
-          className="w-full py-2 btn-secondary"
-        >
-          View Details
-        </a>
+        {onViewDetails ? (
+          <button 
+            onClick={onViewDetails} 
+            className="w-full py-2 btn-secondary cursor-pointer"
+          >
+            View Details
+          </button>
+        ) : (
+          <a 
+            href={url} 
+            className="w-full py-2 btn-secondary"
+          >
+            View Details
+          </a>
+        )}
       </div>
     </div>
   );

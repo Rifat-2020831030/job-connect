@@ -14,6 +14,8 @@ export interface JobRowProps {
   experience?: string;
   vacancy?: string;
   deadline?: string;
+  description?: string;
+  onViewDetails?: () => void;
 }
 
 export default function JobRow({
@@ -28,7 +30,9 @@ export default function JobRow({
   url = "#",
   experience,
   vacancy,
-  deadline
+  deadline,
+  description,
+  onViewDetails
 }: JobRowProps) {
   // Define mapping logic if level doesn't explicitly match the sidebar
   let mappedLevel = level;
@@ -55,9 +59,15 @@ export default function JobRow({
           </div>
           
           <div className="flex flex-col min-w-0">
-            <a href={url} className="inline-block hover:text-primary transition-colors">
-              <h3 className="text-lg md:text-xl font-bold text-foreground break-words whitespace-normal">{title}</h3>
-            </a>
+            {onViewDetails ? (
+              <button onClick={onViewDetails} className="inline-block hover:text-primary transition-colors text-left cursor-pointer">
+                <h3 className="text-lg md:text-xl font-bold text-foreground break-words whitespace-normal">{title}</h3>
+              </button>
+            ) : (
+              <a href={url} className="inline-block hover:text-primary transition-colors">
+                <h3 className="text-lg md:text-xl font-bold text-foreground break-words whitespace-normal">{title}</h3>
+              </a>
+            )}
             <div className="text-[11px] sm:text-xs font-mono text-gray-500 uppercase tracking-widest flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
               <span className="truncate max-w-[120px] sm:max-w-none">{company}</span>
               <span className="text-gray-300">•</span>
@@ -129,12 +139,21 @@ export default function JobRow({
            </div>
            
            <div className="flex gap-3 mt-2 sm:mt-0 w-full sm:w-auto">
-             <a 
-               href={url}
-               className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold text-primary border border-primary uppercase tracking-wider hover:bg-primary/5 transition-colors whitespace-nowrap"
-             >
-               Details
-             </a>
+             {onViewDetails ? (
+               <button 
+                 onClick={onViewDetails}
+                 className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold text-primary border border-primary uppercase tracking-wider hover:bg-primary/5 transition-colors whitespace-nowrap cursor-pointer"
+               >
+                 Details
+               </button>
+             ) : (
+               <a 
+                 href={url}
+                 className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold text-primary border border-primary uppercase tracking-wider hover:bg-primary/5 transition-colors whitespace-nowrap"
+               >
+                 Details
+               </a>
+             )}
              <a 
                href={url}
                className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold bg-primary text-white border border-primary uppercase tracking-wider hover:bg-emerald-700 transition-colors whitespace-nowrap"

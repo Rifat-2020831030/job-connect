@@ -2,26 +2,27 @@ import compression from "compression";
 import dotenv from "dotenv";
 import express from "express";
 import { rateLimit } from "express-rate-limit";
+import dns from "dns";
 import { connectDB } from "./db/database.js";
 dotenv.config();
 
-import dns from "dns";
-import { jobSearcherCron } from "../spider-runner.js";
+dns.setServers(["1.1.1.1", "1.0.0.1"]);
+
 import serverHealth from "./controller/server-health.js";
+import authRouter from "./routers/auth.js";
 import emailRouter from "./routers/email.js";
 import jobsRouter from "./routers/jobs.js";
 import scrapeRouter from "./routers/scrape.js";
 import jobsStat from "./routers/stat.js";
+import usersRouter from "./routers/users.js";
 import { jobAlertSchedule } from "./services/job-alert.js";
 import { source } from "./utils/source.js";
-
-dns.setServers(["1.1.1.1", "1.0.0.1"]);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const isVercelRuntime = Boolean(process.env.VERCEL);
 
-// Job scraping is scheduled externally by GitHub Actions.
+// Job alert emails are scheduled by cron (disabled on Vercel — uses GitHub Actions instead)
 if (!isVercelRuntime) {
   jobAlertSchedule.start();
 }
@@ -31,55 +32,36 @@ const allowedOrigins = [
   "https://chakrilagbe.vercel.app",
   "https://server-health-tau.vercel.app",
   "https://chakrilagbe-client-admin.vercel.app",
-  // "http://localhost:5173", // For local development
+  "http://localhost:3001", // client_v2 dev
 ];
 
 const corsOption = {
   origin: (origin, callback) => {
-    // Disallow requests with no origin
-    if (!origin) {
-      callback(
-        // new Error("CORS Error: No origin provided"),
-        null,
-        true
-      );
-      return;
-    }
-
-    // Check if origin is in allowed list
+    if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       console.error(`CORS blocked origin: ${origin}`);
-      callback(
-        new Error(`Access denied: Origin '${origin}' not allowed.`),
-        false
-      );
+      callback(new Error(`Access denied: Origin '${origin}' not allowed.`), false);
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true, // Allow cookies if needed
+  credentials: true,
   optionsSuccessStatus: 200,
 };
 
 const limiter = rateLimit({
-  windowMs: 30 * 60 * 1000, // 30 minutes
+  windowMs: 30 * 60 * 1000,
   max: 200,
   message: "Too many requests, please try again later.",
-  // standardHeaders: true,
-  skip: (req) => req.path === "/health", // exclude health checks
+  skip: (req) => req.path === "/health",
 });
 
 const healthLimit = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
+  windowMs: 60 * 1000,
   max: 200,
   message: "Too many requests, please try again later.",
-  // standardHeaders: true,
-});
-
-app.get("/", (req, res, next) => {
-  res.send("The server is running");
 });
 
 // app.use("/api", cors(corsOption));
@@ -87,39 +69,34 @@ app.use(limiter);
 app.use(express.json());
 app.use(compression());
 
+app.get("/", (_req, res) => res.send("The server is running"));
 app.get("/health", healthLimit, serverHealth);
 
-app.use(limiter);
-app.use(express.json());
-app.use(compression());
-
-app.get("/health", healthLimit, serverHealth);
-
+app.use("/api/auth", authRouter);
+app.use("/api/users", usersRouter);
 app.use("/api/jobs", source, jobsRouter);
 app.use("/api/stat", jobsStat);
 app.use("/api/email", emailRouter);
 app.use("/api/scrape", scrapeRouter);
 
 // Error handling middleware
-app.use((err, req, res, next) => {
-  // Handle CORS errors
-  if (err.message.includes("Origin") && err.message.includes("not allowed")) {
+app.use((err, req, res, _next) => {
+  if (err.message?.includes("Origin") && err.message?.includes("not allowed")) {
     return res.status(403).json({
       status: 0,
       message: "CORS Error: Origin not allowed",
       error: "Access denied by CORS policy",
     });
   }
-
   const message = err.message || "Internal Server Error";
   res.status(500).json({ status: 0, message });
 });
 
-// Initialize db connection before starting the server
+// Initialize DB then start server
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`The server is running.`);
+      console.log(`The server is running on port ${PORT}`);
     });
   })
   .catch((err) => {
