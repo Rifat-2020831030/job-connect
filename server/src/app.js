@@ -23,17 +23,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const isVercelRuntime = Boolean(process.env.VERCEL);
 
-// Job alert emails are scheduled by cron (disabled on Vercel — uses GitHub Actions instead)
-if (!isVercelRuntime) {
-  jobAlertSchedule.start();
-}
-
 // Allowed origins
 const allowedOrigins = [
   "https://chakrilagbe.vercel.app",
   "https://server-health-tau.vercel.app",
   "https://chakrilagbe-client-admin.vercel.app",
-  "http://localhost:3001", // client_v2 dev
   "http://localhost:3000", // client_v2 dev
 ];
 
@@ -100,10 +94,14 @@ app.use((err, req, res, _next) => {
 // Initialize DB then start server
 connectDB()
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(`The server is running on port ${PORT}`);
-    });
+    if (process.env.NODE_ENV !== "production" && !isVercelRuntime) {
+      app.listen(PORT, () => {
+        console.log(`The server is running on port ${PORT}`);
+      });
+    }
   })
   .catch((err) => {
     console.error("Failed to connect to database:", err);
   });
+
+export default app;
