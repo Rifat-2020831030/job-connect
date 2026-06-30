@@ -4,6 +4,7 @@ import JobFilters, { ActiveFilters, FilterOptions } from "@/components/JobFilter
 import JobRow from "@/components/JobRow";
 import JobSearchBar from "@/components/JobSearchBar";
 import JobDetailsModal, { JobDetail } from "@/components/JobDetailsModal";
+import { API_BASE_URL } from "@/lib/api";
 import { Filter, X, Loader2, Search } from "lucide-react";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -43,15 +44,13 @@ function JobsPageContent() {
     companies: searchParams.get("company") ? searchParams.get("company")!.split(",") : [],
   };
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api";
-
   // Fetch Filter Options
   useEffect(() => {
     async function fetchOptions() {
       try {
         const [optRes, catRes] = await Promise.all([
-          fetch(`${apiUrl}/jobs/filter-options`),
-          fetch(`${apiUrl}/jobs/categories`)
+          fetch(`${API_BASE_URL}/jobs/filter-options`),
+          fetch(`${API_BASE_URL}/jobs/categories`)
         ]);
         
         const optData = await optRes.json();
@@ -70,7 +69,7 @@ function JobsPageContent() {
       }
     }
     fetchOptions();
-  }, [apiUrl]);
+  }, []);
 
   // Fetch Jobs
   useEffect(() => {
@@ -83,7 +82,7 @@ function JobsPageContent() {
           if (!params.get(key)) params.delete(key);
         });
 
-        const res = await fetch(`${apiUrl}/jobs?${params.toString()}`);
+        const res = await fetch(`${API_BASE_URL}/jobs?${params.toString()}`);
         const data = await res.json();
         
         if (data.status === 1) {
@@ -102,7 +101,7 @@ function JobsPageContent() {
       }
     }
     fetchJobs();
-  }, [searchParams, apiUrl]);
+  }, [searchParams]);
 
   const updateUrl = (newParams: Record<string, string | null>, resetPage = true) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -146,7 +145,7 @@ function JobsPageContent() {
     
     setIsLoadingDetails(true);
     try {
-      const res = await fetch(`${apiUrl}/jobs/${jobId}`);
+      const res = await fetch(`${API_BASE_URL}/jobs/${jobId}`);
       const data = await res.json();
       
       if (res.ok && data.status === 1) {
@@ -209,7 +208,7 @@ function JobsPageContent() {
           </div>
           <div className="mt-6 flex items-center justify-between w-full max-w-4xl text-xs md:text-sm px-2">
             <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2 md:h-2.5 md:w-2.5">
+              <span className="relative flex h-2 w-2 md:h-2.5 md:w-2.5 mr-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 md:h-2.5 md:w-2.5 bg-emerald-500"></span>
               </span>

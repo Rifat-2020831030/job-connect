@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { X, MapPin, DollarSign } from 'lucide-react';
 import { formatDate } from '../lib/utils';
+import { API_BASE_URL } from '../lib/api';
 
 export type JobDetail = {
   _id?: string;
@@ -46,8 +47,7 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
   const handleApplyClick = async () => {
     if (job._id) {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api";
-        await fetch(`${apiUrl}/stat/jobs/clicks?jobID=${job._id}`);
+        await fetch(`${API_BASE_URL}/stat/jobs/clicks?jobID=${job._id}`);
       } catch (error) {
         console.error("Failed to register job click stat", error);
       }
@@ -100,17 +100,13 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
                 {job.location}
               </div>
 
-              {job.salary && (
-                <div className="flex items-center gap-1 text-sm text-purple-700 font-medium bg-purple-50 px-2 py-0.5 rounded-md">
-                  <DollarSign className="w-3.5 h-3.5" />
-                  {job.salary}
-                </div>
-              )}
-              {job.job_type && (
-                <div className="flex items-center gap-1 text-sm text-blue-700 font-medium bg-blue-50 px-2 py-0.5 rounded-md">
-                  {job.job_type}
-                </div>
-              )}
+              <div className="flex items-center gap-1 text-sm text-purple-700 font-medium bg-purple-50 px-2 py-0.5 rounded-md">
+                <DollarSign className="w-3.5 h-3.5" />
+                {job.salary || 'Not Mentioned'}
+              </div>
+              <div className="flex items-center gap-1 text-sm text-blue-700 font-medium bg-blue-50 px-2 py-0.5 rounded-md">
+                {job.job_type || 'Not Mentioned'}
+              </div>
             </div>
             
             {/* Additional Crucial Meta */}
@@ -123,30 +119,22 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
                 <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Vacancy</span>
                 <span className="text-sm font-semibold text-gray-700">{displayVacancy}</span>
               </div>
-              {displayDeadline && (
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Deadline</span>
-                  <span className="text-sm font-semibold text-gray-700">{displayDeadline}</span>
-                </div>
-              )}
-              {job.level && (
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Level</span>
-                  <span className="text-sm font-semibold text-gray-700">{job.level}</span>
-                </div>
-              )}
-              {job.industry && (
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Industry</span>
-                  <span className="text-sm font-semibold text-gray-700">{job.industry}</span>
-                </div>
-              )}
-              {job.category && (
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Category</span>
-                  <span className="text-sm font-semibold text-gray-700">{job.category}</span>
-                </div>
-              )}
+              <div className="flex flex-col">
+                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Deadline</span>
+                <span className="text-sm font-semibold text-gray-700">{displayDeadline || 'Not Mentioned'}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Level</span>
+                <span className="text-sm font-semibold text-gray-700">{job.level || 'Not Mentioned'}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Industry</span>
+                <span className="text-sm font-semibold text-gray-700">{job.industry || 'Not Mentioned'}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Category</span>
+                <span className="text-sm font-semibold text-gray-700">{job.category || 'Not Mentioned'}</span>
+              </div>
             </div>
           </div>
 

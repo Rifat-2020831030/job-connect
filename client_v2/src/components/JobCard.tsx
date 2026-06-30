@@ -1,5 +1,6 @@
 import React from 'react';
 import { formatRelativeTime, formatSalary, formatDate } from '../lib/utils';
+import Image from 'next/image';
 
 export interface JobCardProps {
   title: string;
@@ -47,8 +48,8 @@ export default function JobCard({
     <div className="card flex flex-col justify-between h-full">
       <div>
         <div className="flex justify-between items-start mb-4">
-          <div className="size-12 logo-box text-xl">
-            {logo ? <img src={logo} alt={`${company} logo`} className="w-full h-full object-contain p-2" /> : "🏢"}
+          <div className="relative size-12 logo-box text-xl overflow-hidden">
+            {logo ? <Image src={logo} alt={`${company} logo`} fill unoptimized className="object-contain p-2 text-[10px] leading-tight text-center text-gray-400 break-words flex items-center justify-center" /> : "🏢"}
           </div>
           <button className="text-gray-400 hover:text-primary transition-colors shrink-0">
             <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

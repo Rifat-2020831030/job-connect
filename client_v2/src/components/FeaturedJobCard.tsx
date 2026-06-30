@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 export interface FeaturedJobCardProps {
   title: string;
@@ -29,8 +30,8 @@ export default function FeaturedJobCard({
     <div className="card flex flex-col justify-between w-full col-span-1 md:col-span-2">
       <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between w-full">
         <div className="flex items-start md:items-center gap-6">
-          <div className="size-14 logo-box text-2xl">
-            {logoUrl ? <img src={logoUrl} alt={`${companyName} logo`} className="w-full h-full object-contain p-2" /> : "🚀"}
+          <div className="relative size-14 logo-box text-2xl overflow-hidden">
+            {logoUrl ? <Image src={logoUrl} alt={`${companyName} logo`} fill unoptimized className="object-contain p-2 text-[10px] leading-tight text-center text-gray-400 break-words flex items-center justify-center" /> : "🚀"}
           </div>
           
           <div className="flex flex-col gap-1">

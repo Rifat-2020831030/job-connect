@@ -3,15 +3,15 @@ import Link from 'next/link';
 
 export interface CategoryCardProps {
   title: string;
-  icon: string;
+  icon: React.ReactNode;
   count: number;
   href?: string;
 }
 
 export default function CategoryCard({ title, icon, count, href = "#" }: CategoryCardProps) {
   return (
-    <Link href={href} className="group card card-hover flex flex-col items-start h-full justify-between">
-      <div>
+    <Link href={href} className="group card card-hover flex flex-col items-center text-center h-full justify-between">
+      <div className="flex flex-col items-center">
         <div className="size-12 bg-gray-100 group-hover:bg-primary/10 rounded flex items-center justify-center text-2xl mb-4 transition-colors">
           {icon}
         </div>
