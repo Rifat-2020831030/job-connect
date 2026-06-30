@@ -28,14 +28,14 @@ export const setPassword = async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 12);
 
+    const { accessToken, refreshToken } = issueTokens(user._id, email);
+
     await db
       .collection("users")
       .updateOne(
         { email },
-        { $set: { passwordHash, updatedAt: new Date().toISOString() } }
+        { $set: { passwordHash, refreshToken, updatedAt: new Date().toISOString() } }
       );
-
-    const { accessToken, refreshToken } = issueTokens(user._id, email);
 
     return res
       .status(200)

@@ -41,7 +41,7 @@ function AllSetContent() {
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full py-6">
-          <Link href="/" className="w-full sm:w-48 btn-primary py-3 text-base flex items-center justify-center gap-2">
+          <Link href="/saved-jobs" className="w-full sm:w-48 btn-primary py-3 text-base flex items-center justify-center gap-2">
             Go to Dashboard
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
           </Link>
