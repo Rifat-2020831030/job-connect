@@ -1,8 +1,9 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { API_BASE_URL } from "@/lib/api";
+import { toast } from "sonner";
 
 export default function SubscribeForm() {
   const router = useRouter();
@@ -34,12 +35,15 @@ export default function SubscribeForm() {
         } else {
           router.push("/verify?email=" + encodeURIComponent(email));
         }
+      } else if (response.status === 409) {
+        toast.info(data.message || "You are already subscribed. Please log in.");
+        router.push("/login");
       } else {
         setError(data.message || "Failed to subscribe.");
       }
     } catch (err) {
       console.error("Subscription error:", err);
-      setError("An unexpected error occurred.");
+      toast.error("An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
@@ -47,30 +51,27 @@ export default function SubscribeForm() {
 
   return (
     <div className="flex flex-col w-full">
-      <form 
+      <form
         onSubmit={handleSubmit}
         className="flex flex-col sm:flex-row bg-white border border-gray-300 rounded-lg p-1.5 shadow-sm w-full relative"
       >
-        <input 
-          type="email" 
-          placeholder="Enter your email address" 
+        <input
+          type="email"
+          placeholder="Enter your email address"
           className="flex-1 px-4 py-3 outline-none text-gray-700 bg-transparent"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
           disabled={loading}
         />
-        <button 
+        <button
           type="submit"
           disabled={loading}
-          className="bg-primary hover:bg-emerald-600 text-white font-bold px-8 py-3 rounded text-sm sm:text-base transition-colors mt-2 sm:mt-0 disabled:opacity-70 disabled:cursor-not-allowed"
+          className="bg-primary hover:bg-emerald-600 text-white font-bold px-8 py-3 rounded text-sm sm:text-base transition-colors mt-2 sm:mt-0 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
         >
           {loading ? "Please wait..." : "Get Job Alerts"}
         </button>
       </form>
-      {error && (
-        <p className="text-red-500 text-sm mt-2 px-1">{error}</p>
-      )}
     </div>
   );
 }

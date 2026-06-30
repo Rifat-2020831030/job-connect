@@ -30,7 +30,11 @@ function AlertPreferencesContent() {
   useEffect(() => {
     const loadPreferences = async () => {
       const userInfo = getUserInfo();
-      if (!userInfo?.userId) return;
+      if (!userInfo?.userId) {
+        toast.error("Please login to configure your preferences.");
+        router.push("/login");
+        return;
+      }
 
       try {
         const res = await fetchWithAuth(`/users/${userInfo.userId}/preferences`);

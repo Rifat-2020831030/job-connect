@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
+import { useRouter } from "next/navigation";
 import { getUserInfo } from "@/lib/auth";
 import { fetchWithAuth } from "@/lib/apiClient";
 import JobRow from "@/components/JobRow";
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 import { API_BASE_URL } from "@/lib/api";
 
 function SavedJobsContent() {
+  const router = useRouter();
   const [savedJobs, setSavedJobs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState<JobDetail | null>(null);
@@ -18,7 +20,8 @@ function SavedJobsContent() {
     const fetchJobs = async () => {
       const userInfo = getUserInfo();
       if (!userInfo?.userId) {
-        setIsLoading(false);
+        toast.error("Please login to view your saved jobs.");
+        router.push("/login");
         return;
       }
 
