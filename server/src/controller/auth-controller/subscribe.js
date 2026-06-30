@@ -29,16 +29,7 @@ export const subscribe = async (req, res) => {
       await db
         .collection("users")
         .updateOne({ email }, { $set: { geo, updatedAt: now } });
-      await db
-        .collection("subscribers")
-        .updateOne(
-          { email },
-          {
-            $set: { ...geo, updatedAt: now },
-            $setOnInsert: { email, verify: true, subscriptionTime: now },
-          },
-          { upsert: true }
-        );
+        
       return res.status(200).json({
         status: 1,
         alreadyVerified: true,
