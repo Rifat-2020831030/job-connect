@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { getUserInfo } from "@/lib/auth";
+import { fetchWithAuth } from "@/lib/apiClient";
+import { toast } from "sonner";
 
 function AlertPreferencesContent() {
   const router = useRouter();
@@ -22,12 +25,67 @@ function AlertPreferencesContent() {
     );
   };
 
-  const handleSave = () => {
-    const params = new URLSearchParams();
-    if (categories.length) params.set("categories", categories.join(","));
-    if (workModel.length) params.set("model", workModel.join(","));
-    if (frequency) params.set("frequency", frequency);
-    router.push("/all-set?" + params.toString());
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const loadPreferences = async () => {
+      const userInfo = getUserInfo();
+      if (!userInfo?.userId) {
+        toast.error("Please login to configure your preferences.");
+        router.push("/login");
+        return;
+      }
+
+      try {
+        const res = await fetchWithAuth(`/users/${userInfo.userId}/preferences`);
+        const data = await res.json();
+        if (res.ok && data.status === 1 && data.data) {
+          const pref = data.data;
+          if (pref.categories) setCategories(pref.categories);
+          if (pref.workModel) setWorkModel(pref.workModel);
+          if (pref.alertTiming) setFrequency(pref.alertTiming);
+        }
+      } catch (err) {
+        console.error("Failed to load preferences", err);
+      }
+    };
+    loadPreferences();
+  }, []);
+
+  const handleSave = async () => {
+    const userInfo = getUserInfo();
+    if (!userInfo?.userId) {
+      toast.error("You must be logged in to save preferences.");
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      const res = await fetchWithAuth(`/users/${userInfo.userId}/preferences`, {
+        method: "POST",
+        body: JSON.stringify({
+          categories,
+          workModel,
+          alertTiming: frequency
+        })
+      });
+      const data = await res.json();
+      
+      if (res.ok && data.status === 1) {
+        toast.success("Preferences saved successfully!");
+        const params = new URLSearchParams();
+        if (categories.length) params.set("categories", categories.join(","));
+        if (workModel.length) params.set("model", workModel.join(","));
+        if (frequency) params.set("frequency", frequency);
+        router.push("/all-set?" + params.toString());
+      } else {
+        toast.error("Failed to save preferences.");
+      }
+    } catch (err) {
+      toast.error("An error occurred while saving.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const ALL_CATEGORIES = [
@@ -184,8 +242,8 @@ function AlertPreferencesContent() {
               <Link href="/" className="flex-1 sm:flex-none text-center px-8 py-3 rounded-lg border border-gray-300 font-bold text-gray-600 hover:bg-gray-100 transition-colors text-sm">
                 Cancel
               </Link>
-              <button onClick={handleSave} className="flex-1 sm:flex-none btn-primary px-8 py-3 text-sm shadow-md shadow-primary/20">
-                Save Preferences
+              <button onClick={handleSave} disabled={isLoading} className="flex-1 sm:flex-none btn-primary px-8 py-3 text-sm shadow-md shadow-primary/20 disabled:opacity-50">
+                {isLoading ? "Saving..." : "Save Preferences"}
               </button>
             </div>
           </div>

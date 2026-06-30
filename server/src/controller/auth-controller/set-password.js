@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { getDB } from "../../db/database.js";
+import { issueTokens } from "./shared.js";
 
 // POST /api/auth/set-password
 export const setPassword = async (req, res) => {
@@ -34,12 +35,14 @@ export const setPassword = async (req, res) => {
         { $set: { passwordHash, updatedAt: new Date().toISOString() } }
       );
 
+    const { accessToken, refreshToken } = issueTokens(user._id, email);
+
     return res
       .status(200)
       .json({
         status: 1,
         message: "Account created successfully",
-        data: { userId: user._id.toString(), email },
+        data: { userId: user._id.toString(), email, accessToken, refreshToken },
       });
   } catch (error) {
     console.error("setPassword error:", error);

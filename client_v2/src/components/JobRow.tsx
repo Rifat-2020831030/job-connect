@@ -2,6 +2,7 @@ import { Bookmark, Briefcase, Clock, Users } from "lucide-react";
 import Image from "next/image";
 import { API_BASE_URL } from "../lib/api";
 import { formatDate, formatRelativeTime, formatSalary } from "../lib/utils";
+import { useSavedJobs } from "../lib/SavedJobsContext";
 
 export interface JobRowProps {
   _id?: string;
@@ -40,6 +41,9 @@ export default function JobRow({
   deadline,
   onViewDetails,
 }: JobRowProps) {
+  const { isJobSaved, toggleSavedJob } = useSavedJobs();
+  const isSaved = _id ? isJobSaved(_id) : false;
+
   const displaySalary = formatSalary(salary, salary_min, salary_max);
   const displayTime = formatRelativeTime(first_seen);
 
@@ -152,10 +156,11 @@ export default function JobRow({
               {mappedLevel}
             </span>
             <button
-              className="text-gray-400 hover:text-primary transition-colors cursor-pointer"
-              aria-label="Save Job"
+              onClick={() => _id && toggleSavedJob(_id)}
+              className={`${isSaved ? "text-primary" : "text-gray-400"} hover:text-primary transition-colors cursor-pointer`}
+              aria-label={isSaved ? "Unsave Job" : "Save Job"}
             >
-              <Bookmark className="size-5" />
+              <Bookmark className="size-5" fill={isSaved ? "currentColor" : "none"} />
             </button>
           </div>
           <div className="flex flex-col sm:items-end text-left sm:text-right mt-3 sm:mt-4">
