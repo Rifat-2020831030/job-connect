@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { API_BASE_URL } from "@/lib/api";
 import CategoryCard from "@/components/CategoryCard";
 import HeroSection from "@/components/HeroSection";
 import JobCard from "@/components/JobCard";
@@ -9,17 +10,19 @@ import SectionHeader from "@/components/SectionHeader";
 import JobDetailsModal, { JobDetail } from "@/components/JobDetailsModal";
 import { toast } from "sonner";
 
-// Maps backend category identifiers to emojis
-const categoryIconMap: Record<string, string> = {
-  "web": "💻",
-  "ai/ml": "🤖",
-  "data science": "📊",
-  "devops": "☁️",
-  "mobile": "📱",
-  "security": "🔒",
-  "design": "🎨",
-  "PM": "📋",
-  "other": "✨",
+import { Briefcase, MapPin, Search, Monitor, Cpu, BarChart, Cloud, Smartphone, Shield, PenTool, LayoutList, Sparkles, Building2 } from "lucide-react";
+
+// Maps backend category identifiers to icons
+const categoryIconMap: Record<string, React.ReactNode> = {
+  "web": <Monitor className="w-6 h-6" />,
+  "ai/ml": <Cpu className="w-6 h-6" />,
+  "data science": <BarChart className="w-6 h-6" />,
+  "devops": <Cloud className="w-6 h-6" />,
+  "mobile": <Smartphone className="w-6 h-6" />,
+  "security": <Shield className="w-6 h-6" />,
+  "design": <PenTool className="w-6 h-6" />,
+  "PM": <LayoutList className="w-6 h-6" />,
+  "other": <Sparkles className="w-6 h-6" />,
 };
 
 interface HomeClientProps {
@@ -46,8 +49,7 @@ export default function HomeClient({
     
     setIsLoadingDetails(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api";
-      const res = await fetch(`${apiUrl}/jobs/${jobId}`);
+      const res = await fetch(`${API_BASE_URL}/jobs/${jobId}`);
       const data = await res.json();
       
       if (res.ok && data.status === 1) {
@@ -154,8 +156,9 @@ export default function HomeClient({
               <CategoryCard 
                 key={category.category || index} 
                 title={category.label}
-                icon={categoryIconMap[category.category] || "🏢"}
+                icon={categoryIconMap[category.category] || <Building2 className="w-6 h-6" />}
                 count={category.count}
+                href={`/jobs?category=${encodeURIComponent(category.category)}`}
               />
             ))}
             {categories.length === 0 && (

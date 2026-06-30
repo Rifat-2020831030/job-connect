@@ -1,6 +1,5 @@
 import { getTokens, setTokens, clearTokens } from "./auth";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api";
+import { API_BASE_URL } from "./api";
 
 let isRefreshing = false;
 let failedQueue: Array<{

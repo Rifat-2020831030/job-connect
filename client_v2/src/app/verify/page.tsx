@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { API_BASE_URL } from "@/lib/api";
 import { useState, useRef, Suspense } from "react";
 
 function VerificationContent() {
@@ -37,8 +38,7 @@ function VerificationContent() {
     setResendMessage("");
     setError("");
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api";
-      const response = await fetch(`${apiUrl}/auth/resend-otp`, {
+      const response = await fetch(`${API_BASE_URL}/auth/resend-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -64,8 +64,7 @@ function VerificationContent() {
       setResendMessage("");
       
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api";
-        const response = await fetch(`${apiUrl}/auth/verify-otp`, {
+        const response = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, code: code }),

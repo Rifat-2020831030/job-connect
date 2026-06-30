@@ -1,8 +1,9 @@
 import compression from "compression";
+import cors from "cors";
+import dns from "dns";
 import dotenv from "dotenv";
 import express from "express";
 import { rateLimit } from "express-rate-limit";
-import dns from "dns";
 import { connectDB } from "./db/database.js";
 dotenv.config();
 
@@ -33,6 +34,7 @@ const allowedOrigins = [
   "https://server-health-tau.vercel.app",
   "https://chakrilagbe-client-admin.vercel.app",
   "http://localhost:3001", // client_v2 dev
+  "http://localhost:3000", // client_v2 dev
 ];
 
 const corsOption = {
@@ -42,7 +44,10 @@ const corsOption = {
       callback(null, true);
     } else {
       console.error(`CORS blocked origin: ${origin}`);
-      callback(new Error(`Access denied: Origin '${origin}' not allowed.`), false);
+      callback(
+        new Error(`Access denied: Origin '${origin}' not allowed.`),
+        false
+      );
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -64,7 +69,7 @@ const healthLimit = rateLimit({
   message: "Too many requests, please try again later.",
 });
 
-// app.use("/api", cors(corsOption));
+app.use(cors(corsOption));
 app.use(limiter);
 app.use(express.json());
 app.use(compression());

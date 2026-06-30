@@ -16,7 +16,7 @@ export const getJobs = async (req, res) => {
     const db = await getDB();
     const {
       page = 1,
-      limit = 20,
+      limit = 10,
       category,
       experience_level,
       job_type,
@@ -109,16 +109,14 @@ export const getJobs = async (req, res) => {
       db.collection("jobs").countDocuments(filter),
     ]);
 
-    return res
-      .status(200)
-      .json({
-        status: 1,
-        total,
-        page: pageNum,
-        limit: limitNum,
-        totalPages: Math.ceil(total / limitNum),
-        data: jobs,
-      });
+    return res.status(200).json({
+      status: 1,
+      total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(total / limitNum),
+      data: jobs,
+    });
   } catch (error) {
     console.error("getJobs error:", error);
     return res

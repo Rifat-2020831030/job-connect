@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { API_BASE_URL } from "@/lib/api";
 
 export default function SubscribeForm() {
   const router = useRouter();
@@ -17,8 +18,7 @@ export default function SubscribeForm() {
     setError("");
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api";
-      const response = await fetch(`${apiUrl}/auth/subscribe`, {
+      const response = await fetch(`${API_BASE_URL}/auth/subscribe`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
