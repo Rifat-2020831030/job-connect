@@ -1,55 +1,45 @@
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 dotenv.config();
+
 const url = process.env.db_uri;
 const dbName = "job-collection";
 
 const connectOptions = {
-  serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds if no server is available
-  connectTimeoutMS: 10000, // Timeout for initial connection
-  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-  tls: true, // Use TLS for secure connection
+  serverSelectionTimeoutMS: 5000,
+  connectTimeoutMS: 10000,
+  socketTimeoutMS: 45000,
+  tls: true,
+  maxPoolSize: 10,
+  minPoolSize: 0,        // Let idle connections close in serverless
+  maxIdleTimeMS: 10000,  // Close idle connections after 10s (Vercel freezes at ~15s)
 };
 
-let cachedClient = null;
-let cachedDb = null;
+/**
+ * Cache the MongoClient *promise* (not the resolved client) on `globalThis`.
+ * - In development: survives HMR module reloads.
+ * - In production/serverless: survives across warm invocations of the same container.
+ *
+ * The driver's built-in connection pool handles reconnection on stale sockets,
+ * so we never need to manually check topology state.
+ */
+if (!globalThis._mongoClientPromise) {
+  const client = new MongoClient(url, connectOptions);
+  globalThis._mongoClientPromise = client.connect();
+}
 
-const connectDB = async () => {
-  // If we have a cached connection, use it
-  if (cachedDb) {
-    console.log("Using cached database connection");
-    return cachedDb;
-  }
-
-  // No cached connection, create a new one
-  if (!cachedClient) {
-    cachedClient = new MongoClient(url, connectOptions);
-    try {
-      await cachedClient.connect();
-      console.log("Connected to MongoDB");
-    } catch (error) {
-      console.error("Error connecting to MongoDB:", error);
-      throw error;
-    }
-  }
-
-  cachedDb = cachedClient.db(dbName);
-  return cachedDb;
-};
+const clientPromise = globalThis._mongoClientPromise;
 
 const getDB = async () => {
-  if (!cachedDb) {
-    return connectDB();
-  }
-  return cachedDb;
+  const client = await clientPromise;
+  return client.db(dbName);
 };
 
+// Only used for graceful shutdown (e.g. SIGTERM handler), not in request paths.
 const closeDB = async () => {
-  if (cachedClient) {
-    await cachedClient.close();
-  }
-  cachedClient = null;
-  cachedDb = null;
+  const client = await clientPromise;
+  await client.close();
+  globalThis._mongoClientPromise = null;
 };
 
-export { closeDB, connectDB, getDB };
+export { closeDB, getDB };

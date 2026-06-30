@@ -4,7 +4,7 @@ import dns from "dns";
 import dotenv from "dotenv";
 import express from "express";
 import { rateLimit } from "express-rate-limit";
-import { connectDB } from "./db/database.js";
+import { getDB } from "./db/database.js";
 dotenv.config();
 
 dns.setServers(["1.1.1.1", "1.0.0.1"]);
@@ -92,7 +92,7 @@ app.use((err, req, res, _next) => {
 });
 
 // Initialize DB then start server
-connectDB()
+getDB()
   .then(() => {
     if (process.env.NODE_ENV !== "production" && !isVercelRuntime) {
       app.listen(PORT, () => {
