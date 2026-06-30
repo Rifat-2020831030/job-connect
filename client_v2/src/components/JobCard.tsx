@@ -1,8 +1,11 @@
 import React from 'react';
 import { formatRelativeTime, formatSalary, formatDate } from '../lib/utils';
 import Image from 'next/image';
+import { useSavedJobs } from '../lib/SavedJobsContext';
+import { Bookmark } from 'lucide-react';
 
 export interface JobCardProps {
+  _id?: string;
   title: string;
   company: string;
   location: string;
@@ -21,6 +24,7 @@ export interface JobCardProps {
 }
 
 export default function JobCard({
+  _id,
   title,
   company,
   location,
@@ -37,6 +41,9 @@ export default function JobCard({
   url = "#",
   onViewDetails
 }: JobCardProps) {
+  const { isJobSaved, toggleSavedJob } = useSavedJobs();
+  const isSaved = _id ? isJobSaved(_id) : false;
+  
   const displaySalary = formatSalary(salary, salary_min, salary_max);
   const displayTime = formatRelativeTime(first_seen);
   
@@ -51,10 +58,12 @@ export default function JobCard({
           <div className="relative size-12 logo-box text-xl overflow-hidden">
             {logo ? <Image src={logo} alt={`${company} logo`} fill unoptimized className="object-contain p-2 text-[10px] leading-tight text-center text-gray-400 break-words flex items-center justify-center" /> : "🏢"}
           </div>
-          <button className="text-gray-400 hover:text-primary transition-colors shrink-0">
-            <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-            </svg>
+          <button 
+            onClick={() => _id && toggleSavedJob(_id)}
+            className={`${isSaved ? "text-primary" : "text-gray-400"} hover:text-primary transition-colors shrink-0`}
+            aria-label={isSaved ? "Unsave Job" : "Save Job"}
+          >
+            <Bookmark className="size-5" fill={isSaved ? "currentColor" : "none"} />
           </button>
         </div>
         

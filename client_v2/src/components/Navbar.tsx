@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getTokens, getUserInfo, clearTokens, UserInfo } from '../lib/auth';
-import { User, LogOut, ChevronDown } from 'lucide-react';
+import { User, LogOut, ChevronDown, Bookmark } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -90,6 +90,14 @@ export default function Navbar() {
                   <div className="px-4 py-2 border-b border-gray-100">
                     <p className="text-sm font-medium truncate">{user?.email || "User"}</p>
                   </div>
+                  <Link 
+                    href="/saved-jobs" 
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    onClick={() => setShowDropdown(false)}
+                  >
+                    <Bookmark size={14} />
+                    Saved Jobs
+                  </Link>
                   <Link 
                     href="/preferences" 
                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"

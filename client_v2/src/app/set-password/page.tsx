@@ -2,6 +2,10 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
+import { API_BASE_URL } from "@/lib/api";
+import { setTokens, setUserInfo } from "@/lib/auth";
 
 function SetPasswordContent() {
   const router = useRouter();
@@ -10,11 +14,42 @@ function SetPasswordContent() {
   
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password && password === confirmPassword) {
-      router.push("/preferences");
+    if (!password || password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // 1. Set Password
+      const res = await fetch(`${API_BASE_URL}/auth/set-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.status === 1) {
+        // Use tokens returned directly from set-password
+        const { accessToken, refreshToken, userId, email: userEmail } = data.data;
+        setTokens(accessToken, refreshToken);
+        setUserInfo({ userId, email: userEmail });
+        
+        toast.success("Account setup successful!");
+        router.push("/preferences");
+      } else {
+        toast.error(data.message || "Failed to set password");
+      }
+    } catch (err) {
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,30 +86,48 @@ function SetPasswordContent() {
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-gray-700">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-white text-foreground"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-white text-foreground pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-gray-700">Confirm Password</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Re-enter your password"
-                className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-1 bg-white text-foreground ${
-                  confirmPassword && password !== confirmPassword 
-                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:border-primary focus:ring-primary"
-                }`}
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Re-enter your password"
+                  className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-1 bg-white text-foreground pr-10 ${
+                    confirmPassword && password !== confirmPassword 
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                      : "border-gray-300 focus:border-primary focus:ring-primary"
+                  }`}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               {confirmPassword && password !== confirmPassword && (
                 <p className="text-red-500 text-xs mt-1">Passwords do not match.</p>
               )}
@@ -85,10 +138,10 @@ function SetPasswordContent() {
           <div className="flex flex-col gap-4 w-full mt-4">
             <button 
               type="submit" 
-              disabled={!password || password !== confirmPassword}
-              className="w-full py-4 btn-primary text-base disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading || !password || password !== confirmPassword}
+              className="w-full py-4 btn-primary text-base disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              Save Password & Continue
+              {loading ? "Saving..." : "Save Password & Continue"}
             </button>
           </div>
         </form>

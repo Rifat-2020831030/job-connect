@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/react";
+import { SavedJobsProvider } from "@/lib/SavedJobsContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,10 +29,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased font-sans bg-gray-50 text-gray-900 flex flex-col min-h-screen`}>
-        <Toaster position="top-center" richColors />
-        <Navbar />
-        {children}
-        <Analytics />
+        <SavedJobsProvider>
+          <Toaster position="top-center" richColors />
+          <Navbar />
+          {children}
+          <Analytics />
+        </SavedJobsProvider>
       </body>
     </html>
   );
