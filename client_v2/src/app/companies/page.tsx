@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { API_BASE_URL } from '@/lib/api';
 import { Search, Building2, Loader2 } from 'lucide-react';
 import CompanyCard, { Company } from '@/components/CompanyCard';
-import CompanyOverlay from '@/components/CompanyOverlay';
+import { useRouter } from 'next/navigation';
 
 export default function CompaniesPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -13,8 +13,8 @@ export default function CompaniesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   
-  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [totalLoaded, setTotalLoaded] = useState(0);
+  const router = useRouter();
 
   // Debounce search query
   const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
@@ -162,7 +162,7 @@ export default function CompaniesPage() {
                   <div ref={lastCompanyElementRef} key={company._id}>
                     <CompanyCard 
                       company={company}
-                      onClick={(c) => setSelectedCompany(c)}
+                      onClick={(c) => router.push(`/companies/${c._id}`)}
                     />
                   </div>
                 );
@@ -171,7 +171,7 @@ export default function CompaniesPage() {
                   <CompanyCard 
                     key={company._id}
                     company={company}
-                    onClick={(c) => setSelectedCompany(c)}
+                    onClick={(c) => router.push(`/companies/${c._id}`)}
                   />
                 );
               }
@@ -186,15 +186,6 @@ export default function CompaniesPage() {
           </div>
         )}
       </section>
-
-      {/* Overlay Modal */}
-      {selectedCompany && (
-        <CompanyOverlay 
-          company={selectedCompany}
-          isOpen={!!selectedCompany}
-          onClose={() => setSelectedCompany(null)}
-        />
-      )}
     </div>
   );
 }

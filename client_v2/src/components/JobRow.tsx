@@ -21,6 +21,7 @@ export interface JobRowProps {
   vacancy?: string | number;
   deadline?: string;
   onViewDetails?: () => void;
+  isExpired?: boolean;
 }
 
 export default function JobRow({
@@ -40,6 +41,7 @@ export default function JobRow({
   vacancy,
   deadline,
   onViewDetails,
+  isExpired = false,
 }: JobRowProps) {
   const { isJobSaved, toggleSavedJob } = useSavedJobs();
   const isSaved = _id ? isJobSaved(_id) : false;
@@ -92,7 +94,13 @@ export default function JobRow({
           />
 
           <div className="flex flex-col min-w-0">
-            {onViewDetails ? (
+            {isExpired ? (
+              <div className="inline-block text-gray-500">
+                <h3 className="text-lg md:text-xl font-bold break-words whitespace-normal">
+                  {title}
+                </h3>
+              </div>
+            ) : onViewDetails ? (
               <button
                 onClick={onViewDetails}
                 className="inline-block hover:text-primary transition-colors text-left cursor-pointer"
@@ -196,29 +204,35 @@ export default function JobRow({
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 lg:gap-6 shrink-0 border-t border-gray-100 sm:border-0 pt-4 sm:pt-0">
-          <div className="flex gap-3 mt-2 sm:mt-0 w-full sm:w-auto">
-            {onViewDetails ? (
+          {isExpired ? (
+            <div className="flex items-center justify-center px-6 py-2 text-sm font-bold text-gray-400 border border-gray-200 bg-gray-50 uppercase tracking-wider">
+              Closed
+            </div>
+          ) : (
+            <div className="flex gap-3 mt-2 sm:mt-0 w-full sm:w-auto">
+              {onViewDetails ? (
+                <button
+                  onClick={onViewDetails}
+                  className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold text-primary border border-primary uppercase tracking-wider hover:bg-primary/5 transition-colors whitespace-nowrap cursor-pointer"
+                >
+                  Details
+                </button>
+              ) : (
+                <a
+                  href={url}
+                  className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold text-primary border border-primary uppercase tracking-wider hover:bg-primary/5 transition-colors whitespace-nowrap block"
+                >
+                  Details
+                </a>
+              )}
               <button
-                onClick={onViewDetails}
-                className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold text-primary border border-primary uppercase tracking-wider hover:bg-primary/5 transition-colors whitespace-nowrap cursor-pointer"
+                onClick={handleApplyClick}
+                className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold bg-primary text-white border border-primary uppercase tracking-wider hover:bg-emerald-700 transition-colors whitespace-nowrap block cursor-pointer"
               >
-                Details
+                Apply Now
               </button>
-            ) : (
-              <a
-                href={url}
-                className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold text-primary border border-primary uppercase tracking-wider hover:bg-primary/5 transition-colors whitespace-nowrap block"
-              >
-                Details
-              </a>
-            )}
-            <button
-              onClick={handleApplyClick}
-              className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold bg-primary text-white border border-primary uppercase tracking-wider hover:bg-emerald-700 transition-colors whitespace-nowrap block cursor-pointer"
-            >
-              Apply Now
-            </button>
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

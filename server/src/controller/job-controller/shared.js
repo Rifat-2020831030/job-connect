@@ -8,6 +8,16 @@ export const activeJobsFilter = () => {
   };
 };
 
+export const expiredJobsFilter = () => {
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  return {
+    $nor: [
+      { deadline: { $ne: null, $gte: new Date().toISOString() } },
+      { deadline: null, first_seen: { $gte: thirtyDaysAgo.toISOString() } },
+    ],
+  };
+};
+
 export const hasDeadlineFilter = () => ({
   deadline: { $ne: null, $gte: new Date().toISOString() },
 });

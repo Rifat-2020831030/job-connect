@@ -1,6 +1,8 @@
 import { getDB } from "../../db/database.js";
+import { ObjectId } from "mongodb";
 import {
   activeJobsFilter,
+  expiredJobsFilter,
   escapeRegex,
   LIST_PROJECTION,
   VALID_CATEGORIES,
@@ -21,18 +23,27 @@ export const getJobs = async (req, res) => {
       experience_level,
       job_type,
       company,
+      companyId,
       salary_min,
       salary_max,
       sort = "recent",
       q,
       location,
+      status = "active",
     } = req.query;
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
     const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
     const skip = (pageNum - 1) * limitNum;
 
-    const andClauses = [activeJobsFilter()];
+    const andClauses = [];
+    if (status === "expired") {
+      andClauses.push(expiredJobsFilter());
+    } else if (status === "all") {
+      // No status filter
+    } else {
+      andClauses.push(activeJobsFilter());
+    }
 
     if (category) {
       const cats = category
@@ -69,6 +80,14 @@ export const getJobs = async (req, res) => {
             $in: companies.map((c) => new RegExp(`^${escapeRegex(c)}$`, "i")),
           },
         });
+      }
+    }
+
+    if (companyId && companyId.length === 24) {
+      try {
+        andClauses.push({ companyID: new ObjectId(companyId) });
+      } catch (err) {
+        // Invalid object id, ignore
       }
     }
 
