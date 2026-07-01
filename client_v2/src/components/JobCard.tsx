@@ -3,6 +3,7 @@ import { formatRelativeTime, formatSalary, formatDate } from '../lib/utils';
 import Image from 'next/image';
 import { useSavedJobs } from '../lib/SavedJobsContext';
 import { Bookmark } from 'lucide-react';
+import CompanyLogo from './CompanyLogo';
 
 export interface JobCardProps {
   _id?: string;
@@ -55,9 +56,10 @@ export default function JobCard({
     <div className="card flex flex-col justify-between h-full">
       <div>
         <div className="flex justify-between items-start mb-4">
-          <div className="relative size-12 logo-box text-xl overflow-hidden">
-            {logo ? <Image src={logo} alt={`${company} logo`} fill unoptimized className="object-contain p-2 text-[10px] leading-tight text-center text-gray-400 break-words flex items-center justify-center" /> : "🏢"}
-          </div>
+          <CompanyLogo 
+            companyName={company} 
+            className="size-12 logo-box text-xl" 
+          />
           <button 
             onClick={() => _id && toggleSavedJob(_id)}
             className={`${isSaved ? "text-primary" : "text-gray-400"} hover:text-primary transition-colors shrink-0`}

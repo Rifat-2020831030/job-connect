@@ -1,8 +1,8 @@
 import { Bookmark, Briefcase, Clock, Users } from "lucide-react";
-import Image from "next/image";
 import { API_BASE_URL } from "../lib/api";
 import { formatDate, formatRelativeTime, formatSalary } from "../lib/utils";
 import { useSavedJobs } from "../lib/SavedJobsContext";
+import CompanyLogo from "./CompanyLogo";
 
 export interface JobRowProps {
   _id?: string;
@@ -85,21 +85,11 @@ export default function JobRow({
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
         {/* Left: Logo + Title/Company */}
         <div className="flex items-start gap-4 min-w-0">
-          <div className="relative size-12 border border-gray-200 p-2 flex items-center justify-center shrink-0">
-            {logo ? (
-              <Image
-                src={logo}
-                alt={`${company} logo`}
-                fill
-                unoptimized
-                className="object-contain p-1"
-              />
-            ) : (
-              <div className="w-full h-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
-                {company.charAt(0)}
-              </div>
-            )}
-          </div>
+          <CompanyLogo 
+            companyName={company} 
+            className="size-12 shrink-0 border border-gray-200"
+            fallbackClassName="bg-primary/10 text-primary font-bold text-lg"
+          />
 
           <div className="flex flex-col min-w-0">
             {onViewDetails ? (

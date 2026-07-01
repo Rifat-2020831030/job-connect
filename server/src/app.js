@@ -11,6 +11,7 @@ dns.setServers(["1.1.1.1", "1.0.0.1"]);
 
 import serverHealth from "./controller/server-health.js";
 import authRouter from "./routers/auth.js";
+import companiesRouter from "./routers/companies.js";
 import emailRouter from "./routers/email.js";
 import jobsRouter from "./routers/jobs.js";
 import scrapeRouter from "./routers/scrape.js";
@@ -72,6 +73,7 @@ app.get("/", (_req, res) => res.send("The server is running"));
 app.get("/health", healthLimit, serverHealth);
 
 app.use("/api/auth", authRouter);
+app.use("/api/companies", companiesRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/jobs", source, jobsRouter);
 app.use("/api/stat", jobsStat);
