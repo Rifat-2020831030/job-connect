@@ -3,36 +3,30 @@ import { getDB } from "../db/database.js";
 const getJobStats = async (req, res) => {
   try {
     const db = await getDB();
-    const stats = await db
-      .collection("jobs")
-      .aggregate([
-        {
-          $group: {
-            _id: null,
-            totalJobs: { $sum: 1 },
-            totalCompanies: { $addToSet: "$company" },
-            totalLocations: { $addToSet: "$location" },
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            totalJobs: 1,
-            totalCompanies: { $size: "$totalCompanies" },
-            totalLocations: { $size: "$totalLocations" },
-          },
-        },
-      ])
-      .toArray();
+    const stats = await db.collection("cache").findOne({ _id: "site_stats" });
 
-    if (stats.length === 0) {
-      return res.status(404).json({ status: 0, message: "No job stats found" });
+    if (!stats) {
+      // Fallback if cron hasn't run yet
+      return res.status(200).json({
+        status: 1,
+        message: "Default job stats",
+        data: {
+          totalJobs: 0,
+          totalCompanies: 0,
+          subscribersCount: 0,
+          uniqueLocations: 0,
+          newRolesAdded: 0,
+        },
+      });
     }
+
+    // Remove _id for client
+    delete stats._id;
 
     res.status(200).json({
       status: 1,
       message: "Job stats fetched successfully",
-      data: stats[0],
+      data: stats,
     });
   } catch (error) {
     console.error("Error fetching job stats:", error);
@@ -40,6 +34,4 @@ const getJobStats = async (req, res) => {
   }
 };
 
-export {
-  getJobStats,
-};
+export { getJobStats };

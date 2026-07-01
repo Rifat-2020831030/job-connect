@@ -30,6 +30,7 @@ interface HomeClientProps {
   engineeringJobs: any[];
   leadershipJobs: any[];
   categories: any[];
+  siteStats: any;
 }
 
 export default function HomeClient({
@@ -37,6 +38,7 @@ export default function HomeClient({
   engineeringJobs,
   leadershipJobs,
   categories,
+  siteStats,
 }: HomeClientProps) {
   const [selectedJob, setSelectedJob] = useState<JobDetail | null>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
@@ -68,7 +70,7 @@ export default function HomeClient({
 
   return (
     <div className="flex flex-col w-full">
-      <HeroSection />
+      <HeroSection siteStats={siteStats} />
 
       <main className="flex flex-col w-full max-w-7xl mx-auto px-6 md:px-12 py-16 gap-24 relative">
         {/* Loading Overlay for details fetch */}

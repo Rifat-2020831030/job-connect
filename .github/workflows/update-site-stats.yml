@@ -1,0 +1,29 @@
+name: Update Site Stats
+
+on:
+  schedule:
+    # Runs 4 times a day (every 6 hours: 00:00, 06:00, 12:00, 18:00 UTC)
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Allows manual trigger from UI
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: ./server
+        run: npm ci
+
+      - name: Run update stats script
+        working-directory: ./server
+        env:
+          DB_URI: ${{ secrets.DB_URI }}
+        run: node scripts/update-site-stats.js

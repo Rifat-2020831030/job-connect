@@ -1,15 +1,16 @@
 import Footer from "@/components/Footer";
 import HomeClient from "@/components/HomeClient";
-import { fetchCategories, fetchFeaturedJobs } from "@/lib/api";
+import { fetchCategories, fetchFeaturedJobs, fetchSiteStats } from "@/lib/api";
 
 export const revalidate = 3600;
 
 export default async function Home() {
-  const [featuredJobs, engineeringJobs, leadershipJobs, categories] = await Promise.all([
+  const [featuredJobs, engineeringJobs, leadershipJobs, categories, siteStats] = await Promise.all([
     fetchFeaturedJobs("featured"),
     fetchFeaturedJobs("engineering"),
     fetchFeaturedJobs("leadership"),
     fetchCategories(),
+    fetchSiteStats(),
   ]);
 
   return (
@@ -19,6 +20,7 @@ export default async function Home() {
         engineeringJobs={engineeringJobs} 
         leadershipJobs={leadershipJobs} 
         categories={categories} 
+        siteStats={siteStats}
       />
       <Footer />
     </div>

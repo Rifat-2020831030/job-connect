@@ -38,3 +38,22 @@ export async function fetchCategories() {
     return [];
   }
 }
+
+export async function fetchSiteStats() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/stat`, {
+      next: { revalidate: 3600 },
+    });
+    
+    if (!res.ok) {
+      console.error(`Failed to fetch site stats: ${res.statusText}`);
+      return null;
+    }
+    
+    const json = await res.json();
+    return json.data || null;
+  } catch (error) {
+    console.error("Error fetching site stats:", error);
+    return null;
+  }
+}
