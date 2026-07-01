@@ -70,9 +70,14 @@ export const subscribe = async (req, res) => {
       { upsert: true }
     );
 
-    sendVerificationOtp(email, code).catch((err) =>
-      console.error("OTP email failed:", err)
-    );
+    const emailSent = await sendVerificationOtp(email, code);
+    if (!emailSent) {
+      console.error("OTP email failed to send.");
+      return res.status(500).json({
+        status: 0,
+        message: "Failed to send verification email. Please try again later.",
+      });
+    }
 
     return res.status(200).json({
       status: 1,

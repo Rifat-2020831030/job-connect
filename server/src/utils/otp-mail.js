@@ -66,7 +66,7 @@ const buildHtml = ({ heading, bodyLines, code, expiryHours = 24, footerNote }) =
                 </tr>
               </table>
               <p style="margin:0 0 12px;font-size:13px;color:#6b7280;">
-                This code expires in <strong>${expiryHours} hour${expiryHours !== 1 ? "s" : ""}</strong>.
+                This code expires in <strong>5 minutes</strong>.
               </p>`
                   : ""
               }
@@ -105,7 +105,7 @@ const buildText = ({ heading, bodyLines, code, expiryHours = 24 }) =>
     ...(code
       ? [
           `Your code: ${code}`,
-          `This code expires in ${expiryHours} hour${expiryHours !== 1 ? "s" : ""}.`,
+          `This code expires in 5 minutes.`,
           "",
         ]
       : []),

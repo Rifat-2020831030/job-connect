@@ -45,9 +45,14 @@ export const resendOtp = async (req, res) => {
         }
       );
 
-    sendResendOtp(email, code).catch((err) =>
-      console.error("Resend OTP email failed:", err)
-    );
+    const emailSent = await sendResendOtp(email, code);
+    if (!emailSent) {
+      console.error("OTP email failed to send.");
+      return res.status(500).json({
+        status: 0,
+        message: "Failed to send verification email. Please try again later.",
+      });
+    }
 
     return res
       .status(200)

@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 
 export const generateOtp = () => crypto.randomInt(100000, 999999).toString();
 
-// OTP expires 24 h from now
-export const otpExpiresAt = () => Date.now() + 24 * 60 * 60 * 1000;
+// OTP expires 5 minutes from now
+export const otpExpiresAt = () => Date.now() + 5 * 60 * 1000;
 
 export const DEFAULT_PREFERENCES = {
   categories: [
