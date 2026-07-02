@@ -3,7 +3,7 @@ name: Job Alert
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 14 * * *"
+    - cron: "0 16 * * *"
 
 concurrency:
   group: job-alert
@@ -38,4 +38,4 @@ jobs:
 
       - name: Send job alert
         working-directory: server
-        run: npm run send-job-alert
+        run: node scripts/send-job-alert.js Night
