@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect } from 'react';
-import { X, MapPin, DollarSign } from 'lucide-react';
+import { X, MapPin, DollarSign, Share2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { formatDate } from '../lib/utils';
 import { API_BASE_URL } from '../lib/api';
 
@@ -59,6 +60,15 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
     }
   };
 
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success("Link copied to clipboard!");
+    } catch (err) {
+      toast.error("Failed to copy link");
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
@@ -73,12 +83,22 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
           <h2 className="text-base font-medium text-foreground">Job Details</h2>
-          <button 
-            onClick={onClose}
-            className="p-1.5 hover:bg-gray-100 rounded-md transition-colors text-gray-500 cursor-pointer"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={handleShare}
+              className="p-1.5 hover:bg-gray-100 rounded-md transition-colors text-gray-500 cursor-pointer flex items-center gap-2 text-sm font-medium"
+              title="Share Job"
+            >
+              <Share2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Share</span>
+            </button>
+            <button 
+              onClick={onClose}
+              className="p-1.5 hover:bg-gray-100 rounded-md transition-colors text-gray-500 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Content Body */}

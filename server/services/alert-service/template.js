@@ -1,4 +1,5 @@
-export const jobCardBuilder = (job) => {
+export const jobCardBuilder = (job, frontendUrl) => {
+  const jobUrl = `${frontendUrl}/jobs?jobId=${job._id}`;
   return `
     <!-- Card Container -->
     <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation" style="max-width: 300px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin: 0 auto 20px auto;">
@@ -7,7 +8,7 @@ export const jobCardBuilder = (job) => {
             <td align="center" style="padding: 0; text-align: center; background-color: #6BAAE8; border-radius: 8px 8px 0 0;">
                 <img src="${job.logo}" alt="${
     job.company
-  } Logo" width="150" height="auto" style="display: block; max-width: 150px; height: auto; min-height: 50px; padding: 20px 0; border: 0; object-fit: cover;">
+  } Logo" width="150" height="auto" style="display: block; max-width: 150px; height: auto; min-height: 50px; padding: 20px 0; border: 0; margin: 0 auto; object-fit: contain;">
             </td>
         </tr>
         
@@ -50,20 +51,16 @@ export const jobCardBuilder = (job) => {
         
         <!-- Job Details -->
         <tr>
-            <td style="padding: 15px 25px 25px 25px;">
+            <td style="padding: 15px 25px 15px 25px;">
                 <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation">
                     <tr>
                         <td style="width: 33.33%; padding-right: 10px; vertical-align: top;">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">SALARY</p>
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">
                             ${
-                              job.salary_min != null && job.salary_min !== ""
-                                ? `${job.salary_min} to ${job.salary_max}`
-                                : `${
-                                    job.salary && job.salary !== ""
-                                      ? job.salary
-                                      : "Not specified"
-                                  }`
+                                job.salary && job.salary !== ""
+                                    ? job.salary
+                                    : "Not mentioned"
                             }
                             </p>
                         </td>
@@ -71,7 +68,7 @@ export const jobCardBuilder = (job) => {
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">VACANCY</p>
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">
                             ${
-                              job.vacancy != -1 ? job.vacancy : "Not specified"
+                              job.vacancy != -1 ? job.vacancy : "Not mentioned"
                             }</p>
                         </td>
                         <td style="width: 33.33%; vertical-align: top;">
@@ -86,11 +83,18 @@ export const jobCardBuilder = (job) => {
                                       year: "numeric",
                                     }
                                   )
-                                : "Not specified"
+                                : "Not mentioned"
                             }</p>
                         </td>
                     </tr>
                 </table>
+            </td>
+        </tr>
+
+        <!-- View Details Button -->
+        <tr>
+            <td align="center" style="padding: 0 25px 25px 25px;">
+                <a href="${jobUrl}" target="_blank" style="display: block; width: 100%; box-sizing: border-box; background-color: #3b82f6; border-radius: 4px; color: #ffffff; font-size: 14px; font-weight: bold; padding: 12px 0; text-align: center; text-decoration: none; font-family: Arial, Helvetica, sans-serif;">View Details</a>
             </td>
         </tr>
     </table>
@@ -159,7 +163,7 @@ export const createEmailTemplate = (jobList, unsubscribeUrl, data) => {
             <!-- Button -->
             <tr>
                 <td style="padding: 10px 30px 30px 30px; text-align: center;">
-                    <a href="https://chakrilagbe.vercel.app" style="background-color: #3b82f6; border-radius: 4px; color: #ffffff; display: inline-block; font-size: 16px; font-weight: bold; padding: 14px 30px; text-decoration: none; font-family: Arial, Helvetica, sans-serif; width: 80%; max-width: 400px;">View All Job Postings</a>
+                    <a href="https://chakrilagbe.vercel.app/jobs" style="background-color: #3b82f6; border-radius: 4px; color: #ffffff; display: inline-block; font-size: 16px; font-weight: bold; padding: 14px 30px; text-decoration: none; font-family: Arial, Helvetica, sans-serif; width: 80%; max-width: 400px;">View All Job Postings</a>
                 </td>
             </tr>
             

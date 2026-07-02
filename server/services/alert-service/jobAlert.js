@@ -80,8 +80,10 @@ export const sendJobAlert = async (timeSet, testEmail = null) => {
                     continue;
                 }
 
+                const frontendUrl = process.env.FRONTEND_URL || 'https://chakrilagbe.vercel.app';
+                
                 // Build job card html
-                const jobCards = jobs.map(job => jobCardBuilder(job)).join('');
+                const jobCards = jobs.map(job => jobCardBuilder(job, frontendUrl)).join('');
                 
                 // Get counts for template data
                 const companyCount = new Set(jobs.map(job => job.company)).size;
@@ -90,7 +92,7 @@ export const sendJobAlert = async (timeSet, testEmail = null) => {
                     companyCount: companyCount
                 };
 
-                const unsubscribeUrl = `${process.env.FRONTEND_URL || 'https://chakrilagbe.vercel.app'}/unsubscribe?id=${user._id}`;
+                const unsubscribeUrl = `${frontendUrl}/unsubscribe?id=${user._id}`;
                 const html = createEmailTemplate(jobCards, unsubscribeUrl, data);
                 const subject = "New Job Postings Alert - ChakriLagbe";
 

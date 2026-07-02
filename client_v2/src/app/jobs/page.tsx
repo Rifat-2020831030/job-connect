@@ -76,11 +76,15 @@ function JobsPageContent() {
     async function fetchJobs() {
       setIsLoadingJobs(true);
       try {
-        const params = new URLSearchParams(searchParams.toString());
-        // Clean empty params
-        Array.from(params.keys()).forEach(key => {
-          if (!params.get(key)) params.delete(key);
-        });
+        const params = new URLSearchParams();
+        if (currentPage > 1) params.set("page", currentPage.toString());
+        if (currentSort) params.set("sort", currentSort);
+        if (currentQuery) params.set("q", currentQuery);
+        if (currentLocation) params.set("location", currentLocation);
+        if (activeFilters.categories.length) params.set("category", activeFilters.categories.join(","));
+        if (activeFilters.experienceLevels.length) params.set("experience_level", activeFilters.experienceLevels.join(","));
+        if (activeFilters.jobTypes.length) params.set("job_type", activeFilters.jobTypes.join(","));
+        if (activeFilters.companies.length) params.set("company", activeFilters.companies.join(","));
 
         const res = await fetch(`${API_BASE_URL}/jobs?${params.toString()}`);
         const data = await res.json();
@@ -101,7 +105,16 @@ function JobsPageContent() {
       }
     }
     fetchJobs();
-  }, [searchParams]);
+  }, [
+    currentPage, 
+    currentSort, 
+    currentQuery, 
+    currentLocation, 
+    searchParams.get("category"), 
+    searchParams.get("experience_level"), 
+    searchParams.get("job_type"), 
+    searchParams.get("company")
+  ]);
 
   const updateUrl = (newParams: Record<string, string | null>, resetPage = true) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -143,6 +156,11 @@ function JobsPageContent() {
       return;
     }
     
+    // Add jobId to URL without resetting page or triggering jobs reload, silently
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set("jobId", jobId);
+    window.history.pushState(null, "", `?${newParams.toString()}`);
+    
     setIsLoadingDetails(true);
     try {
       const res = await fetch(`${API_BASE_URL}/jobs/${jobId}`);
@@ -161,6 +179,24 @@ function JobsPageContent() {
       setIsLoadingDetails(false);
     }
   };
+
+  const handleCloseModal = () => {
+    setSelectedJob(null);
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.delete("jobId");
+    const newSearch = newParams.toString();
+    window.history.pushState(null, "", newSearch ? `?${newSearch}` : pathname);
+  };
+
+  // Handle URL jobId on load / navigation
+  useEffect(() => {
+    const urlJobId = searchParams.get("jobId");
+    if (urlJobId && (!selectedJob || selectedJob._id !== urlJobId)) {
+      handleViewDetails(urlJobId, null);
+    } else if (!urlJobId && selectedJob) {
+      setSelectedJob(null);
+    }
+  }, [searchParams.get("jobId")]);
 
   // Generate pagination pages
   const getPages = () => {
@@ -384,7 +420,7 @@ function JobsPageContent() {
       {selectedJob && (
         <JobDetailsModal 
           job={selectedJob} 
-          onClose={() => setSelectedJob(null)} 
+          onClose={handleCloseModal} 
         />
       )}
     </div>
