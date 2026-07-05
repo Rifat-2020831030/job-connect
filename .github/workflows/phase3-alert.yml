@@ -3,7 +3,7 @@ name: Job Alert
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 16 * * *"
+    - cron: "0 15 * * *"
 
 concurrency:
   group: job-alert

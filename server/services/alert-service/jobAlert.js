@@ -53,7 +53,7 @@ const getMatchingJobs = async (db, user) => {
         },
         category: { $in: user.preferences.categories },
         job_type: { $in: user.preferences.workModel},
-        industry: { $regex: '^engineering$', $options: 'i' }
+        // industry: { $regex: '^engineering$', $options: 'i' }
     };
 
     return db.collection('jobs')
