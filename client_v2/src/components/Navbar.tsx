@@ -4,13 +4,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getTokens, getUserInfo, clearTokens, UserInfo } from '../lib/auth';
-import { User, LogOut, ChevronDown, Bookmark } from 'lucide-react';
+import { User, LogOut, ChevronDown, Bookmark, Menu, X as XIcon } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<UserInfo | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,6 +40,7 @@ export default function Navbar() {
     setIsAuthenticated(false);
     setUser(null);
     setShowDropdown(false);
+    setShowMobileMenu(false);
     window.location.href = "/";
   };
 
@@ -50,10 +52,14 @@ export default function Navbar() {
 
   return (
     <nav className="w-full border-b border-gray-200 bg-white sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold text-foreground tracking-tight">
+      <div className="max-w-7xl mx-auto px-4 md:px-12 h-16 flex items-center justify-between">
+        
+        {/* Logo */}
+        <Link href="/" className="text-lg sm:text-xl md:text-2xl font-bold text-foreground tracking-tight">
           ChakriLagbe
         </Link>
+        
+        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8 text-sm font-medium">
           {navLinks.map((link) => {
             const isActive = pathname === link.href || pathname?.startsWith(link.href + '/');
@@ -68,9 +74,11 @@ export default function Navbar() {
             );
           })}
         </div>
-        <div className="flex items-center gap-4">
+        
+        {/* Desktop Actions */}
+        <div className="hidden md:flex items-center gap-4">
           {!isAuthenticated ? (
-            <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors hidden sm:block">
+            <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
               Sign In
             </Link>
           ) : (
@@ -117,9 +125,98 @@ export default function Navbar() {
               )}
             </div>
           )}
-          <Link href="/post-job" className="bg-foreground hover:bg-gray-800 text-white px-4 py-2 rounded text-sm font-bold transition-colors">
-            Post a Job
-          </Link>
+        </div>
+
+        {/* Mobile Menu Toggle Button */}
+        <div className="md:hidden flex items-center">
+          <button 
+            onClick={() => setShowMobileMenu(!showMobileMenu)} 
+            className="p-2 -mr-2 text-gray-600 hover:text-foreground transition-colors"
+          >
+            {showMobileMenu ? <XIcon size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu Overlay & Panel */}
+      <div 
+        className={`md:hidden fixed top-16 inset-x-0 bottom-0 z-40 transition-opacity duration-300 ${
+          showMobileMenu ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        {/* Backdrop */}
+        <div 
+          className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+          onClick={() => setShowMobileMenu(false)}
+        />
+        
+        {/* Sliding Panel */}
+        <div 
+          className={`absolute inset-y-0 right-0 w-72 bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out ${
+            showMobileMenu ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+            <div className="flex flex-col space-y-2">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href || pathname?.startsWith(link.href + '/');
+                return (
+                  <Link 
+                    key={link.name} 
+                    href={link.href} 
+                    onClick={() => setShowMobileMenu(false)}
+                    className={`block px-3 py-2.5 text-base font-medium rounded-md transition-colors ${isActive ? "text-primary bg-primary/5" : "text-gray-600 hover:text-primary hover:bg-gray-50"}`}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
+            </div>
+            
+            <div className="pt-6 border-t border-gray-100 flex flex-col space-y-2">
+              {!isAuthenticated ? (
+                <Link 
+                  href="/login" 
+                  onClick={() => setShowMobileMenu(false)}
+                  className="block px-3 py-2.5 text-base font-medium text-gray-600 hover:text-primary rounded-md hover:bg-gray-50"
+                >
+                  Sign In
+                </Link>
+              ) : (
+                <>
+                  <div className="px-3 py-2 mb-2 flex items-center gap-3 bg-gray-50 rounded-lg">
+                    <div className="size-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
+                      {user?.email?.charAt(0).toUpperCase() || <User size={18} />}
+                    </div>
+                    <span className="text-sm font-medium truncate text-gray-800">{user?.email || "User"}</span>
+                  </div>
+                  <Link 
+                    href="/saved-jobs" 
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 text-base font-medium text-gray-600 hover:text-primary rounded-md hover:bg-gray-50"
+                  >
+                    <Bookmark size={18} />
+                    Saved Jobs
+                  </Link>
+                  <Link 
+                    href="/preferences" 
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 text-base font-medium text-gray-600 hover:text-primary rounded-md hover:bg-gray-50"
+                  >
+                    <User size={18} />
+                    Preferences
+                  </Link>
+                  <button 
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 px-3 py-2.5 text-base font-medium text-red-600 hover:text-red-700 rounded-md hover:bg-red-50 w-full text-left"
+                  >
+                    <LogOut size={18} />
+                    Sign Out
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </nav>
