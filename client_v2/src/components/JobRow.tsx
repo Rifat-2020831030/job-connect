@@ -1,5 +1,5 @@
 import { Bookmark, Briefcase, Clock, Users } from "lucide-react";
-import { API_BASE_URL } from "../lib/api";
+import { handleApplyClick } from "@/shared/handleJobClick";
 import { formatDate, formatRelativeTime, formatSalary } from "../lib/utils";
 import { useSavedJobs } from "../lib/SavedJobsContext";
 import CompanyLogo from "./CompanyLogo";
@@ -66,20 +66,7 @@ export default function JobRow({
       mappedLevel = "Junior (0-2 years)";
   }
 
-  const handleApplyClick = async () => {
-    if (_id) {
-      try {
-        await fetch(`${API_BASE_URL}/stat/jobs/clicks?jobID=${_id}`);
-      } catch (error) {
-        console.error("Failed to register job click stat", error);
-      }
-    }
-    if (url && url !== "#") {
-      window.open(url, "_blank", "noopener,noreferrer");
-    } else {
-      alert("No application URL provided for this job.");
-    }
-  };
+  
 
   return (
     <div className="group border border-gray-200 bg-white p-5 md:p-6 flex flex-col gap-5 hover:border-gray-300 transition-colors w-full">
@@ -226,7 +213,7 @@ export default function JobRow({
                 </a>
               )}
               <button
-                onClick={handleApplyClick}
+                onClick={() => handleApplyClick({ url, _id })}
                 className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold bg-primary text-white border border-primary uppercase tracking-wider hover:bg-emerald-700 transition-colors whitespace-nowrap block cursor-pointer"
               >
                 Apply Now

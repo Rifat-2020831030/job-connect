@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { X, MapPin, DollarSign, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDate } from '../lib/utils';
-import { API_BASE_URL } from '../lib/api';
+import { handleApplyClick } from '@/shared/handleJobClick';
 
 export type JobDetail = {
   _id?: string;
@@ -44,21 +44,6 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
   const displayExp = (!job.experience || job.experience === "-1") ? "Not Mentioned" : job.experience;
   const displayVacancy = (!job.vacancy || job.vacancy === "-1") ? "Not Mentioned" : job.vacancy;
   const displayDeadline = formatDate(job.deadline);
-
-  const handleApplyClick = async () => {
-    if (job._id) {
-      try {
-        await fetch(`${API_BASE_URL}/stat/jobs/clicks?jobID=${job._id}`);
-      } catch (error) {
-        console.error("Failed to register job click stat", error);
-      }
-    }
-    if (job.url) {
-      window.open(job.url, "_blank", "noopener,noreferrer");
-    } else {
-      alert("No application URL provided for this job.");
-    }
-  };
 
   const handleShare = async () => {
     try {
@@ -198,7 +183,7 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
         <div className="bg-[#f2f3ff] px-6 py-5 border-t border-[#bbcabf33] shrink-0">
           <button 
             className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3.5 rounded-md transition-colors cursor-pointer text-lg tracking-wide shadow-sm"
-            onClick={handleApplyClick}
+            onClick={() => handleApplyClick({ url: job.url, _id: job._id })}
           >
             Apply Now
           </button>
