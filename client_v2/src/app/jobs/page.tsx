@@ -71,22 +71,23 @@ function JobsPageContent() {
     fetchOptions();
   }, []);
 
-  // Fetch Jobs
+  // Fetch Jobs — build API params from URL state, excluding non-filter keys like jobId
   useEffect(() => {
     async function fetchJobs() {
       setIsLoadingJobs(true);
       try {
-        const params = new URLSearchParams();
-        if (currentPage > 1) params.set("page", currentPage.toString());
-        if (currentSort) params.set("sort", currentSort);
-        if (currentQuery) params.set("q", currentQuery);
-        if (currentLocation) params.set("location", currentLocation);
-        if (activeFilters.categories.length) params.set("category", activeFilters.categories.join(","));
-        if (activeFilters.experienceLevels.length) params.set("experience_level", activeFilters.experienceLevels.join(","));
-        if (activeFilters.jobTypes.length) params.set("job_type", activeFilters.jobTypes.join(","));
-        if (activeFilters.companies.length) params.set("company", activeFilters.companies.join(","));
+        const apiParams: Record<string, string> = {
+          ...(currentPage > 1 && { page: currentPage.toString() }),
+          ...(currentSort && { sort: currentSort }),
+          ...(currentQuery && { q: currentQuery }),
+          ...(currentLocation && { location: currentLocation }),
+          ...(activeFilters.categories.length && { category: activeFilters.categories.join(",") }),
+          ...(activeFilters.experienceLevels.length && { experience_level: activeFilters.experienceLevels.join(",") }),
+          ...(activeFilters.jobTypes.length && { job_type: activeFilters.jobTypes.join(",") }),
+          ...(activeFilters.companies.length && { company: activeFilters.companies.join(",") }),
+        };
 
-        const res = await fetch(`${API_BASE_URL}/jobs?${params.toString()}`);
+        const res = await fetch(`${API_BASE_URL}/jobs?${new URLSearchParams(apiParams).toString()}`);
         const data = await res.json();
         
         if (data.status === 1) {
@@ -118,6 +119,10 @@ function JobsPageContent() {
 
   const updateUrl = (newParams: Record<string, string | null>, resetPage = true) => {
     const params = new URLSearchParams(searchParams.toString());
+    // Always strip jobId on normal navigations so modal auto-closes
+    if (!("jobId" in newParams)) {
+      params.delete("jobId");
+    }
     Object.entries(newParams).forEach(([key, value]) => {
       if (value === null || value === "") {
         params.delete(key);
@@ -128,8 +133,8 @@ function JobsPageContent() {
     if (resetPage) {
       params.delete("page");
     }
-    const isPageChange = !resetPage;
-    router.push(`${pathname}?${params.toString()}`, { scroll: isPageChange });
+    const qs = params.toString();
+    router.replace(`${pathname}${qs ? `?${qs}` : ""}`, { scroll: false });
   };
 
   const handleSearch = (q: string, loc: string) => {
@@ -150,16 +155,24 @@ function JobsPageContent() {
     updateUrl({ category: null, experience_level: null, job_type: null, company: null });
   };
 
+  // Open job details modal from URL jobId (shared link)
+  const currentJobId = searchParams.get("jobId");
+  useEffect(() => {
+    if (currentJobId && (!selectedJob || selectedJob._id !== currentJobId)) {
+      handleViewDetails(currentJobId, null);
+    } else if (!currentJobId && selectedJob) {
+      setSelectedJob(null);
+    }
+  }, [currentJobId]);
+
   const handleViewDetails = async (jobId: string, fallbackJob: any) => {
     if (!jobId) {
       setSelectedJob(fallbackJob);
       return;
     }
     
-    // Add jobId to URL without resetting page or triggering jobs reload, silently
-    const newParams = new URLSearchParams(searchParams.toString());
-    newParams.set("jobId", jobId);
-    window.history.pushState(null, "", `?${newParams.toString()}`);
+    // Add jobId to URL via Next.js router
+    updateUrl({ jobId }, false);
     
     setIsLoadingDetails(true);
     try {
@@ -182,21 +195,8 @@ function JobsPageContent() {
 
   const handleCloseModal = () => {
     setSelectedJob(null);
-    const newParams = new URLSearchParams(searchParams.toString());
-    newParams.delete("jobId");
-    const newSearch = newParams.toString();
-    window.history.pushState(null, "", newSearch ? `?${newSearch}` : pathname);
+    updateUrl({ jobId: null }, false);
   };
-
-  // Handle URL jobId on load / navigation
-  useEffect(() => {
-    const urlJobId = searchParams.get("jobId");
-    if (urlJobId && (!selectedJob || selectedJob._id !== urlJobId)) {
-      handleViewDetails(urlJobId, null);
-    } else if (!urlJobId && selectedJob) {
-      setSelectedJob(null);
-    }
-  }, [searchParams.get("jobId")]);
 
   // Generate pagination pages
   const getPages = () => {
@@ -218,7 +218,7 @@ function JobsPageContent() {
   return (
     <div className="min-h-screen bg-background pb-20 relative">
       {isLoadingDetails && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/20 backdrop-blur-sm">
           <div className="bg-white p-4 rounded-lg shadow-lg flex items-center gap-3">
             <Loader2 className="animate-spin h-5 w-5 text-primary" />
             <span className="font-mono text-sm text-gray-700">Loading details...</span>
