@@ -7,7 +7,7 @@ export const handleApplyClick = ({ url, _id }) => {
   } else {
     toast.error("No application URL provided for this job.");
   }
-  if (_id && process.env.ENV !== "development") {
+  if (_id && process.env.NODE_ENV !== "development") {
     fetch(`${API_BASE_URL}/stat/jobs/clicks?jobID=${_id}`).catch((error) => {
       console.error("Failed to register job click stat", error);
     });

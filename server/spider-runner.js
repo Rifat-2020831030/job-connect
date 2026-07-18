@@ -25,6 +25,4 @@ const LOG_FILE = path.join(SCRAPER_DIR, "spider_runner.log");
 //   "Asia/Dhaka"
 // );
 
-export {
-  jobSearcherCron,
-};
+export {};
