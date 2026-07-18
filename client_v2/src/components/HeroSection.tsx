@@ -1,4 +1,5 @@
 import SubscribeForm from "./SubscribeForm";
+import HeroBackground from "./HeroBackground";
 
 interface SiteStats {
   newRolesAdded: number;
@@ -15,7 +16,9 @@ export default function HeroSection({ siteStats }: { siteStats: SiteStats }) {
   const subscribers = siteStats?.subscribersCount || 0;
 
   return (
-    <section className="flex flex-col items-center justify-center pt-24 pb-16 px-6 md:px-12 w-full max-w-7xl mx-auto">
+    <div className="relative w-full overflow-hidden">
+      <HeroBackground />
+      <section className="flex flex-col items-center justify-center pt-24 pb-16 px-6 md:px-12 w-full max-w-7xl mx-auto relative z-10">
       <div className="bg-primary/10 border border-primary/30 flex gap-2 items-center px-4 py-1.5 rounded-full mb-8">
         <div className="size-2 bg-primary rounded-full animate-pulse"></div>
         <span className="font-mono text-primary text-xs md:text-sm font-semibold tracking-wider uppercase">
@@ -60,6 +63,7 @@ export default function HeroSection({ siteStats }: { siteStats: SiteStats }) {
           <span className="text-meta text-center">Subscribers</span>
         </div>
       </div>
-    </section>
+      </section>
+    </div>
   );
 }
