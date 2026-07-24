@@ -27,6 +27,11 @@
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.4.0",
     "nodemailer": "^7.0.5",
+    "pino": "^10.3.1",
+    "pino-http": "^11.0.0",
     "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "pino-pretty": "^13.1.3"
   }
 }

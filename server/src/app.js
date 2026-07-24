@@ -4,7 +4,9 @@ import dns from "node:dns/promises";
 import dotenv from "dotenv";
 import express from "express";
 import { rateLimit } from "express-rate-limit";
+import pinoHttp from "pino-http";
 import { getDB } from "./db/database.js";
+import { logger } from "./utils/logger.js";
 dotenv.config();
 
 dns.setServers(["1.1.1.1", "1.0.0.1"]); 
@@ -24,6 +26,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const isVercelRuntime = Boolean(process.env.VERCEL);
 
+// HTTP request logging middleware
+app.use(pinoHttp({ logger }));
+
 // Allowed origins
 const allowedOrigins = [
   "https://chakrilagbe.vercel.app",
@@ -38,7 +43,7 @@ const corsOption = {
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.error(`CORS blocked origin: ${origin}`);
+      logger.warn({ origin }, "CORS blocked origin");
       callback(
         new Error(`Access denied: Origin '${origin}' not allowed.`),
         false
@@ -89,6 +94,7 @@ app.use((err, req, res, _next) => {
       error: "Access denied by CORS policy",
     });
   }
+  logger.error({ err, url: req.url, method: req.method }, "Unhandled server error");
   const message = err.message || "Internal Server Error";
   res.status(500).json({ status: 0, message });
 });
@@ -98,12 +104,12 @@ getDB()
   .then(() => {
     if (process.env.NODE_ENV !== "production" && !isVercelRuntime) {
       app.listen(PORT, () => {
-        console.log(`The server is running on port ${PORT}`);
+        logger.info(`The server is running on port ${PORT}`);
       });
     }
   })
   .catch((err) => {
-    console.error("Failed to connect to database:", err);
+    logger.error({ err }, "Failed to connect to database");
   });
 
 export default app;

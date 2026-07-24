@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { getUserInfo } from "./auth";
 import { fetchWithAuth } from "./apiClient";
+import { logger } from "./logger";
 import { toast } from "sonner";
 
 interface SavedJobsContextType {
@@ -35,7 +36,7 @@ export function SavedJobsProvider({ children }: { children: ReactNode }) {
           setSavedJobIds(new Set(ids));
         }
       } catch (error) {
-        console.error("Failed to load saved jobs", error);
+        logger.error({ error }, "Failed to load saved jobs");
       } finally {
         setIsLoading(false);
       }

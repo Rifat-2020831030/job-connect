@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "@/lib/api";
+import { logger } from "@/lib/logger";
 import { toast } from "sonner";
 
 export const handleApplyClick = ({ url, _id }) => {
@@ -9,7 +10,7 @@ export const handleApplyClick = ({ url, _id }) => {
   }
   if (_id && process.env.NODE_ENV !== "development") {
     fetch(`${API_BASE_URL}/stat/jobs/clicks?jobID=${_id}`).catch((error) => {
-      console.error("Failed to register job click stat", error);
+      logger.error({ error }, "Failed to register job click stat");
     });
   }
 };
