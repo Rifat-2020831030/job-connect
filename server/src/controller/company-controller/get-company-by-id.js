@@ -1,5 +1,6 @@
 import { getDB } from "../../db/database.js";
 import { ObjectId } from "mongodb";
+import { logger } from "../../utils/logger.js";
 
 export const getCompanyById = async (req, res) => {
   try {
@@ -18,7 +19,7 @@ export const getCompanyById = async (req, res) => {
 
     return res.status(200).json({ status: 1, data: company });
   } catch (error) {
-    console.error("getCompanyById error:", error);
+    logger.error({ error }, "getCompanyById error");
     return res.status(500).json({ status: 0, message: "Internal Server Error" });
   }
 };

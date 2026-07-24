@@ -1,5 +1,6 @@
 import { getDB } from "../../db/database.js";
 import { ObjectId } from "mongodb";
+import { logger } from "../../utils/logger.js";
 
 const getCompanies = async (req, res) => {
   try {
@@ -40,7 +41,7 @@ const getCompanies = async (req, res) => {
           query = cursorQuery;
         }
       } catch (err) {
-        console.error("Invalid cursor format", err);
+        logger.warn({ err }, "Invalid cursor format");
       }
     }
     
@@ -78,7 +79,7 @@ const getCompanies = async (req, res) => {
       nextCursor: nextCursor
     });
   } catch (error) {
-    console.error("Error fetching companies:", error);
+    logger.error({ error }, "Error fetching companies");
     res.status(500).json({ status: 0, message: "Error when fetching company list" });
   }
 };

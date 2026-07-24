@@ -1,5 +1,6 @@
 import { getDB } from "../db/database.js";
 import { getLocalTime } from "../utils/local-time.js";
+import { logger } from "../utils/logger.js";
 
 const serverHealth = async (_, res) => {
   try {
@@ -27,7 +28,7 @@ const serverHealth = async (_, res) => {
 
     res.status(200).json(healthCheck);
   } catch (error) {
-    console.error("Error checking server health:", error);
+    logger.error({ error }, "Error checking server health");
     return res
       .status(503)
       .json({

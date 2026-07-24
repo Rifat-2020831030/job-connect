@@ -1,4 +1,5 @@
 import { getDB } from "../../db/database.js";
+import { logger } from "../../utils/logger.js";
 import { activeJobsFilter, VALID_CATEGORIES } from "./shared.js";
 
 // GET /api/jobs/categories
@@ -38,7 +39,7 @@ export const getCategories = async (req, res) => {
 
     return res.status(200).json({ status: 1, data });
   } catch (error) {
-    console.error("getCategories error:", error);
+    logger.error({ error }, "getCategories error");
     return res
       .status(500)
       .json({ status: 0, message: "Internal Server Error" });

@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getDB } from "../db/database.js";
+import { logger } from "../utils/logger.js";
 
 // Valid enum values from DB
 const VALID_CATEGORIES = ["web", "ai/ml", "data science", "devops", "mobile", "security", "design", "PM", "other"];
@@ -26,7 +27,7 @@ export const getPreferences = async (req, res) => {
 
     return res.status(200).json({ status: 1, data: user.preferences });
   } catch (error) {
-    console.error("getPreferences error:", error);
+    logger.error({ error }, "getPreferences error");
     return res.status(500).json({ status: 0, message: "Internal Server Error" });
   }
 };
@@ -72,7 +73,7 @@ export const savePreferences = async (req, res) => {
 
     return res.status(200).json({ status: 1, message: "Preferences saved", data: preferences });
   } catch (error) {
-    console.error("savePreferences error:", error);
+    logger.error({ error }, "savePreferences error");
     return res.status(500).json({ status: 0, message: "Internal Server Error" });
   }
 };
@@ -115,7 +116,7 @@ export const getSavedJobs = async (req, res) => {
 
     return res.status(200).json({ status: 1, data: jobs });
   } catch (error) {
-    console.error("getSavedJobs error:", error);
+    logger.error({ error }, "getSavedJobs error");
     return res.status(500).json({ status: 0, message: "Internal Server Error" });
   }
 };
@@ -168,7 +169,7 @@ export const saveJob = async (req, res) => {
       data: { savedJobs: updated.savedJobs.map((j) => j.toString()) },
     });
   } catch (error) {
-    console.error("saveJob error:", error);
+    logger.error({ error }, "saveJob error");
     return res.status(500).json({ status: 0, message: "Internal Server Error" });
   }
 };
@@ -206,7 +207,7 @@ export const removeSavedJob = async (req, res) => {
 
     return res.status(200).json({ status: 1, message: "Job removed from saved list" });
   } catch (error) {
-    console.error("removeSavedJob error:", error);
+    logger.error({ error }, "removeSavedJob error");
     return res.status(500).json({ status: 0, message: "Internal Server Error" });
   }
 };

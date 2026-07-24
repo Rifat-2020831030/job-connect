@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { getDB } from "../../db/database.js";
+import { logger } from "../../utils/logger.js";
 import { issueTokens } from "./shared.js";
 
 // POST /api/auth/set-password
@@ -45,7 +46,7 @@ export const setPassword = async (req, res) => {
         data: { userId: user._id.toString(), email, accessToken, refreshToken },
       });
   } catch (error) {
-    console.error("setPassword error:", error);
+    logger.error({ error }, "setPassword error");
     return res
       .status(500)
       .json({ status: 0, message: "Internal Server Error" });

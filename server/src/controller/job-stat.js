@@ -1,5 +1,6 @@
 import { getDB } from "../db/database.js";
 import { ObjectId } from "mongodb";
+import { logger } from "../utils/logger.js";
 
 const getJobStats = async (req, res) => {
   try {
@@ -30,7 +31,7 @@ const getJobStats = async (req, res) => {
       data: stats,
     });
   } catch (error) {
-    console.error("Error fetching job stats:", error);
+    logger.error({ error }, "Error fetching job stats");
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -57,7 +58,7 @@ const incrementJobClick = async (req, res) => {
 
     res.status(200).json({ status: 1, message: "Click registered" });
   } catch (error) {
-    console.error("Error registering job click:", error);
+    logger.error({ error }, "Error registering job click");
     res.status(500).json({ status: 0, message: "Internal Server Error" });
   }
 };

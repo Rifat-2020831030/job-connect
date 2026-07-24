@@ -1,5 +1,6 @@
 import { getDB } from "../../db/database.js";
 import { ObjectId } from "mongodb";
+import { logger } from "../../utils/logger.js";
 import {
   activeJobsFilter,
   expiredJobsFilter,
@@ -137,7 +138,7 @@ export const getJobs = async (req, res) => {
       data: jobs,
     });
   } catch (error) {
-    console.error("getJobs error:", error);
+    logger.error({ error }, "getJobs error");
     return res
       .status(500)
       .json({ status: 0, message: "Internal Server Error" });

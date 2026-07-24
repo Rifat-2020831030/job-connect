@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { getDB } from "../../db/database.js";
+import { logger } from "../../utils/logger.js";
 
 // POST /api/auth/reset-password
 export const resetPassword = async (req, res) => {
@@ -39,7 +40,7 @@ export const resetPassword = async (req, res) => {
       .status(200)
       .json({ status: 1, message: "Password updated successfully" });
   } catch (error) {
-    console.error("resetPassword error:", error);
+    logger.error({ error }, "resetPassword error");
     return res
       .status(500)
       .json({ status: 0, message: "Internal Server Error" });

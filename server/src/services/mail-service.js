@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { logger } from "../utils/logger.js";
 
 const mailer = async (receiver, sub, msg = "", html = "") => {
   try {
@@ -26,22 +27,22 @@ const mailer = async (receiver, sub, msg = "", html = "") => {
         },
         (error, _info) => {
           if (error) {
-            console.error("Email sending error:", error);
+            logger.error({ error, receiver }, "Email sending error");
             resolve(false);
             return;
           }
           if (_info && _info.rejected && _info.rejected.length > 0) {
-            console.error("Email sending failed:", _info.rejected);
+            logger.error({ rejected: _info.rejected, receiver }, "Email sending failed");
             resolve(false);
             return;
           }
-          console.log("Email sent successfully to:", receiver);
+          logger.info({ receiver }, "Email sent successfully");
           resolve(true);
         }
       );
     });
   } catch (error) {
-    console.error("Error in mailer function:", error);
+    logger.error({ error, receiver }, "Error in mailer function");
     return false;
   }
 };

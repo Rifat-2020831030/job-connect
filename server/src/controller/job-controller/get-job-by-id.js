@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getDB } from "../../db/database.js";
+import { logger } from "../../utils/logger.js";
 import { DETAIL_PROJECTION } from "./shared.js";
 
 // GET /api/jobs/:id
@@ -23,7 +24,7 @@ export const getJobById = async (req, res) => {
 
     return res.status(200).json({ status: 1, data: job });
   } catch (error) {
-    console.error("getJobById error:", error);
+    logger.error({ error }, "getJobById error");
     return res
       .status(500)
       .json({ status: 0, message: "Internal Server Error" });

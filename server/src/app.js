@@ -27,7 +27,15 @@ const PORT = process.env.PORT || 3000;
 const isVercelRuntime = Boolean(process.env.VERCEL);
 
 // HTTP request logging middleware
-app.use(pinoHttp({ logger }));
+app.use(pinoHttp({
+  logger,
+  autoLogging: {
+    ignore: (req) => {
+      const url = req.url || req.originalUrl || "";
+      return url.startsWith("/health") || url.startsWith("/favicon.ico");
+    },
+  },
+}));
 
 // Allowed origins
 const allowedOrigins = [

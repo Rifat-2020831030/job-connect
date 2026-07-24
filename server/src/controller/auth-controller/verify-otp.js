@@ -1,4 +1,5 @@
 import { getDB } from "../../db/database.js";
+import { logger } from "../../utils/logger.js";
 
 // POST /api/auth/verify-otp
 export const verifyOtp = async (req, res) => {
@@ -49,7 +50,7 @@ export const verifyOtp = async (req, res) => {
         data: { email },
       });
   } catch (error) {
-    console.error("verifyOtp error:", error);
+    logger.error({ error }, "verifyOtp error");
     return res
       .status(500)
       .json({ status: 0, message: "Internal Server Error" });

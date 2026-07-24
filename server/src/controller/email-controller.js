@@ -4,6 +4,7 @@ import { ObjectId } from "mongodb";
 import { getDB } from "../db/database.js";
 import mailer from "../services/mail-service.js";
 import { getLocalTime } from "../utils/local-time.js";
+import { logger } from "../utils/logger.js";
 
 const subscribeEmail = async (req, res) => {
   try {
@@ -76,7 +77,7 @@ const subscribeEmail = async (req, res) => {
       data: { email },
     });
   } catch (error) {
-    console.error("Error subscribing email:", error);
+    logger.error({ error }, "Error subscribing email");
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -106,7 +107,7 @@ const unsubscribeEmail = async (req, res) => {
       data: response.email,
     });
   } catch (error) {
-    console.error("Error unsubscribing email:", error);
+    logger.error({ error }, "Error unsubscribing email");
     res.status(500).json({ error: "Error occured while unsubscribing" });
   }
 };
@@ -120,7 +121,7 @@ const getEmailList = async () => {
       .toArray();
     return emails;
   } catch (error) {
-    console.error("Error fetching email list:", error);
+    logger.error({ error }, "Error fetching email list");
     throw error;
   }
 };
@@ -224,14 +225,13 @@ const verifyCode = async (req, res) => {
       try {
         const html = welcomeMailTemplate();
         await mailer(email, "Greetings from ChakriLagbe", "", html);
-        console.log(`Welcome email sent to ${email}`);
+        logger.info({ email }, "Welcome email sent");
       } catch (error) {
-        console.error(`Error sending welcome email to ${email}:`, error);
+        logger.error({ error, email }, "Error sending welcome email");
       }
     });
-    console.log(`Welcome email sent to ${email}`);
   } catch (error) {
-    console.error("Error verifying code:", error);
+    logger.error({ error }, "Error verifying code");
     return res.status(500).json({ status: 0, message: "Error verifying code" });
   }
 };
@@ -270,7 +270,7 @@ const getNewJobs = async () => {
 
     return jobList;
   } catch (error) {
-    console.error("Error fetching new jobs:", error);
+    logger.error({ error }, "Error fetching new jobs");
     throw error;
   }
 };
@@ -282,7 +282,7 @@ const sendJobAlert = async () => {
     // gather mailing list
     const mailingList = await getEmailList();
     if (mailingList.length === 0) {
-      console.log("No Verified Mail subscriber found.");
+      logger.info("No Verified Mail subscriber found.");
       return {
         failedEmails: [],
         receiverEmails: [],
@@ -293,7 +293,7 @@ const sendJobAlert = async () => {
     // gather new jobs
     const newJobs = await getNewJobs();
     if (newJobs.length === 0) {
-      console.log("No new jobs found to send alert.");
+      logger.info("No new jobs found to send alert.");
       return {
         failedEmails: [],
         receiverEmails: [],
@@ -343,7 +343,7 @@ const sendJobAlert = async () => {
           failedEmails.push(subscriber.email);
         }
       } catch (error) {
-        console.error(`Error sending job alert to ${subscriber.email}:`, error);
+        logger.error({ error, subscriberEmail: subscriber.email }, "Error sending job alert");
         failedEmails.push(subscriber.email);
         continue; // skip to next subscriber
       }
@@ -366,7 +366,7 @@ const sendJobAlert = async () => {
       totalSubscribers: mailingList.length,
     };
   } catch (error) {
-    console.error("Error sending job alert:", error);
+    logger.error({ error }, "Error sending job alert");
     throw error;
   }
 };

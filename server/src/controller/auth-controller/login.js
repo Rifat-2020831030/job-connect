@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { getDB } from "../../db/database.js";
+import { logger } from "../../utils/logger.js";
 import { issueTokens } from "./shared.js";
 
 // POST /api/auth/login
@@ -48,7 +49,7 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("login error:", error);
+    logger.error({ error }, "login error");
     return res
       .status(500)
       .json({ status: 0, message: "Internal Server Error" });

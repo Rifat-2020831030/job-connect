@@ -1,5 +1,6 @@
 import { getDB } from "../../db/database.js";
 import { sendVerificationOtp } from "../../utils/otp-mail.js";
+import { logger } from "../../utils/logger.js";
 import { DEFAULT_PREFERENCES, generateOtp, otpExpiresAt } from "./shared.js";
 
 // POST /api/auth/subscribe
@@ -72,7 +73,7 @@ export const subscribe = async (req, res) => {
 
     const emailSent = await sendVerificationOtp(email, code);
     if (!emailSent) {
-      console.error("OTP email failed to send.");
+      logger.error("OTP email failed to send.");
       return res.status(500).json({
         status: 0,
         message: "Failed to send verification email. Please try again later.",
@@ -86,7 +87,7 @@ export const subscribe = async (req, res) => {
       data: { email },
     });
   } catch (error) {
-    console.error("subscribe error:", error);
+    logger.error({ error }, "subscribe error");
     return res
       .status(500)
       .json({ status: 0, message: "Internal Server Error" });

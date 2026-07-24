@@ -1,5 +1,6 @@
 import { getDB } from "../../db/database.js";
 import { sendResendOtp } from "../../utils/otp-mail.js";
+import { logger } from "../../utils/logger.js";
 import { generateOtp, otpExpiresAt } from "./shared.js";
 
 // POST /api/auth/resend-otp
@@ -47,7 +48,7 @@ export const resendOtp = async (req, res) => {
 
     const emailSent = await sendResendOtp(email, code);
     if (!emailSent) {
-      console.error("OTP email failed to send.");
+      logger.error("OTP email failed to send.");
       return res.status(500).json({
         status: 0,
         message: "Failed to send verification email. Please try again later.",
@@ -58,7 +59,7 @@ export const resendOtp = async (req, res) => {
       .status(200)
       .json({ status: 1, message: "New verification code sent" });
   } catch (error) {
-    console.error("resendOtp error:", error);
+    logger.error({ error }, "resendOtp error");
     return res
       .status(500)
       .json({ status: 0, message: "Internal Server Error" });

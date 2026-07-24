@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getDB } from "../../db/database.js";
+import { logger } from "../../utils/logger.js";
 import {
   hasDeadlineFilter,
   LIST_PROJECTION,
@@ -105,7 +106,7 @@ export const getFeaturedJobs = async (req, res) => {
 
     return res.status(200).json({ status: 1, data: jobs });
   } catch (error) {
-    console.error("getFeaturedJobs error:", error);
+    logger.error({ error }, "getFeaturedJobs error");
     return res
       .status(500)
       .json({ status: 0, message: "Internal Server Error" });

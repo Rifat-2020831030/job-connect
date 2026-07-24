@@ -1,4 +1,5 @@
 import { getDB } from "../../db/database.js";
+import { logger } from "../../utils/logger.js";
 import { escapeRegex } from "./shared.js";
 
 // GET /api/jobs/location-suggestions
@@ -29,7 +30,7 @@ export const getLocationSuggestions = async (req, res) => {
       data: results.map((r) => r.location),
     });
   } catch (error) {
-    console.error("getLocationSuggestions error:", error);
+    logger.error({ error }, "getLocationSuggestions error");
     return res
       .status(500)
       .json({ status: 0, message: "Internal Server Error" });

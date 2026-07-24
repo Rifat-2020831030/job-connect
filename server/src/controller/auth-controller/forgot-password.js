@@ -1,5 +1,6 @@
 import { getDB } from "../../db/database.js";
 import { sendPasswordResetOtp } from "../../utils/otp-mail.js";
+import { logger } from "../../utils/logger.js";
 import { generateOtp, otpExpiresAt } from "./shared.js";
 
 // POST /api/auth/forgot-password
@@ -33,7 +34,7 @@ export const forgotPassword = async (req, res) => {
 
     const emailSent = await sendPasswordResetOtp(email, code);
     if (!emailSent) {
-      console.error("OTP email failed to send.");
+      logger.error("OTP email failed to send.");
       return res.status(500).json({
         status: 0,
         message: "Failed to send password reset email. Please try again later.",
@@ -42,7 +43,7 @@ export const forgotPassword = async (req, res) => {
 
     return res.status(200).json(GENERIC_RESPONSE);
   } catch (error) {
-    console.error("forgotPassword error:", error);
+    logger.error({ error }, "forgotPassword error");
     return res
       .status(500)
       .json({ status: 0, message: "Internal Server Error" });

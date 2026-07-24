@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { ObjectId } from "mongodb";
 import { getDB } from "../../db/database.js";
+import { logger } from "../../utils/logger.js";
 import { issueTokens } from "./shared.js";
 
 // POST /api/auth/refresh
@@ -50,7 +51,7 @@ export const refresh = async (req, res) => {
         },
       });
   } catch (error) {
-    console.error("refresh error:", error);
+    logger.error({ error }, "refresh error");
     return res
       .status(500)
       .json({ status: 0, message: "Internal Server Error" });

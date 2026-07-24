@@ -1,4 +1,5 @@
 import { getDB } from "../../db/database.js";
+import { logger } from "../../utils/logger.js";
 import { VALID_EXPERIENCE_LEVELS, VALID_JOB_TYPES } from "./shared.js";
 
 // GET /api/jobs/filter-options
@@ -52,7 +53,7 @@ export const getFilterOptions = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("getFilterOptions error:", error);
+    logger.error({ error }, "getFilterOptions error");
     return res
       .status(500)
       .json({ status: 0, message: "Internal Server Error" });

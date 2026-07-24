@@ -1,4 +1,5 @@
 import { getDB } from "../db/database.js";
+import { logger } from "../utils/logger.js";
 
 const getCompanies = async (req, res) => {
   try {
@@ -15,7 +16,7 @@ const getCompanies = async (req, res) => {
       data: companies,
     });
   } catch (error) {
-    console.error("Error fetching companies:", error);
+    logger.error({ error }, "Error fetching companies");
     res.status(500).json({ error: "Error when fetching company list" });
   }
 };

@@ -1,5 +1,6 @@
 import { getDB } from "../db/database.js";
 import { runScraper } from "../services/scraper-runner.js";
+import { logger } from "../utils/logger.js";
 
 const getLastScrapeTime = async (req, res) => {
   try {
@@ -14,7 +15,7 @@ const getLastScrapeTime = async (req, res) => {
 
     return res.status(200).json({ status: 1, data: lastScrape });
   } catch (error) {
-    console.error("An error occurred while fetching last scraping time:", error);
+    logger.error({ error }, "An error occurred while fetching last scraping time");
     return res.status(500).json({
       status: 0,
       message: "Failed to fetch last scraping time",
