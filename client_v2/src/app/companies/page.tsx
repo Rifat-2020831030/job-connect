@@ -5,6 +5,7 @@ import { API_BASE_URL } from '@/lib/api';
 import { Search, Building2, Loader2 } from 'lucide-react';
 import CompanyCard, { Company } from '@/components/CompanyCard';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/lib/logger';
 
 export default function CompaniesPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -36,7 +37,7 @@ export default function CompaniesPage() {
       
       return data;
     } catch (error) {
-      console.error("Failed to fetch companies:", error);
+      logger.error({ error }, "Failed to fetch companies");
       return null;
     }
   };

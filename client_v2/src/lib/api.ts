@@ -1,3 +1,5 @@
+import { logger } from "@/lib/logger";
+
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api";
 
 export async function fetchFeaturedJobs(section: "featured" | "engineering" | "leadership") {
@@ -8,14 +10,14 @@ export async function fetchFeaturedJobs(section: "featured" | "engineering" | "l
     });
     
     if (!res.ok) {
-      console.error(`Failed to fetch ${section} jobs: ${res.statusText}`);
+      logger.error({ section, statusText: res.statusText }, "Failed to fetch jobs");
       return [];
     }
     
     const json = await res.json();
     return json.data || [];
   } catch (error) {
-    console.error(`Error fetching ${section} jobs:`, error);
+    logger.error({ error, section }, "Error fetching jobs");
     return [];
   }
 }
@@ -27,14 +29,14 @@ export async function fetchCategories() {
     });
     
     if (!res.ok) {
-      console.error(`Failed to fetch categories: ${res.statusText}`);
+      logger.error({ statusText: res.statusText }, "Failed to fetch categories");
       return [];
     }
     
     const json = await res.json();
     return json.data || [];
   } catch (error) {
-    console.error("Error fetching categories:", error);
+    logger.error({ error }, "Error fetching categories");
     return [];
   }
 }
@@ -46,14 +48,14 @@ export async function fetchSiteStats() {
     });
     
     if (!res.ok) {
-      console.error(`Failed to fetch site stats: ${res.statusText}`);
+      logger.error({ statusText: res.statusText }, "Failed to fetch site stats");
       return null;
     }
     
     const json = await res.json();
     return json.data || null;
   } catch (error) {
-    console.error("Error fetching site stats:", error);
+    logger.error({ error }, "Error fetching site stats");
     return null;
   }
 }

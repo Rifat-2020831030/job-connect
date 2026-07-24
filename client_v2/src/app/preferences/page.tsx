@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getUserInfo } from "@/lib/auth";
 import { fetchWithAuth } from "@/lib/apiClient";
 import { toast } from "sonner";
+import { logger } from "@/lib/logger";
 
 function AlertPreferencesContent() {
   const router = useRouter();
@@ -46,7 +47,7 @@ function AlertPreferencesContent() {
           if (pref.alertTiming) setFrequency(pref.alertTiming);
         }
       } catch (err) {
-        console.error("Failed to load preferences", err);
+        logger.error({ err }, "Failed to load preferences");
       }
     };
     loadPreferences();

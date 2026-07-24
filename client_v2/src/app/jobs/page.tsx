@@ -5,6 +5,7 @@ import JobRow from "@/components/JobRow";
 import JobSearchBar from "@/components/JobSearchBar";
 import JobDetailsModal, { JobDetail } from "@/components/JobDetailsModal";
 import { API_BASE_URL } from "@/lib/api";
+import { logger } from "@/lib/logger";
 import { Filter, X, Loader2, Search } from "lucide-react";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -65,7 +66,7 @@ function JobsPageContent() {
           });
         }
       } catch (err) {
-        console.error("Failed to fetch filter options", err);
+        logger.error({ err }, "Failed to fetch filter options");
       }
     }
     fetchOptions();

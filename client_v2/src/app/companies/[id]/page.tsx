@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { API_BASE_URL } from "@/lib/api";
+import { logger } from "@/lib/logger";
 import { Company } from "@/components/CompanyCard";
 import CompanyLogo from "@/components/CompanyLogo";
 import JobRow from "@/components/JobRow";
@@ -38,7 +39,7 @@ export default function CompanyProfilePage() {
           setCompany(data.data);
         }
       } catch (err) {
-        console.error("Failed to fetch company profile", err);
+        logger.error({ err, companyId }, "Failed to fetch company profile");
       } finally {
         setIsLoadingProfile(false);
       }
@@ -61,7 +62,7 @@ export default function CompanyProfilePage() {
           setTotalPages(1);
         }
       } catch (err) {
-        console.error("Failed to fetch jobs", err);
+        logger.error({ err, companyId }, "Failed to fetch jobs");
         setJobs([]);
         setTotalPages(1);
       } finally {

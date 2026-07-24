@@ -1,6 +1,7 @@
 "use client";
 
 import { API_BASE_URL } from "@/lib/api";
+import { logger } from "@/lib/logger";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -80,7 +81,7 @@ function VerificationContent() {
         toast.error(data.message || "Failed to resend code.");
       }
     } catch (err) {
-      console.error("Resend error:", err);
+      logger.error({ err }, "Resend error");
       toast.error("An unexpected error occurred.");
     } finally {
       setResending(false);
@@ -108,7 +109,7 @@ function VerificationContent() {
           toast.error(data.message || "Invalid or expired code.");
         }
       } catch (err) {
-        console.error("Verification error:", err);
+        logger.error({ err }, "Verification error");
         toast.error("An unexpected error occurred.");
       } finally {
         setLoading(false);

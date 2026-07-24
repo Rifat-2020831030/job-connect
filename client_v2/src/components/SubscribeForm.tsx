@@ -4,6 +4,7 @@ import { API_BASE_URL } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { logger } from "@/lib/logger";
 
 export default function SubscribeForm() {
   const router = useRouter();
@@ -42,7 +43,7 @@ export default function SubscribeForm() {
         setError(data.message || "Failed to subscribe.");
       }
     } catch (err) {
-      console.error("Subscription error:", err);
+      logger.error({ err }, "Subscription error");
       toast.error("An unexpected error occurred.");
     } finally {
       setLoading(false);
