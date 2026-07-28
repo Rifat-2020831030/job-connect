@@ -6,6 +6,7 @@ interface SiteStats {
   totalJobs: number;
   totalCompanies: number;
   subscribersCount: number;
+  totalUniqueVisitors?: number;
 }
 
 export default function HeroSection({ siteStats }: { siteStats: SiteStats }) {
@@ -14,6 +15,7 @@ export default function HeroSection({ siteStats }: { siteStats: SiteStats }) {
   const activeJobs = siteStats?.totalJobs || 0;
   const companies = siteStats?.totalCompanies || 0;
   const subscribers = siteStats?.subscribersCount || 0;
+  const uniqueVisitors = siteStats?.totalUniqueVisitors || 0;
 
   return (
     <div className="relative w-full overflow-hidden">
@@ -43,7 +45,7 @@ export default function HeroSection({ siteStats }: { siteStats: SiteStats }) {
       </div>
 
       {/* Stats Section */}
-      <div className="flex items-center justify-center gap-8 md:gap-16 pt-8 border-t border-gray-200 w-full max-w-2xl">
+      <div className="flex items-center justify-center gap-8 md:gap-16 pt-8 border-t border-gray-200 w-full max-w-4xl flex-wrap">
         <div className="flex flex-col items-center gap-1">
           <span className="text-2xl md:text-3xl font-bold text-foreground">
             {activeJobs.toLocaleString()}+
@@ -61,6 +63,12 @@ export default function HeroSection({ siteStats }: { siteStats: SiteStats }) {
             {subscribers.toLocaleString()}+
           </span>
           <span className="text-meta text-center">Subscribers</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <span className="text-2xl md:text-3xl font-bold text-foreground text-primary">
+            {uniqueVisitors.toLocaleString()}
+          </span>
+          <span className="text-meta text-center">Unique Visitors</span>
         </div>
       </div>
       </section>

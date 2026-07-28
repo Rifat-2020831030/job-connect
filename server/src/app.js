@@ -48,7 +48,7 @@ const allowedOrigins = [
 const corsOption = {
   origin: (origin, callback) => {
     if (!origin) return callback(
-        new Error(`Access denied: Origin '${origin}' not allowed.`),
+        new Error(`Access denied: Empty origin not allowed.`),
         false
       );
     if (allowedOrigins.includes(origin)) {

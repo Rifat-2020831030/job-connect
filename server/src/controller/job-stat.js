@@ -1,34 +1,36 @@
 import { getDB } from "../db/database.js";
 import { ObjectId } from "mongodb";
 import { logger } from "../utils/logger.js";
+import { trackVisitor } from "../services/visitor-service.js";
 
 const getJobStats = async (req, res) => {
   try {
     const db = await getDB();
-    const stats = await db.collection("cache").findOne({ _id: "site_stats" });
+    
+    // Fetch stats and unique visitor count in parallel
+    const [stats, uniqueVisitorsCount] = await Promise.all([
+      db.collection("cache").findOne({ _id: "site_stats" }),
+      db.collection("unique_visitors").countDocuments()
+    ]);
 
-    if (!stats) {
-      // Fallback if cron hasn't run yet
-      return res.status(200).json({
-        status: 1,
-        message: "Default job stats",
-        data: {
-          totalJobs: 0,
-          totalCompanies: 0,
-          subscribersCount: 0,
-          uniqueLocations: 0,
-          newRolesAdded: 0,
-        },
-      });
+    let data = stats ? { ...stats } : {
+      totalJobs: 0,
+      totalCompanies: 0,
+      subscribersCount: 0,
+      uniqueLocations: 0,
+      newRolesAdded: 0,
+    };
+
+    if (data._id) {
+      delete data._id;
     }
 
-    // Remove _id for client
-    delete stats._id;
+    data.totalUniqueVisitors = uniqueVisitorsCount;
 
     res.status(200).json({
       status: 1,
       message: "Job stats fetched successfully",
-      data: stats,
+      data,
     });
   } catch (error) {
     logger.error({ error }, "Error fetching job stats");
@@ -63,4 +65,30 @@ const incrementJobClick = async (req, res) => {
   }
 };
 
-export { getJobStats, incrementJobClick };
+const registerVisitor = async (req, res) => {
+  try {
+    // Extract IP address from request headers or socket
+    let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    
+    // Handle cases where x-forwarded-for contains multiple IPs
+    if (typeof ip === 'string' && ip.includes(',')) {
+      ip = ip.split(',')[0].trim();
+    }
+
+    if (!ip) {
+      return res.status(400).json({ status: 0, message: "Could not determine IP address" });
+    }
+
+    const success = await trackVisitor(ip);
+    if (success) {
+      return res.status(200).json({ status: 1, message: "Visitor tracked successfully" });
+    } else {
+      return res.status(500).json({ status: 0, message: "Failed to track visitor" });
+    }
+  } catch (error) {
+    logger.error({ error }, "Error in registerVisitor controller");
+    return res.status(500).json({ status: 0, message: "Internal Server Error" });
+  }
+};
+
+export { getJobStats, incrementJobClick, registerVisitor };

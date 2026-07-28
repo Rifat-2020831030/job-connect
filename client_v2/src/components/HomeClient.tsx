@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { API_BASE_URL } from "@/lib/api";
+import { useVisitorTracker } from "@/lib/useVisitorTracker";
 import CategoryCard from "@/components/CategoryCard";
 import HeroSection from "@/components/HeroSection";
 import JobCard from "@/components/JobCard";
@@ -42,6 +43,29 @@ export default function HomeClient({
 }: HomeClientProps) {
   const [selectedJob, setSelectedJob] = useState<JobDetail | null>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+  const [currentSiteStats, setCurrentSiteStats] = useState(siteStats);
+
+  // Initialize unique visitor tracking
+  useVisitorTracker();
+
+  // Fetch real-time site stats on client side
+  useEffect(() => {
+    const fetchRealTimeStats = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/stat`, {
+          cache: 'no-store', // Ensure we get fresh data
+        });
+        const data = await res.json();
+        if (res.ok && data.status === 1 && data.data) {
+          setCurrentSiteStats(data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch real-time site stats", error);
+      }
+    };
+
+    fetchRealTimeStats();
+  }, []);
 
   const handleViewDetails = async (jobId: string, fallbackJob: any) => {
     if (!jobId) {
@@ -70,7 +94,7 @@ export default function HomeClient({
 
   return (
     <div className="flex flex-col w-full">
-      <HeroSection siteStats={siteStats} />
+      <HeroSection siteStats={currentSiteStats} />
 
       <main className="flex flex-col w-full max-w-7xl mx-auto px-6 md:px-12 py-16 gap-24 relative">
         {/* Loading Overlay for details fetch */}
