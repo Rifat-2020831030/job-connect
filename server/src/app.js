@@ -6,6 +6,7 @@ import express from "express";
 import { rateLimit } from "express-rate-limit";
 import pinoHttp from "pino-http";
 import { getDB } from "./db/database.js";
+import { getAllowedOrigins } from "./services/originsService.js";
 import { logger } from "./utils/logger.js";
 dotenv.config();
 
@@ -23,6 +24,7 @@ import { jobAlertSchedule } from "./services/job-alert.js";
 import { source } from "./utils/source.js";
 
 const app = express();
+app.set('trust proxy', true); 
 const PORT = process.env.PORT || 3000;
 const isVercelRuntime = Boolean(process.env.VERCEL);
 
@@ -38,12 +40,7 @@ app.use(pinoHttp({
 }));
 
 // Allowed origins
-const allowedOrigins = [
-  "https://chakrilagbe.vercel.app",
-  "https://server-health-tau.vercel.app",
-  "https://chakrilagbe-client-admin.vercel.app",
-  "http://localhost:3000", // client_v2 dev
-];
+let allowedOrigins = [];
 
 const corsOption = {
   origin: (origin, callback) => {
@@ -61,7 +58,7 @@ const corsOption = {
       );
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
   optionsSuccessStatus: 200,
@@ -80,14 +77,14 @@ const healthLimit = rateLimit({
   message: "Too many requests, please try again later.",
 });
 
+app.get("/health", healthLimit, serverHealth);
+
 app.use(cors(corsOption));
 app.use(limiter);
 app.use(express.json());
 app.use(compression());
 
 app.get("/", (_req, res) => res.send("The server is running"));
-app.get("/health", healthLimit, serverHealth);
-
 app.use("/api/auth", authRouter);
 app.use("/api/companies", companiesRouter);
 app.use("/api/users", usersRouter);
@@ -112,7 +109,14 @@ app.use((err, req, res, _next) => {
 
 // Initialize DB then start server
 getDB()
-  .then(() => {
+  .then(async () => {
+    try {
+      const origins = await getAllowedOrigins();
+      allowedOrigins = origins;
+      logger.info({ origins }, "Allowed origins loaded from DB");
+    } catch (e) {
+      logger.error({ e }, "Failed to load allowed origins from DB");
+    }
     if (process.env.NODE_ENV !== "production" && !isVercelRuntime) {
       app.listen(PORT, () => {
         logger.info(`The server is running on port ${PORT}`);
