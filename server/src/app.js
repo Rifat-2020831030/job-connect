@@ -38,12 +38,21 @@ app.use(pinoHttp({
   },
 }));
 
-// Allowed origins
-let allowedOrigins = [];
+// Allowed origins - yet loaded
+let allowedOrigins = null;
 
 const corsOption = {
-  origin: (origin, callback) => {
+  origin: async (origin, callback) => {
     if (!origin) return callback(null, true); 
+    
+    if (allowedOrigins === null) {
+      try {
+        allowedOrigins = await getAllowedOrigins();
+      } catch (err) {
+        allowedOrigins = [];
+      }
+    }
+
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -75,7 +84,7 @@ const healthLimit = rateLimit({
 
 app.get("/health", healthLimit, serverHealth);
 
-// app.use(cors(corsOption));
+app.use(cors(corsOption));
 app.use(limiter);
 app.use(express.json());
 app.use(compression());

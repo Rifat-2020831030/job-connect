@@ -7,4 +7,5 @@ export async function getAllowedOrigins() {
   if (doc && Array.isArray(doc.value)) {
     return doc.value;
   }
+  return [];
 }
