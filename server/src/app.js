@@ -24,7 +24,6 @@ import { jobAlertSchedule } from "./services/job-alert.js";
 import { source } from "./utils/source.js";
 
 const app = express();
-app.set('trust proxy', true); 
 const PORT = process.env.PORT || 3000;
 const isVercelRuntime = Boolean(process.env.VERCEL);
 
@@ -76,7 +75,7 @@ const healthLimit = rateLimit({
 
 app.get("/health", healthLimit, serverHealth);
 
-app.use(cors(corsOption));
+// app.use(cors(corsOption));
 app.use(limiter);
 app.use(express.json());
 app.use(compression());
