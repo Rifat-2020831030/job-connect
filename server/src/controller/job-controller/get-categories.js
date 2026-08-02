@@ -31,11 +31,19 @@ export const getCategories = async (req, res) => {
     ];
 
     const results = await db.collection("jobs").aggregate(pipeline).toArray();
-    const data = results.map(({ _id, count }) => ({
-      category: _id,
-      label: categoryLabels[_id] || _id,
-      count,
+
+    // Build a lookup from aggregation results
+    const countMap = new Map(results.map(({ _id, count }) => [_id, count]));
+
+    // Always return ALL valid categories, even those with 0 active jobs
+    const data = [...VALID_CATEGORIES].map((cat) => ({
+      category: cat,
+      label: categoryLabels[cat] || cat,
+      count: countMap.get(cat) || 0,
     }));
+
+    // Sort by count descending, then alphabetically for ties
+    data.sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
 
     return res.status(200).json({ status: 1, data });
   } catch (error) {

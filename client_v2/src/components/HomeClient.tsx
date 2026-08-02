@@ -41,6 +41,7 @@ export default function HomeClient({
   categories,
   siteStats,
 }: HomeClientProps) {
+
   const [selectedJob, setSelectedJob] = useState<JobDetail | null>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [currentSiteStats, setCurrentSiteStats] = useState(siteStats);
@@ -81,7 +82,6 @@ export default function HomeClient({
       if (res.ok && data.status === 1) {
         setSelectedJob(data.data);
       } else {
-        toast.error("Failed to load job details. Showing cached data.");
         setSelectedJob(fallbackJob); // Fallback if API fails
       }
     } catch (err) {
@@ -178,7 +178,7 @@ export default function HomeClient({
             viewAllLink="/jobs"
           />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {categories.map((category, index) => (
+            {categories.map((category: any, index: number) => (
               <CategoryCard 
                 key={category.category || index} 
                 title={category.label}
@@ -187,9 +187,6 @@ export default function HomeClient({
                 href={`/jobs?category=${encodeURIComponent(category.category)}`}
               />
             ))}
-            {categories.length === 0 && (
-              <p className="text-gray-500 col-span-full">No categories available.</p>
-            )}
           </div>
         </section>
       </main>
