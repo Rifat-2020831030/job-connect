@@ -64,12 +64,12 @@ export default function HeroSection({ siteStats }: { siteStats: SiteStats }) {
           </span>
           <span className="text-meta text-center">Subscribers</span>
         </div>
-        <div className="flex flex-col items-center gap-1">
+        {/* <div className="flex flex-col items-center gap-1">
           <span className="text-2xl md:text-3xl font-bold text-foreground text-primary">
             {uniqueVisitors.toLocaleString()}
           </span>
           <span className="text-meta text-center">Unique Visitors</span>
-        </div>
+        </div> */}
       </div>
       </section>
     </div>
