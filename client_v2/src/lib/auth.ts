@@ -29,6 +29,7 @@ export function clearTokens() {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_INFO_KEY);
+    localStorage.removeItem("jf_is_subscribed");
   }
 }
 
@@ -48,6 +49,23 @@ export function getUserInfo(): UserInfo | null {
         return null;
       }
     }
+  }
+  return null;
+}
+
+const IS_SUBSCRIBED_KEY = "jf_is_subscribed";
+
+export function setIsSubscribed(isSubscribed: boolean) {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(IS_SUBSCRIBED_KEY, isSubscribed ? "true" : "false");
+  }
+}
+
+export function getIsSubscribed(): boolean | null {
+  if (typeof window !== "undefined") {
+    const val = localStorage.getItem(IS_SUBSCRIBED_KEY);
+    if (val === "true") return true;
+    if (val === "false") return false;
   }
   return null;
 }

@@ -19,13 +19,13 @@ export const getPreferences = async (req, res) => {
 
     const user = await db
       .collection("users")
-      .findOne({ _id: new ObjectId(id) }, { projection: { preferences: 1 } });
+      .findOne({ _id: new ObjectId(id) }, { projection: { preferences: 1, unsubscribe_at: 1 } });
 
     if (!user) {
       return res.status(404).json({ status: 0, message: "User not found" });
     }
 
-    return res.status(200).json({ status: 1, data: user.preferences });
+    return res.status(200).json({ status: 1, data: { ...user.preferences, unsubscribe_at: user.unsubscribe_at } });
   } catch (error) {
     logger.error({ error }, "getPreferences error");
     return res.status(500).json({ status: 0, message: "Internal Server Error" });
@@ -64,7 +64,10 @@ export const savePreferences = async (req, res) => {
 
     const result = await db.collection("users").updateOne(
       { _id: new ObjectId(id) },
-      { $set: { preferences, updatedAt: new Date().toISOString() } }
+      { 
+        $set: { preferences, updatedAt: new Date().toISOString() },
+        $unset: { unsubscribe_at: "" }
+      }
     );
 
     if (result.matchedCount === 0) {

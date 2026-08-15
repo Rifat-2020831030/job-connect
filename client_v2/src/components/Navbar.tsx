@@ -3,8 +3,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { getTokens, getUserInfo, clearTokens, UserInfo } from '../lib/auth';
-import { User, LogOut, ChevronDown, Bookmark, Menu, X as XIcon } from 'lucide-react';
+import { getTokens, getUserInfo, clearTokens, UserInfo, getIsSubscribed, setIsSubscribed } from '../lib/auth';
+import { fetchWithAuth } from '../lib/apiClient';
+import { User, LogOut, ChevronDown, Bookmark, Menu, X as XIcon, Bell, MailMinus } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -12,16 +13,38 @@ export default function Navbar() {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [isSubscribed, setIsSubscribedState] = useState<boolean | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const { accessToken } = getTokens();
     if (accessToken) {
       setIsAuthenticated(true);
-      setUser(getUserInfo());
+      const userInfo = getUserInfo();
+      setUser(userInfo);
+
+      if (userInfo?.userId) {
+        const storedSub = getIsSubscribed();
+        if (storedSub !== null) {
+          setIsSubscribedState(storedSub);
+        } else {
+          // Fetch from server
+          fetchWithAuth(`/users/${userInfo.userId}/preferences`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.status === 1 && data.data) {
+                const subscribed = data.data.unsubscribe_at == null;
+                setIsSubscribed(subscribed);
+                setIsSubscribedState(subscribed);
+              }
+            })
+            .catch(err => console.error("Failed to load subscription state", err));
+        }
+      }
     } else {
       setIsAuthenticated(false);
       setUser(null);
+      setIsSubscribedState(null);
     }
   }, [pathname]);
 
@@ -114,6 +137,26 @@ export default function Navbar() {
                     <User size={14} />
                     Preferences
                   </Link>
+                  {isSubscribed === false && (
+                    <Link 
+                      href="/preferences" 
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      <Bell size={14} /> 
+                      Subscribe
+                    </Link>
+                  )}
+                  {isSubscribed === true && (
+                    <Link 
+                      href={`/unsubscribe?id=${user?.userId}`}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      <MailMinus size={14} />
+                      Unsubscribe
+                    </Link>
+                  )}
                   <button 
                     onClick={handleLogout}
                     className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left cursor-pointer"
@@ -206,6 +249,26 @@ export default function Navbar() {
                     <User size={18} />
                     Preferences
                   </Link>
+                  {isSubscribed === false && (
+                    <Link 
+                      href="/preferences" 
+                      onClick={() => setShowMobileMenu(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 text-base font-medium text-gray-600 hover:text-primary rounded-md hover:bg-gray-50"
+                    >
+                      <Bell size={18} />
+                      Subscribe
+                    </Link>
+                  )}
+                  {isSubscribed === true && (
+                    <Link 
+                      href={`/unsubscribe?id=${user?.userId}`}
+                      onClick={() => setShowMobileMenu(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 text-base font-medium text-gray-600 hover:text-primary rounded-md hover:bg-gray-50"
+                    >
+                      <MailMinus size={18} />
+                      Unsubscribe
+                    </Link>
+                  )}
                   <button 
                     onClick={handleLogout}
                     className="flex items-center gap-3 px-3 py-2.5 text-base font-medium text-red-600 hover:text-red-700 rounded-md hover:bg-red-50 w-full text-left"

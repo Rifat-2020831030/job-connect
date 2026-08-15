@@ -1,86 +1,12 @@
 import crypto from "crypto";
 import { ObjectId } from "mongodb";
+import sanitizeHtml from "sanitize-html";
 
 import { getDB } from "../db/database.js";
 import mailer from "../services/mail-service.js";
 import { getLocalTime } from "../utils/local-time.js";
 import { logger } from "../utils/logger.js";
 
-const subscribeEmail = async (req, res) => {
-  try {
-    const db = await getDB();
-    const {
-      email,
-      ipAddress = "unknown",
-      latlong = "unknown",
-      country = "unknown",
-    } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ status: 0, message: "Email is required" });
-    }
-
-    // Check if the email already exists and is verified
-    const existingEmail = await db
-      .collection("emails")
-      .findOne({ email: email, verify: true });
-    if (existingEmail) {
-      return res
-        .status(409)
-        .json({ status: 0, message: "Email already subscribed" });
-    }
-
-    // verification section
-
-    // unverified email check
-    const unverifiedEmail = await db
-      .collection("emails")
-      .findOne({ email: email, verify: false });
-    const code = generateCode(6);
-    const exp = new Date().getTime() + 24 * 60 * 60 * 1000; // 1day expiration time
-    if (!unverifiedEmail) {
-      await db.collection("emails").insertOne({
-        email,
-        ipAddress,
-        latlong,
-        country,
-        code,
-        exp,
-        verify: false,
-      });
-    } else {
-      // If the email exists but is not verified, update the code
-      await db.collection("emails").updateOne(
-        { email: email },
-        {
-          $set: {
-            code: code,
-            exp: exp,
-          },
-        }
-      );
-    }
-
-    // send verification code to mail
-    const subject = "Email Verification Code";
-    const html = `<p>Your verification code is: <strong>${code}</strong> and will expire in <strong>24 hours</strong>.</br> If you did not request this, please ignore this email.</p>`;
-    const response = await mailer(email, subject, "", html);
-    // if (!response) {
-    //   return res
-    //     .status(500)
-    //     .json({ status: 0, message: "Failed to send verification email" });
-    // }
-
-    res.status(200).json({
-      status: 1,
-      message: "Verification Code Sent to Email",
-      data: { email },
-    });
-  } catch (error) {
-    logger.error({ error }, "Error subscribing email");
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
 
 const unsubscribeEmail = async (req, res) => {
   try {
@@ -118,6 +44,34 @@ const unsubscribeEmail = async (req, res) => {
   } catch (error) {
     logger.error({ error }, "Error unsubscribing email");
     res.status(500).json({ error: "Error occured while unsubscribing" });
+  }
+};
+
+const submitUnsubscribeReason = async (req, res) => {
+  try {
+    const db = await getDB();
+    let { id, reason, email } = req.body;
+
+    reason = reason ? sanitizeHtml(String(reason), {
+      allowedTags: [],
+      allowedAttributes: {}
+    }).trim() : '';
+
+    if (!id || !reason) {
+      return res.status(400).json({ status: 0, message: "ID and reason are required" });
+    }
+
+    await db.collection("unsub_reason").insertOne({
+      userId: new ObjectId(id),
+      email: email || "unknown",
+      reason,
+      createdAt: getLocalTime()
+    });
+
+    res.status(200).json({ status: 1, message: "Reason submitted successfully" });
+  } catch (error) {
+    logger.error({ error }, "Error submitting unsubscribe reason");
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -383,7 +337,7 @@ const sendJobAlert = async () => {
 export {
   getEmailList,
   sendJobAlert,
-  subscribeEmail,
   unsubscribeEmail,
+  submitUnsubscribeReason,
   verifyCode,
 };

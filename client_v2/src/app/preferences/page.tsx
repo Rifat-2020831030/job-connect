@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getUserInfo } from "@/lib/auth";
+import { getUserInfo, setIsSubscribed } from "@/lib/auth";
 import { fetchWithAuth } from "@/lib/apiClient";
 import { toast } from "sonner";
 import { logger } from "@/lib/logger";
@@ -74,6 +74,7 @@ function AlertPreferencesContent() {
       
       if (res.ok && data.status === 1) {
         toast.success("Preferences saved successfully!");
+        setIsSubscribed(true);
         const params = new URLSearchParams();
         if (categories.length) params.set("categories", categories.join(","));
         if (workModel.length) params.set("model", workModel.join(","));
