@@ -92,19 +92,28 @@ const unsubscribeEmail = async (req, res) => {
       return;
     }
     const response = await db
-      .collection("emails")
+      .collection("users")
       .findOneAndUpdate(
         { _id: new ObjectId(id) },
-        { $set: { verify: false, unsubscriptionTime: getLocalTime() } }
+        { 
+          $set: { 
+            "preferences.categories": null,
+            "preferences.workModel": null,
+            "preferences.alertTiming": null,
+            unsubscribe_at: getLocalTime() 
+          } 
+        },
+        { returnDocument: "after" }
       );
 
     if (!response) {
-      return res.status(404).json({ status: 0, message: "Email not found" });
+      return res.status(404).json({ status: 0, message: "User not found" });
     }
+    const unsubscribedEmail = response.value ? response.value.email : response.email;
     res.status(200).json({
       status: 1,
-      message: "Email unsubscribed successfully",
-      data: response.email,
+      message: "Unsubscribed from job alerts successfully",
+      data: unsubscribedEmail,
     });
   } catch (error) {
     logger.error({ error }, "Error unsubscribing email");
