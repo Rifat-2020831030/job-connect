@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { ObjectId } from "mongodb";
-import sanitizeHtml from "sanitize-html";
+import DOMPurify from "isomorphic-dompurify";
 
 import { getDB } from "../db/database.js";
 import mailer from "../services/mail-service.js";
@@ -52,10 +52,8 @@ const submitUnsubscribeReason = async (req, res) => {
     const db = await getDB();
     let { id, reason, email } = req.body;
 
-    reason = reason ? sanitizeHtml(String(reason), {
-      allowedTags: [],
-      allowedAttributes: {}
-    }).trim() : '';
+    // Sanitize using DOMPurify, strictly allowing no HTML tags
+    reason = reason ? DOMPurify.sanitize(String(reason), { ALLOWED_TAGS: [] }).trim() : '';
 
     if (!id || !reason) {
       return res.status(400).json({ status: 0, message: "ID and reason are required" });
