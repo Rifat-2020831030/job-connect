@@ -20,37 +20,12 @@ const getMatchingJobs = async (db, user) => {
 
     const filter = {
         $expr: {
-            $and: [
-                {
-                    $gte: [
-                        { $convert: { input: "$first_seen", to: "date", onError: new Date(0), onNull: new Date(0) } },
-                        lastMailTime
-                    ]
-                },
-                {
-                    $or: [
-                        {
-                            $and: [
-                                { $ne: ["$deadline", null] },
-                                { $gte: [
-                                    { $convert: { input: "$deadline", to: "date", onError: new Date(0), onNull: new Date(0) } },
-                                    currentDate
-                                ]}
-                            ]
-                        },
-                        {
-                            $and: [
-                                { $eq: ["$deadline", null] },
-                                { $gte: [
-                                    { $convert: { input: "$first_seen", to: "date", onError: new Date(0), onNull: new Date(0) } },
-                                    thirtyDaysAgo
-                                ]}
-                            ]
-                        }
-                    ]
-                }
+            $gte: [
+                { $convert: { input: "$first_seen", to: "date", onError: new Date(0), onNull: new Date(0) } },
+                lastMailTime
             ]
         },
+        expires_at: { $gte: currentDate.toISOString() },
         category: { $in: user.preferences.categories },
         job_type: { $in: user.preferences.workModel},
         // industry: { $regex: '^engineering$', $options: 'i' }

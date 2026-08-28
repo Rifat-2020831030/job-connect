@@ -1,25 +1,14 @@
 export const activeJobsFilter = () => {
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  return {
-    $or: [
-      { deadline: { $ne: null, $gte: new Date().toISOString() } },
-      { deadline: null, first_seen: { $gte: thirtyDaysAgo.toISOString() } },
-    ],
-  };
+  return { expires_at: { $gte: new Date().toISOString() } };
 };
 
 export const expiredJobsFilter = () => {
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  return {
-    $nor: [
-      { deadline: { $ne: null, $gte: new Date().toISOString() } },
-      { deadline: null, first_seen: { $gte: thirtyDaysAgo.toISOString() } },
-    ],
-  };
+  return { expires_at: { $lt: new Date().toISOString() } };
 };
 
 export const hasDeadlineFilter = () => ({
-  deadline: { $ne: null, $gte: new Date().toISOString() },
+  expires_at: { $gte: new Date().toISOString() },
+  deadline: { $ne: null },
 });
 
 export const LIST_PROJECTION = {
@@ -36,6 +25,7 @@ export const LIST_PROJECTION = {
   skills: 1,
   vacancy: 1,
   deadline: 1,
+  expires_at: 1,
   first_seen: 1,
   category: 1,
   url: 1,
@@ -56,6 +46,7 @@ export const DETAIL_PROJECTION = {
   benefits: 1,
   vacancy: 1,
   deadline: 1,
+  expires_at: 1,
   first_seen: 1,
   url: 1,
   category: 1,

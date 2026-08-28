@@ -34,15 +34,9 @@ async function syncCompanyJobs() {
       // 2. Baseline count calculation
       const totalJobs = await jobsCol.countDocuments({ companyID: company._id });
       
-      const now = new Date(), monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
       const currentOpenJobs = await jobsCol.countDocuments({
         companyID: company._id,
-        $or: [
-          { deadline: { $exists: false }, first_seen: { $gte: monthAgo } },
-          { deadline: null, first_seen: { $gte: monthAgo } },
-          { deadline: { $gte: now } },
-          { deadline: { $gte: now.toISOString() } }
-        ]
+        expires_at: { $gte: new Date().toISOString() },
       });
 
       // 3. Update the company with baseline counts

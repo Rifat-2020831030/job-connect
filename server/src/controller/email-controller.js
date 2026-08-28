@@ -220,13 +220,7 @@ const getNewJobs = async () => {
       .collection("jobs")
       .find({
         isUpdated: true,
-        $or: [
-          { deadline: { $ne: null, $gte: currentDate.toISOString() } },
-          {
-            deadline: null,
-            first_seen: { $gte: twentyFourHoursAgo.toISOString() },
-          },
-        ],
+        expires_at: { $gte: currentDate.toISOString() },
       })
       .toArray();
 

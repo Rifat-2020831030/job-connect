@@ -20,7 +20,6 @@ import jobsRouter from "./routers/jobs.js";
 import scrapeRouter from "./routers/scrape.js";
 import jobsStat from "./routers/stat.js";
 import usersRouter from "./routers/users.js";
-import { jobAlertSchedule } from "./services/job-alert.js";
 import { source } from "./utils/source.js";
 
 const app = express();
