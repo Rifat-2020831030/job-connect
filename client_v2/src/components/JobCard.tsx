@@ -1,6 +1,4 @@
-import React from 'react';
 import { formatRelativeTime, formatSalary, formatDate } from '../lib/utils';
-import Image from 'next/image';
 import { useSavedJobs } from '../lib/SavedJobsContext';
 import { Bookmark } from 'lucide-react';
 import CompanyLogo from './CompanyLogo';
@@ -48,10 +46,9 @@ export default function JobCard({
   const displaySalary = formatSalary(salary, salary_min, salary_max);
   const displayTime = formatRelativeTime(first_seen);
   
-  const displayExp = (!experience || experience === "-1") ? "Not Mentioned" : experience;
-  const displayVacancy = (!vacancy || vacancy === "-1") ? "Not Mentioned" : vacancy;
-  const displayDeadline = formatDate(deadline);
-
+  const displayExp = experience != null ? experience : "Unknown Experience";
+  const displayVacancy = vacancy != null ? vacancy : "Unknown Vacancy";
+  const displayDeadline = formatDate(deadline) || "Unknown Deadline";
   return (
     <div className="card flex flex-col justify-between h-full">
       <div>

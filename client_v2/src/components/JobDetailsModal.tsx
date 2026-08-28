@@ -41,8 +41,8 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
     };
   }, []);
   
-  const displayExp = (!job.experience || job.experience === "-1") ? "Not Mentioned" : job.experience;
-  const displayVacancy = (!job.vacancy || job.vacancy === "-1") ? "Not Mentioned" : job.vacancy;
+  const displayExp = job.experience != null ? job.experience : "Unknown Experience";
+  const displayVacancy = job.vacancy != null ? job.vacancy : "Unknown Vacancy";
   const displayDeadline = formatDate(job.deadline);
 
   const handleShare = async () => {
@@ -107,7 +107,7 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
 
               <div className="flex items-center gap-1 text-sm text-purple-700 font-medium bg-purple-50 px-2 py-0.5 rounded-md">
                 <DollarSign className="w-3.5 h-3.5" />
-                {job.salary || 'Not Mentioned'}
+                {job.salary || 'Salary unknown'}
               </div>
               <div className="flex items-center gap-1 text-sm text-blue-700 font-medium bg-blue-50 px-2 py-0.5 rounded-md">
                 {job.job_type || 'Not Mentioned'}
@@ -126,19 +126,19 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Deadline</span>
-                <span className="text-sm font-semibold text-gray-700">{displayDeadline || 'Not Mentioned'}</span>
+                <span className="text-sm font-semibold text-gray-700">{displayDeadline || 'Unknown Deadline'}</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Level</span>
-                <span className="text-sm font-semibold text-gray-700">{job.level || 'Not Mentioned'}</span>
+                <span className="text-sm font-semibold text-gray-700">{job.level || 'Unknown Level'}</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Industry</span>
-                <span className="text-sm font-semibold text-gray-700">{job.industry || 'Not Mentioned'}</span>
+                <span className="text-sm font-semibold text-gray-700">{job.industry || 'Unknown Industry'}</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Category</span>
-                <span className="text-sm font-semibold text-gray-700">{job.category || 'Not Mentioned'}</span>
+                <span className="text-sm font-semibold text-gray-700">{job.category || 'Unknown Category'}</span>
               </div>
             </div>
           </div>

@@ -49,11 +49,9 @@ export default function JobRow({
   const displaySalary = formatSalary(salary, salary_min, salary_max);
   const displayTime = formatRelativeTime(first_seen);
 
-  const displayExp =
-    !experience || experience === "-1" ? "Not Mentioned" : experience;
-  const displayVacancy =
-    !vacancy || vacancy === "-1" ? "Not Mentioned" : vacancy;
-  const displayDeadline = formatDate(deadline) || "Not Mentioned";
+  const displayExp = experience != null ? experience : "Unknown Experience";
+  const displayVacancy = vacancy != null ? vacancy : "Unknown Vacancy";
+  const displayDeadline = formatDate(deadline) || "Unknown Deadline";
 
   // Define mapping logic if level doesn't explicitly match the sidebar
   let mappedLevel = experience_level;
@@ -170,7 +168,7 @@ export default function JobRow({
               Salary
             </span>
             <span className="text-base md:text-lg font-bold text-foreground shrink-0">
-              {displaySalary || "Not Mentioned"}
+              {displaySalary || "Salary unknown"}
             </span>
           </div>
           <div className="flex flex-wrap gap-2 items-center sm:ml-4">

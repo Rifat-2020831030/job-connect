@@ -47,11 +47,11 @@ export function formatSalary(
 ): string {
   if (salary) return salary;
   if (salary_min && salary_max) {
-    return `$${Math.round(salary_min / 1000)}k - $${Math.round(
+    return `৳${Math.round(salary_min / 1000)}k - ৳${Math.round(
       salary_max / 1000
     )}k`;
   }
-  if (salary_min) return `From $${Math.round(salary_min / 1000)}k`;
-  if (salary_max) return `Up to $${Math.round(salary_max / 1000)}k`;
-  return "Not Mentioned";
+  if (salary_min) return `From ৳${Math.round(salary_min / 1000)}k`;
+  if (salary_max) return `Up to ৳${Math.round(salary_max / 1000)}k`;
+  return "Salary unknown";
 }
