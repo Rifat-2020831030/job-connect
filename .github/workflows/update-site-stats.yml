@@ -26,4 +26,5 @@ jobs:
         working-directory: ./server
         env:
           DB_URI: ${{ secrets.DB_URI }}
+          MONGO_DATABASE: ${{ secrets.MONGO_DATABASE }}
         run: node scripts/update-site-stats.js
