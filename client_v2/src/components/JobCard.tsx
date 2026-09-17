@@ -1,8 +1,9 @@
 import { formatRelativeTime, formatSalary, formatDate } from '../lib/utils';
 import { useSavedJobs } from '../lib/SavedJobsContext';
-import { Bookmark } from 'lucide-react';
+import { Bookmark, Flag } from 'lucide-react';
 import CompanyLogo from './CompanyLogo';
-
+import { useState } from 'react';
+import ReportJobModal from './ReportJobModal';
 export interface JobCardProps {
   _id?: string;
   title: string;
@@ -42,6 +43,7 @@ export default function JobCard({
 }: JobCardProps) {
   const { isJobSaved, toggleSavedJob } = useSavedJobs();
   const isSaved = _id ? isJobSaved(_id) : false;
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   
   const displaySalary = formatSalary(salary, salary_min, salary_max);
   const displayTime = formatRelativeTime(first_seen);
@@ -50,6 +52,7 @@ export default function JobCard({
   const displayVacancy = vacancy != null ? vacancy : "Unknown Vacancy";
   const displayDeadline = formatDate(deadline) || "Unknown Deadline";
   return (
+    <>
     <div className="card flex flex-col justify-between h-full">
       <div>
         <div className="flex justify-between items-start mb-4">
@@ -57,13 +60,25 @@ export default function JobCard({
             companyName={company} 
             className="size-12 logo-box text-xl" 
           />
-          <button 
-            onClick={() => _id && toggleSavedJob(_id)}
-            className={`${isSaved ? "text-primary" : "text-gray-400"} hover:text-primary transition-colors shrink-0`}
-            aria-label={isSaved ? "Unsave Job" : "Save Job"}
-          >
-            <Bookmark className="size-5" fill={isSaved ? "currentColor" : "none"} />
-          </button>
+          <div className="flex gap-2">
+            {_id && (
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsReportModalOpen(true); }}
+                className="text-gray-400 hover:text-red-500 transition-colors shrink-0 cursor-pointer"
+                aria-label="Report Job"
+                title="Report issue with this job"
+              >
+                <Flag className="size-5" />
+              </button>
+            )}
+            <button 
+              onClick={(e) => { e.stopPropagation(); _id && toggleSavedJob(_id); }}
+              className={`${isSaved ? "text-primary" : "text-gray-400"} hover:text-primary transition-colors shrink-0 cursor-pointer`}
+              aria-label={isSaved ? "Unsave Job" : "Save Job"}
+            >
+              <Bookmark className="size-5" fill={isSaved ? "currentColor" : "none"} />
+            </button>
+          </div>
         </div>
         
         <div className="mb-4">
@@ -118,5 +133,9 @@ export default function JobCard({
         )}
       </div>
     </div>
+    {isReportModalOpen && _id && (
+      <ReportJobModal jobId={_id} onClose={() => setIsReportModalOpen(false)} />
+    )}
+    </>
   );
 }
