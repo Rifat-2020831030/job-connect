@@ -1,16 +1,17 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, MapPin, X } from 'lucide-react';
+import { Loader2, Search, MapPin, X } from 'lucide-react';
 import { API_BASE_URL } from '@/lib/api';
 
 interface JobSearchBarProps {
   initialQuery?: string;
   initialLocation?: string;
   onSearch: (query: string, location: string) => void;
+  isLoading?: boolean;
 }
 
-export default function JobSearchBar({ initialQuery = "", initialLocation = "", onSearch }: JobSearchBarProps) {
+export default function JobSearchBar({ initialQuery = "", initialLocation = "", onSearch, isLoading = false }: JobSearchBarProps) {
   const [query, setQuery] = useState(initialQuery);
   const [location, setLocation] = useState(initialLocation);
   
@@ -146,9 +147,15 @@ export default function JobSearchBar({ initialQuery = "", initialLocation = "", 
       
       <button 
         type="submit" 
-        className="bg-primary hover:bg-emerald-700 text-white font-bold py-2 sm:py-3 px-4 sm:px-8 rounded-full transition-colors cursor-pointer shrink-0 text-xs sm:text-base ml-1 sm:ml-0"
+        disabled={isLoading}
+        className="bg-primary hover:bg-emerald-700 text-white font-bold py-2 sm:py-3 px-4 sm:px-8 rounded-full transition-colors cursor-pointer shrink-0 text-xs sm:text-base ml-1 sm:ml-0 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
       >
-        Search
+        {isLoading ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <Search className="size-4 sm:hidden" />
+        )}
+        <span className="hidden sm:inline">Search</span>
       </button>
     </form>
   );

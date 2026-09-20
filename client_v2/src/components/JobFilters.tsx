@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Search, X } from 'lucide-react';
+import { Loader2, Search, X } from 'lucide-react';
 
 export interface FilterOption {
   value: string;
@@ -27,13 +27,17 @@ interface JobFiltersProps {
   activeFilters: ActiveFilters;
   onApplyFilters: (filters: ActiveFilters) => void;
   onClearFilters: () => void;
+  className?: string;
+  isApplying?: boolean;
 }
 
 export default function JobFilters({
   options,
   activeFilters,
   onApplyFilters,
-  onClearFilters
+  onClearFilters,
+  className,
+  isApplying = false
 }: JobFiltersProps) {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(activeFilters.categories);
   const [selectedExp, setSelectedExp] = useState<string[]>(activeFilters.experienceLevels);
@@ -77,6 +81,12 @@ export default function JobFilters({
     c.value.toLowerCase().includes(companySearch.toLowerCase())
   );
 
+  const activeFilterCount =
+    selectedCategories.length +
+    selectedExp.length +
+    selectedTypes.length +
+    selectedCompanies.length;
+
   const handleApply = () => {
     onApplyFilters({
       categories: selectedCategories,
@@ -86,10 +96,37 @@ export default function JobFilters({
     });
   };
 
+  const handleClear = () => {
+    setCompanySearch("");
+    onClearFilters();
+  };
+
   return (
-    <div className="flex flex-col gap-8 w-full border border-gray-200 bg-white p-5 md:p-6">
-      
-      {/* Categories */}
+    <div className={`flex flex-col w-full h-full bg-white border border-gray-200 overflow-hidden ${className || ""}`}>
+      {/* Desktop Header */}
+      <div className="hidden lg:flex items-center justify-between px-5 py-3.5 border-b border-gray-200 bg-white shrink-0">
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-sm text-foreground tracking-tight">Filters</span>
+          {activeFilterCount > 0 && (
+            <span className="size-5 rounded-full bg-primary/10 text-primary text-[10px] font-mono font-bold flex items-center justify-center">
+              {activeFilterCount}
+            </span>
+          )}
+        </div>
+        {activeFilterCount > 0 && (
+          <button
+            onClick={handleClear}
+            disabled={isApplying}
+            className="text-xs font-mono text-gray-500 hover:text-primary transition-colors cursor-pointer underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline"
+          >
+            Reset
+          </button>
+        )}
+      </div>
+
+      {/* Scrollable Filter Content Body */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-5 md:p-6 flex flex-col gap-8">
+        {/* Categories */}
       {options.categories.length > 0 && (
         <div className="flex flex-col gap-4">
           <h3 className="text-xs font-mono font-medium tracking-[1.2px] text-gray-500 uppercase">
@@ -227,21 +264,28 @@ export default function JobFilters({
           </div>
         </div>
       )}
-      
-      {/* Divider */}
-      <div className="w-full h-px bg-gray-100"></div>
+      </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col gap-3">
+      {/* Pinned Action Buttons Footer */}
+      <div className="shrink-0 p-4 border-t border-gray-200 bg-white flex flex-col gap-2.5 z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
         <button 
           onClick={handleApply}
-          className="w-full py-3 text-xs sm:text-sm font-bold bg-primary text-white border border-primary uppercase tracking-wider hover:bg-emerald-700 transition-colors cursor-pointer"
+          disabled={isApplying}
+          className="w-full py-2.5 sm:py-3 text-xs sm:text-sm font-bold bg-primary text-white border border-primary uppercase tracking-wider hover:bg-emerald-700 transition-colors cursor-pointer rounded-xs disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          Apply Filters
+          {isApplying ? (
+            <>
+              <Loader2 className="size-3.5 animate-spin" />
+              Applying...
+            </>
+          ) : (
+            "Apply Filters"
+          )}
         </button>
         <button 
-          className="w-full py-3 text-xs sm:text-sm font-bold text-gray-500 border border-gray-300 uppercase tracking-wider hover:bg-gray-50 hover:text-gray-900 transition-colors cursor-pointer"
-          onClick={onClearFilters}
+          className="w-full py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-gray-500 border border-gray-300 uppercase tracking-wider hover:bg-gray-50 hover:text-gray-900 transition-colors cursor-pointer rounded-xs disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={handleClear}
+          disabled={isApplying}
         >
           Clear All
         </button>

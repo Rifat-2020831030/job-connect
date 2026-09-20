@@ -205,7 +205,7 @@ function JobsPageContent() {
     const pages = [];
     const maxVisible = 5;
     let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-    let end = Math.min(totalPages, start + maxVisible - 1);
+    const end = Math.min(totalPages, start + maxVisible - 1);
     
     if (end - start + 1 < maxVisible) {
       start = Math.max(1, end - maxVisible + 1);
@@ -241,7 +241,8 @@ function JobsPageContent() {
             <JobSearchBar 
               initialQuery={currentQuery} 
               initialLocation={currentLocation} 
-              onSearch={handleSearch} 
+              onSearch={handleSearch}
+              isLoading={isLoadingJobs}
             />
           </div>
           <div className="mt-6 flex items-center justify-between w-full max-w-4xl text-xs md:text-sm px-2">
@@ -304,6 +305,7 @@ function JobsPageContent() {
                 activeFilters={activeFilters}
                 onApplyFilters={handleApplyFilters}
                 onClearFilters={handleClearFilters}
+                isApplying={isLoadingJobs}
               />
             </div>
           </aside>
