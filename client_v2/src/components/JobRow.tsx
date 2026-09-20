@@ -2,7 +2,7 @@ import { handleApplyClick } from "@/shared/handleJobClick";
 import { Bookmark, Briefcase, Clock, Flag, Users } from "lucide-react";
 import { useState } from "react";
 import { useSavedJobs } from "../lib/SavedJobsContext";
-import { formatDate, formatRelativeTime, formatSalary } from "../lib/utils";
+import { formatDate, formatRelativeTime, formatSalary, formatVacancy, formatExp } from "../lib/utils";
 import CompanyLogo from "./CompanyLogo";
 import ReportJobModal from "./ReportJobModal";
 
@@ -52,8 +52,8 @@ export default function JobRow({
   const displaySalary = formatSalary(salary, salary_min, salary_max);
   const displayTime = formatRelativeTime(first_seen);
 
-  const displayExp = experience != null ? experience : "Unknown Experience";
-  const displayVacancy = vacancy != null ? vacancy : "Unknown Vacancy";
+  const displayExp = formatExp(experience);
+  const displayVacancy = formatVacancy(vacancy);
   const displayDeadline = formatDate(deadline) || "Unknown Deadline";
 
   // Define mapping logic if level doesn't explicitly match the sidebar
@@ -124,11 +124,11 @@ export default function JobRow({
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-gray-500">
                   <Users className="size-3.5" />
-                  <span>{displayVacancy} Vacancies</span>
+                  <span>{displayVacancy}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-gray-500">
                   <Clock className="size-3.5" />
-                  <span>Deadline: {displayDeadline}</span>
+                  <span>{displayDeadline}</span>
                 </div>
               </div>
             </div>
@@ -193,7 +193,7 @@ export default function JobRow({
                 Salary
               </span>
               <span className="text-base md:text-lg font-bold text-foreground shrink-0">
-                {displaySalary || "Salary unknown"}
+                {displaySalary}
               </span>
             </div>
             <div className="flex flex-wrap gap-2 items-center sm:ml-4">

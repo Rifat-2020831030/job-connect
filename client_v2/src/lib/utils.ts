@@ -55,3 +55,25 @@ export function formatSalary(
   if (salary_max) return `Up to ৳${Math.round(salary_max / 1000)}k`;
   return "Salary unknown";
 }
+
+export function formatVacancy(
+  vacancy: string | number | null | undefined
+): string {
+  const vacancyNumber = Number(vacancy);
+
+  if (vacancy == null || isNaN(vacancyNumber) || vacancyNumber < 1) {
+    return "Unknown Vacancy";
+  }
+
+  return `${vacancyNumber} ${vacancyNumber === 1 ? "Vacancy" : "Vacancies"}`;
+}
+
+export function formatExp(
+  experience: string | number | null | undefined
+): string {
+  const experienceNumber = Number(experience);
+  if (experience == null || isNaN(experienceNumber) || experienceNumber < 0) {
+    return "Unknown Experience";
+  }
+  return `${experienceNumber} ${experienceNumber === 1 ? "yr" : "yrs"}`;
+}

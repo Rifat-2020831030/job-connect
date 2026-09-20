@@ -3,28 +3,30 @@
 import React, { useEffect } from 'react';
 import { X, MapPin, DollarSign, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { formatDate } from '../lib/utils';
+import { formatDate, formatVacancy, formatExp, formatSalary } from '../lib/utils';
 import { handleApplyClick } from '@/shared/handleJobClick';
 
 export type JobDetail = {
-  _id?: string;
+  _id: string;
   title: string;
   company: string;
   location: string;
-  salary?: string;
-  level?: string;
+  salary: string;
+  salary_min?: number;
+  salary_max?: number;
+  experience_level: string;
   postedAt?: string;
-  skills?: string[];
+  skills: string[];
   description?: string;
-  vacancy?: string;
-  experience?: string;
-  deadline?: string;
+  vacancy: string;
+  experience: string;
+  deadline: string;
   logoUrl?: string;
-  benefits?: string[];
+  benefits: string[];
   industry?: string;
-  job_type?: string;
-  category?: string;
-  url?: string;
+  job_type: string;
+  category: string;
+  url: string;
 };
 
 interface JobDetailsModalProps {
@@ -41,8 +43,8 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
     };
   }, []);
   
-  const displayExp = job.experience != null ? job.experience : "Unknown Experience";
-  const displayVacancy = job.vacancy != null ? job.vacancy : "Unknown Vacancy";
+  const displayExp = formatExp(job.experience);
+  const displayVacancy = formatVacancy(job.vacancy);
   const displayDeadline = formatDate(job.deadline);
 
   const handleShare = async () => {
@@ -106,8 +108,7 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
               </div>
 
               <div className="flex items-center gap-1 text-sm text-purple-700 font-medium bg-purple-50 px-2 py-0.5 rounded-md">
-                <DollarSign className="w-3.5 h-3.5" />
-                {job.salary || 'Salary unknown'}
+                {formatSalary(job.salary, job.salary_min, job.salary_max)}
               </div>
               <div className="flex items-center gap-1 text-sm text-blue-700 font-medium bg-blue-50 px-2 py-0.5 rounded-md">
                 {job.job_type || 'Not Mentioned'}
@@ -130,15 +131,15 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Level</span>
-                <span className="text-sm font-semibold text-gray-700">{job.level || 'Unknown Level'}</span>
+                <span className="text-sm font-semibold text-gray-700">{job.experience_level || 'Unknown Level'}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Category</span>
+                <span className="text-sm font-semibold text-gray-700">{job.category.toUpperCase() || 'Unknown Category'}</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Industry</span>
                 <span className="text-sm font-semibold text-gray-700">{job.industry || 'Unknown Industry'}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Category</span>
-                <span className="text-sm font-semibold text-gray-700">{job.category || 'Unknown Category'}</span>
               </div>
             </div>
           </div>

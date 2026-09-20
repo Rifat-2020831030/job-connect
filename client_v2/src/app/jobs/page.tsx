@@ -4,6 +4,7 @@ import JobFilters, { ActiveFilters, FilterOptions } from "@/components/JobFilter
 import JobRow from "@/components/JobRow";
 import JobSearchBar from "@/components/JobSearchBar";
 import JobDetailsModal, { JobDetail } from "@/components/JobDetailsModal";
+import Footer from "@/components/Footer";
 import { API_BASE_URL } from "@/lib/api";
 import { logger } from "@/lib/logger";
 import { Filter, X, Loader2, Search } from "lucide-react";
@@ -217,7 +218,7 @@ function JobsPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20 relative">
+    <div className="min-h-screen bg-background flex flex-col w-full relative">
       {isLoadingDetails && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/20 backdrop-blur-sm">
           <div className="bg-white p-4 rounded-lg shadow-lg flex items-center gap-3">
@@ -228,8 +229,8 @@ function JobsPageContent() {
       )}
       
       {/* Header / Search Section */}
-      <section className="border-b border-gray-200 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-8 md:py-12 flex flex-col items-center">
+      <section className="w-full border-b border-gray-200 bg-white">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-8 md:py-12 flex flex-col items-center">
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground tracking-tight text-center mb-3 md:mb-4">
             Find your next opportunity
           </h1>
@@ -258,7 +259,7 @@ function JobsPageContent() {
       </section>
 
       {/* Main Content Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-6 md:py-8">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-6 md:py-8 flex-1">
         <div className="lg:hidden mb-4 flex justify-end">
           <button
             onClick={() => setShowMobileFilters(true)}
@@ -269,7 +270,7 @@ function JobsPageContent() {
           </button>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6 md:gap-8 relative">
+        <div className="w-full flex flex-col lg:flex-row gap-6 md:gap-8 items-start relative">
           {showMobileFilters && (
             <div
               className="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity"
@@ -278,22 +279,26 @@ function JobsPageContent() {
           )}
 
           <aside
-            className={`fixed inset-y-0 left-0 z-50 w-[75vw] sm:w-80 bg-white transform transition-transform duration-300 ease-in-out lg:relative lg:transform-none lg:w-72 shrink-0 ${
+            className={`fixed inset-y-0 left-0 z-50 w-[85vw] max-w-xs sm:w-80 bg-white transform transition-transform duration-300 ease-in-out lg:relative lg:transform-none lg:w-72 shrink-0 lg:self-start lg:sticky lg:top-20 lg:z-10 ${
               showMobileFilters
                 ? "translate-x-0"
                 : "-translate-x-full lg:translate-x-0"
-            } overflow-y-auto lg:overflow-visible shadow-2xl lg:shadow-none`}
+            } h-full lg:h-[calc(100vh-6rem)] shadow-2xl lg:shadow-none flex flex-col`}
           >
-            <div className="p-4 lg:p-0 min-h-screen lg:min-h-0 lg:sticky lg:top-[5rem] lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto custom-scrollbar lg:pb-4 z-10 lg:z-auto">
-              <div className="flex items-center justify-between lg:hidden mb-4 pb-4 border-b border-gray-100">
-                <span className="font-bold text-lg">Filters</span>
-                <button
-                  onClick={() => setShowMobileFilters(false)}
-                  className="p-2 cursor-pointer hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X className="size-5" />
-                </button>
-              </div>
+            {/* Mobile Header with close button */}
+            <div className="flex items-center justify-between lg:hidden p-4 border-b border-gray-100 shrink-0">
+              <span className="font-bold text-lg">Filters</span>
+              <button
+                onClick={() => setShowMobileFilters(false)}
+                className="p-2 cursor-pointer hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="Close filters"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* Filter Content */}
+            <div className="flex-1 min-h-0 overflow-hidden">
               <JobFilters 
                 options={filterOptions}
                 activeFilters={activeFilters}
@@ -303,7 +308,7 @@ function JobsPageContent() {
             </div>
           </aside>
 
-          <main className="flex-1 flex flex-col min-w-0">
+          <main className="flex-1 w-full flex flex-col min-w-0">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
               <h2 className="text-lg md:text-xl font-bold text-foreground">
                 Showing Results
@@ -322,12 +327,12 @@ function JobsPageContent() {
             </div>
 
             {isLoadingJobs ? (
-              <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <div className="flex flex-col items-center justify-center py-20 gap-4 w-full">
                 <Loader2 className="animate-spin h-8 w-8 text-primary" />
                 <span className="text-gray-500 font-medium">Loading jobs...</span>
               </div>
             ) : jobs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 gap-4 text-center px-4">
+              <div className="flex flex-col items-center justify-center py-20 gap-4 text-center px-4 w-full">
                 <div className="size-16 bg-gray-100 rounded-full flex items-center justify-center mb-2">
                   <Search className="size-8 text-gray-400" />
                 </div>
@@ -424,6 +429,8 @@ function JobsPageContent() {
           onClose={handleCloseModal} 
         />
       )}
+
+      <Footer />
     </div>
   );
 }
