@@ -1,9 +1,15 @@
-import { Bookmark, Flag, MapPin } from 'lucide-react';
-import { useState } from 'react';
-import { useSavedJobs } from '../lib/SavedJobsContext';
-import { formatDate, formatExp, formatRelativeTime, formatSalary, formatVacancy } from '../lib/utils';
-import CompanyLogo from './CompanyLogo';
-import ReportJobModal from './ReportJobModal';
+import { Bookmark, Flag, MapPin } from "lucide-react";
+import { useState } from "react";
+import { useSavedJobs } from "../lib/SavedJobsContext";
+import {
+  formatDate,
+  formatExp,
+  formatRelativeTime,
+  formatSalary,
+  formatVacancy,
+} from "../lib/utils";
+import CompanyLogo from "./CompanyLogo";
+import ReportJobModal from "./ReportJobModal";
 export interface JobCardProps {
   _id?: string;
   title: string;
@@ -39,103 +45,146 @@ export default function JobCard({
   skills = [],
   logo,
   url = "#",
-  onViewDetails
+  onViewDetails,
 }: JobCardProps) {
   const { isJobSaved, toggleSavedJob } = useSavedJobs();
   const isSaved = _id ? isJobSaved(_id) : false;
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  
+
   const displaySalary = formatSalary(salary, salary_min, salary_max);
   const displayTime = formatRelativeTime(first_seen);
-  
+
   const displayExp = formatExp(experience);
   const displayVacancy = formatVacancy(vacancy);
   const displayDeadline = formatDate(deadline) || "Unknown";
   return (
     <>
-    <div className="card flex flex-col justify-between h-full">
-      <div>
-        <div className="flex justify-between items-start mb-4">
-          <CompanyLogo 
-            companyName={company} 
-            className="size-12 logo-box text-xl" 
-          />
-          <div className="flex gap-2">
-            {_id && (
-              <button 
-                onClick={(e) => { e.stopPropagation(); setIsReportModalOpen(true); }}
-                className="text-gray-400 hover:text-red-500 transition-colors shrink-0 cursor-pointer"
-                aria-label="Report Job"
-                title="Report issue with this job"
+      <div className="card flex flex-col justify-between h-full">
+        <div>
+          <div className="flex justify-between items-start mb-4">
+            <CompanyLogo
+              companyName={company}
+              className="size-12 logo-box text-xl"
+            />
+            <div className="flex gap-2">
+              {_id && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsReportModalOpen(true);
+                  }}
+                  className="text-gray-400 hover:text-red-500 transition-colors shrink-0 cursor-pointer"
+                  aria-label="Report Job"
+                  title="Report issue with this job"
+                >
+                  <Flag className="size-5" />
+                </button>
+              )}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  _id && toggleSavedJob(_id);
+                }}
+                className={`${
+                  isSaved ? "text-primary" : "text-gray-400"
+                } hover:text-primary transition-colors shrink-0 cursor-pointer`}
+                aria-label={isSaved ? "Unsave Job" : "Save Job"}
               >
-                <Flag className="size-5" />
+                <Bookmark
+                  className="size-5"
+                  fill={isSaved ? "currentColor" : "none"}
+                />
               </button>
-            )}
-            <button 
-              onClick={(e) => { e.stopPropagation(); _id && toggleSavedJob(_id); }}
-              className={`${isSaved ? "text-primary" : "text-gray-400"} hover:text-primary transition-colors shrink-0 cursor-pointer`}
-              aria-label={isSaved ? "Unsave Job" : "Save Job"}
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <h3
+              className="text-xl font-bold text-foreground mb-1 line-clamp-1"
+              title={title}
             >
-              <Bookmark className="size-5" fill={isSaved ? "currentColor" : "none"} />
+              {title}
+            </h3>
+            <p
+              className="text-meta !text-primary mb-2 line-clamp-1"
+              title={`${company} • ${location}`}
+            >
+              {company} <span className="sm:mx-1 text-primary/60">•</span>
+              <MapPin className="size-3.5 inline-block -mt-1 sm:mr-0.5" />
+              {location}
+            </p>
+            <p className="text-meta tracking-widest mb-2 line-clamp-1">
+              {experience_level}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-y-1 mb-4 text-xs text-gray-500 font-mono">
+            <div className="truncate">
+              <span className="font-semibold text-gray-700">Exp:</span>{" "}
+              {displayExp}
+            </div>
+            <div className="truncate">
+              <span className="font-semibold text-gray-700">Vacancies:</span>{" "}
+              {displayVacancy}
+            </div>
+            {displayDeadline && (
+              <div className="col-span-2 truncate">
+                <span className="font-semibold text-gray-700">Deadline:</span>{" "}
+                {displayDeadline}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between border-t border-gray-200 pt-4 mb-4">
+            <div className="flex flex-col">
+              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">
+                Salary
+              </span>
+              <span className="font-bold text-foreground truncate">
+                {displaySalary}
+              </span>
+            </div>
+            <div className="flex flex-col items-end text-right">
+              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">
+                Posted
+              </span>
+              <span className="text-meta shrink-0">{displayTime}</span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2 mb-4">
+            {skills.map((tag, index) => (
+              <span key={index} className="tag-outline">
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          {onViewDetails ? (
+            <button
+              onClick={onViewDetails}
+              className="w-full py-2 btn-secondary cursor-pointer"
+            >
+              View Details
             </button>
-          </div>
-        </div>
-        
-        <div className="mb-4">
-          <h3 className="text-xl font-bold text-foreground mb-1 line-clamp-1" title={title}>{title}</h3>
-          <p className="text-meta !text-primary mb-2 line-clamp-1" title={`${company} • ${location}`}>
-            {company} <span className="sm:mx-1 text-primary/60">•</span><MapPin className="size-3.5 inline-block -mt-1 sm:mr-0.5" />{location}
-          </p>
-          <p className="text-meta tracking-widest mb-2 line-clamp-1">{experience_level}</p>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-y-1 mb-4 text-xs text-gray-500 font-mono">
-          <div className="truncate"><span className="font-semibold text-gray-700">Exp:</span> {displayExp}</div>
-          <div className="truncate"><span className="font-semibold text-gray-700">Vacancies:</span> {displayVacancy}</div>
-          {displayDeadline && <div className="col-span-2 truncate"><span className="font-semibold text-gray-700">Deadline:</span> {displayDeadline}</div>}
+          ) : (
+            <a
+              href={url}
+              className="w-full py-2 btn-secondary block text-center"
+            >
+              View Details
+            </a>
+          )}
         </div>
       </div>
-      
-      <div>
-        <div className="flex items-center justify-between border-t border-gray-200 pt-4 mb-4">
-          <div className="flex flex-col">
-            <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Salary</span>
-            <span className="font-bold text-foreground truncate">{displaySalary}</span>
-          </div>
-          <div className="flex flex-col items-end text-right">
-            <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Posted</span>
-            <span className="text-meta shrink-0">{displayTime}</span>
-          </div>
-        </div>
-        
-        <div className="flex flex-wrap gap-2 mb-4">
-          {skills.map((tag, index) => (
-            <span key={index} className="tag-outline">
-              {tag}
-            </span>
-          ))}
-        </div>
-        
-        {onViewDetails ? (
-          <button 
-            onClick={onViewDetails} 
-            className="w-full py-2 btn-secondary cursor-pointer"
-          >
-            View Details
-          </button>
-        ) : (
-          <a 
-            href={url} 
-            className="w-full py-2 btn-secondary block text-center"
-          >
-            View Details
-          </a>
-        )}
-      </div>
-    </div>
-    {isReportModalOpen && _id && (
-      <ReportJobModal jobId={_id} onClose={() => setIsReportModalOpen(false)} />
-    )}
+      {isReportModalOpen && _id && (
+        <ReportJobModal
+          jobId={_id}
+          onClose={() => setIsReportModalOpen(false)}
+        />
+      )}
     </>
   );
 }
