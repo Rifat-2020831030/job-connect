@@ -29,7 +29,7 @@
     "nodemailer": "^7.0.5",
     "pino": "^10.3.1",
     "pino-http": "^11.0.0",
-    "sanitize-html": "^2.13.0",
+    "xss": "^1.0.15",
     "zod": "^4.4.3"
   },
   "devDependencies": {

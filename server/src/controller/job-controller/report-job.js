@@ -1,4 +1,4 @@
-import sanitizeHtml from "sanitize-html";
+import xss from "xss";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
 import { getDB } from "../../db/database.js";
@@ -42,9 +42,9 @@ export const reportJob = async (req, res) => {
     // Sanitize optional suggested_info
     let sanitized_info = "";
     if (suggested_info) {
-      sanitized_info = sanitizeHtml(suggested_info, {
-        allowedTags: [],
-        allowedAttributes: {}
+      sanitized_info = xss(suggested_info, {
+        whiteList: {},
+        stripIgnoreTag: true,
       });
     }
 
