@@ -1,4 +1,4 @@
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
 import { getDB } from "../../db/database.js";
@@ -42,7 +42,10 @@ export const reportJob = async (req, res) => {
     // Sanitize optional suggested_info
     let sanitized_info = "";
     if (suggested_info) {
-      sanitized_info = DOMPurify.sanitize(suggested_info);
+      sanitized_info = sanitizeHtml(suggested_info, {
+        allowedTags: [],
+        allowedAttributes: {}
+      });
     }
 
     const db = await getDB();
