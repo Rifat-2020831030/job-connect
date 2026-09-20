@@ -1,12 +1,8 @@
-import DOMPurify from "dompurify";
-import { JSDOM } from "jsdom";
+import DOMPurify from "isomorphic-dompurify";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
 import { getDB } from "../../db/database.js";
 import { logger } from "../../utils/logger.js";
-
-const window = new JSDOM("").window;
-const purify = DOMPurify(window);
 
 const reportJobSchema = z.object({
   issue_field: z.enum([
@@ -46,7 +42,7 @@ export const reportJob = async (req, res) => {
     // Sanitize optional suggested_info
     let sanitized_info = "";
     if (suggested_info) {
-      sanitized_info = purify.sanitize(suggested_info);
+      sanitized_info = DOMPurify.sanitize(suggested_info);
     }
 
     const db = await getDB();
