@@ -1,8 +1,8 @@
-import { formatRelativeTime, formatSalary, formatDate, formatVacancy, formatExp } from '../lib/utils';
-import { useSavedJobs } from '../lib/SavedJobsContext';
-import { Bookmark, Flag } from 'lucide-react';
-import CompanyLogo from './CompanyLogo';
+import { Bookmark, Flag, MapPin } from 'lucide-react';
 import { useState } from 'react';
+import { useSavedJobs } from '../lib/SavedJobsContext';
+import { formatDate, formatExp, formatRelativeTime, formatSalary, formatVacancy } from '../lib/utils';
+import CompanyLogo from './CompanyLogo';
 import ReportJobModal from './ReportJobModal';
 export interface JobCardProps {
   _id?: string;
@@ -84,7 +84,7 @@ export default function JobCard({
         <div className="mb-4">
           <h3 className="text-xl font-bold text-foreground mb-1 line-clamp-1" title={title}>{title}</h3>
           <p className="text-meta !text-primary mb-2 line-clamp-1" title={`${company} • ${location}`}>
-            {company} • {location}
+            {company} <span className="sm:mx-1 text-primary/60">•</span><MapPin className="size-3.5 inline-block -mt-1 sm:mr-0.5" />{location}
           </p>
           <p className="text-meta tracking-widest mb-2 line-clamp-1">{experience_level}</p>
         </div>

@@ -139,8 +139,17 @@ function JobsPageContent() {
     router.replace(`${pathname}${qs ? `?${qs}` : ""}`, { scroll: false });
   };
 
+  const scrollToResults = () => {
+    const el = document.getElementById("results-section");
+    if (el) {
+      // Small delay ensures DOM paints before scrolling, though mostly needed for mobile filter close
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    }
+  };
+
   const handleSearch = (q: string, loc: string) => {
     updateUrl({ q, location: loc });
+    scrollToResults();
   };
 
   const handleApplyFilters = (filters: ActiveFilters) => {
@@ -151,10 +160,17 @@ function JobsPageContent() {
       company: filters.companies.length > 0 ? filters.companies.join(",") : null,
     });
     setShowMobileFilters(false);
+    scrollToResults();
   };
 
   const handleClearFilters = () => {
     updateUrl({ category: null, experience_level: null, job_type: null, company: null });
+    scrollToResults();
+  };
+
+  const handlePageChange = (page: number) => {
+    updateUrl({ page: page.toString() }, false);
+    scrollToResults();
   };
 
   // Open job details modal from URL jobId (shared link)
@@ -310,7 +326,7 @@ function JobsPageContent() {
             </div>
           </aside>
 
-          <main className="flex-1 w-full flex flex-col min-w-0">
+          <main id="results-section" className="flex-1 w-full flex flex-col min-w-0 scroll-mt-24 lg:scroll-mt-28">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
               <h2 className="text-lg md:text-xl font-bold text-foreground">
                 Showing Results
@@ -377,11 +393,11 @@ function JobsPageContent() {
 
             {/* Pagination */}
             {!isLoadingJobs && totalPages > 1 && (
-              <div className="mt-8 md:mt-12 flex justify-center items-center gap-1 md:gap-2">
-                <button
-                  onClick={() => updateUrl({ page: (currentPage - 1).toString() }, false)}
+              <div className="mt-8 flex justify-center items-center gap-1 md:gap-2 pb-12 w-full">
+                <button 
+                  onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage <= 1}
-                  className="size-8 md:size-10 flex items-center justify-center border border-gray-200 rounded-md hover:border-gray-300 hover:bg-gray-50 transition-colors text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="size-8 md:size-10 flex items-center justify-center border border-gray-200 rounded-md hover:border-gray-300 hover:bg-gray-50 transition-colors text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   &larr;
                 </button>
@@ -389,7 +405,7 @@ function JobsPageContent() {
                 {getPages().map(p => (
                   <button 
                     key={p}
-                    onClick={() => updateUrl({ page: p.toString() }, false)}
+                    onClick={() => handlePageChange(p)}
                     className={`size-8 md:size-10 flex items-center justify-center border rounded-md transition-colors font-medium cursor-pointer ${
                       p === currentPage 
                         ? 'border-primary bg-primary/10 text-primary font-bold' 
@@ -404,7 +420,7 @@ function JobsPageContent() {
                   <>
                     <span className="px-1 md:px-2 text-gray-400">...</span>
                     <button 
-                      onClick={() => updateUrl({ page: totalPages.toString() }, false)}
+                      onClick={() => handlePageChange(totalPages)}
                       className="size-8 md:size-10 flex items-center justify-center border border-gray-200 rounded-md hover:border-gray-300 hover:bg-gray-50 transition-colors text-foreground font-medium cursor-pointer"
                     >
                       {totalPages}
@@ -413,7 +429,7 @@ function JobsPageContent() {
                 )}
 
                 <button 
-                  onClick={() => updateUrl({ page: (currentPage + 1).toString() }, false)}
+                  onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage >= totalPages}
                   className="size-8 md:size-10 flex items-center justify-center border border-gray-200 rounded-md hover:border-gray-300 hover:bg-gray-50 transition-colors text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >

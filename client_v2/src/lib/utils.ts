@@ -53,7 +53,7 @@ export function formatSalary(
   }
   if (salary_min) return `From ৳${Math.round(salary_min / 1000)}k`;
   if (salary_max) return `Up to ৳${Math.round(salary_max / 1000)}k`;
-  return "Salary unknown";
+  return "Salary Unknown";
 }
 
 export function formatVacancy(

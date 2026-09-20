@@ -1,8 +1,14 @@
 import { handleApplyClick } from "@/shared/handleJobClick";
-import { Bookmark, Briefcase, Clock, Flag, Users } from "lucide-react";
+import { Bookmark, Briefcase, Clock, Flag, MapPin, Users } from "lucide-react";
 import { useState } from "react";
 import { useSavedJobs } from "../lib/SavedJobsContext";
-import { formatDate, formatRelativeTime, formatSalary, formatVacancy, formatExp } from "../lib/utils";
+import {
+  formatDate,
+  formatExp,
+  formatRelativeTime,
+  formatSalary,
+  formatVacancy,
+} from "../lib/utils";
 import CompanyLogo from "./CompanyLogo";
 import ReportJobModal from "./ReportJobModal";
 
@@ -110,7 +116,8 @@ export default function JobRow({
                 <span className="truncate max-w-[120px] sm:max-w-none">
                   {company}
                 </span>
-                <span className="text-gray-300">•</span>
+                <span className="mx-1 text-primary/60 sm:text-2xl">•</span>
+                <MapPin className="size-3.5 inline-block -mt-1 sm:mr-0.5" />
                 <span className="truncate max-w-[120px] sm:max-w-none">
                   {location}
                 </span>
