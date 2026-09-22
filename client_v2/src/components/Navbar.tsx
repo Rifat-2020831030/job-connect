@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getTokens, getUserInfo, clearTokens, UserInfo, getIsSubscribed, setIsSubscribed } from '../lib/auth';
 import { fetchWithAuth } from '../lib/apiClient';
-import { User, LogOut, ChevronDown, Bookmark, Menu, X as XIcon, Bell, MailMinus } from 'lucide-react';
+import { User, LogOut, ChevronDown, Bookmark, Menu, X as XIcon, Bell, MailMinus, Activity } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -130,6 +130,14 @@ export default function Navbar() {
                     Saved Jobs
                   </Link>
                   <Link 
+                    href="/tracker" 
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    onClick={() => setShowDropdown(false)}
+                  >
+                    <Activity size={14} />
+                    Tracker
+                  </Link>
+                  <Link 
                     href="/preferences" 
                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     onClick={() => setShowDropdown(false)}
@@ -240,6 +248,14 @@ export default function Navbar() {
                   >
                     <Bookmark size={18} />
                     Saved Jobs
+                  </Link>
+                  <Link 
+                    href="/tracker" 
+                    onClick={() => setShowMobileMenu(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 text-base font-medium text-gray-600 hover:text-primary rounded-md hover:bg-gray-50"
+                  >
+                    <Activity size={18} />
+                    Tracker
                   </Link>
                   <Link 
                     href="/preferences" 

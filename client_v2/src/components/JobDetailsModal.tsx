@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { X, MapPin, DollarSign, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDate, formatVacancy, formatExp, formatSalary } from '../lib/utils';
-import { handleApplyClick } from '@/shared/handleJobClick';
+import { useTracking } from '@/contexts/TrackingContext';
 
 export type JobDetail = {
   _id: string;
@@ -35,6 +35,7 @@ interface JobDetailsModalProps {
 }
 
 export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) {
+  const { handleApply } = useTracking();
   // Prevent body scrolling when modal is open
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -184,7 +185,7 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
         <div className="bg-[#f2f3ff] px-6 py-5 border-t border-[#bbcabf33] shrink-0">
           <button 
             className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3.5 rounded-md transition-colors cursor-pointer text-lg tracking-wide shadow-sm"
-            onClick={() => handleApplyClick({ url: job.url, _id: job._id })}
+            onClick={() => handleApply({ url: job.url, _id: job._id })}
           >
             Apply Now
           </button>

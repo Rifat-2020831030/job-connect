@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/react";
 import { SavedJobsProvider } from "@/lib/SavedJobsContext";
+import { TrackingProvider } from "@/contexts/TrackingContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -30,10 +31,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased font-sans bg-gray-50 text-gray-900 flex flex-col min-h-screen`}>
         <SavedJobsProvider>
-          <Toaster position="top-center" richColors />
-          <Navbar />
-          {children}
-          <Analytics />
+          <TrackingProvider>
+            <Toaster position="top-center" richColors />
+            <Navbar />
+            {children}
+            <Analytics />
+          </TrackingProvider>
         </SavedJobsProvider>
       </body>
     </html>
