@@ -3,8 +3,7 @@ name: Job Alert
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 8 * * *"
-      timezone: "Asia/Dhaka"
+    - cron: "0 1 * * *"
 
 concurrency:
   group: job-alert
@@ -15,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      TZ: 'Asia/Dhaka'
+      TZ: "Asia/Dhaka"
       db_uri: ${{ secrets.DB_URI }}
       FRONTEND_URL: ${{ vars.FRONTEND_URL }}
       MAIL_HOST: ${{ secrets.MAIL_HOST }}

@@ -7,6 +7,13 @@ import {
   saveJob,
   removeSavedJob,
 } from "../controller/user-controller.js";
+import {
+  getTrackedJobs,
+  addTrackedJob,
+  updateTrackedJob,
+  deleteTrackedJob,
+  getTrackedCompanies,
+} from "../controller/tracker-controller.js";
 import { validate } from "../middleware/validate.js";
 import {
   getPreferencesSchema,
@@ -14,6 +21,10 @@ import {
   getSavedJobsSchema,
   saveJobSchema,
   removeSavedJobSchema,
+  getTrackedJobsSchema,
+  addTrackedJobSchema,
+  updateTrackedJobSchema,
+  deleteTrackedJobSchema,
 } from "../utils/validators.js";
 
 const router = express.Router();
@@ -27,5 +38,12 @@ router.post("/:id/preferences", validate(savePreferencesSchema), savePreferences
 router.get("/:id/saved-jobs", validate(getSavedJobsSchema), getSavedJobs);
 router.post("/:id/saved-jobs", validate(saveJobSchema), saveJob);
 router.delete("/:id/saved-jobs/:jobId", validate(removeSavedJobSchema), removeSavedJob);
+
+router.get("/:id/tracked-jobs", validate(getTrackedJobsSchema), getTrackedJobs);
+router.post("/:id/tracked-jobs", validate(addTrackedJobSchema), addTrackedJob);
+router.put("/:id/tracked-jobs/:jobId", validate(updateTrackedJobSchema), updateTrackedJob);
+router.delete("/:id/tracked-jobs/:jobId", validate(deleteTrackedJobSchema), deleteTrackedJob);
+
+router.get("/:id/tracked-companies", getTrackedCompanies);
 
 export default router;
