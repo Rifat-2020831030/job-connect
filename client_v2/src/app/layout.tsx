@@ -19,6 +19,9 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "ChakriLagbe",
   description: "Find Your Next Destination.",
+  verification: {
+    google: "IT8neFOSAcU25m1x0vK8_kpUm-3oUDY9uTBRSZx_Qqo",
+  },
 };
 
 export default function RootLayout({
