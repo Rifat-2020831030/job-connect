@@ -31,7 +31,7 @@ export function TrackingProvider({ children }: { children: ReactNode }) {
     if (_id) {
       fetchWithAuth(`/users/${userInfo.userId}/tracked-jobs`, {
         method: "POST",
-        body: JSON.stringify({ jobId: _id, status: "PENDING_CONFIRMATION" }),
+        body: JSON.stringify({ type: "INTERNAL", jobId: _id, status: "PENDING_CONFIRMATION" }),
       })
       .then(async (res) => {
         const data = await res.json();

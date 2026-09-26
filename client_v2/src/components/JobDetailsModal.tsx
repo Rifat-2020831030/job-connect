@@ -5,6 +5,7 @@ import { X, MapPin, DollarSign, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDate, formatVacancy, formatExp, formatSalary } from '../lib/utils';
 import { useTracking } from '@/contexts/TrackingContext';
+import { RemoveScroll } from "react-remove-scroll";
 
 export type JobDetail = {
   _id: string;
@@ -36,14 +37,6 @@ interface JobDetailsModalProps {
 
 export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) {
   const { handleApply } = useTracking();
-  // Prevent body scrolling when modal is open
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, []);
-  
   const displayExp = formatExp(job.experience);
   const displayVacancy = formatVacancy(job.vacancy);
   const displayDeadline = formatDate(job.deadline);
@@ -58,6 +51,7 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
   };
 
   return (
+    <RemoveScroll>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
       <div 
@@ -193,5 +187,6 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
 
       </div>
     </div>
+    </RemoveScroll>
   );
 }

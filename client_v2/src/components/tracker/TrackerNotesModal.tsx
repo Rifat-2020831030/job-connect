@@ -11,6 +11,7 @@ interface TrackerNotesModalProps {
   onUpdateNotes: (id: string, notes: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 }
+import { RemoveScroll } from "react-remove-scroll";
 
 export default function TrackerNotesModal({ 
   job, 
@@ -21,13 +22,6 @@ export default function TrackerNotesModal({
   const [notes, setNotes] = useState(job.notes || "");
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, []);
 
   const handleSaveNotes = async () => {
     setIsSaving(true);
@@ -49,7 +43,8 @@ export default function TrackerNotesModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+    <RemoveScroll>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       <div 
         className="absolute inset-0 bg-[#131b2e]/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
@@ -139,5 +134,6 @@ export default function TrackerNotesModal({
         </div>
       </div>
     </div>
+    </RemoveScroll>
   );
 }

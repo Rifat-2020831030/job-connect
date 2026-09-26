@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { fetchWithAuth } from "@/lib/apiClient";
 import { getUserInfo } from "@/lib/auth";
 import AutocompleteInput from "@/components/AutocompleteInput";
+import { RemoveScroll } from "react-remove-scroll";
 
 interface AddExternalJobModalProps {
   onClose: () => void;
@@ -165,8 +166,9 @@ export default function AddExternalJobModal({ onClose, onJobAdded }: AddExternal
   };
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 animate-in fade-in duration-200"
+    <RemoveScroll>
+      <div 
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div 
@@ -372,5 +374,6 @@ export default function AddExternalJobModal({ onClose, onJobAdded }: AddExternal
 
       </div>
     </div>
+    </RemoveScroll>
   );
 }
