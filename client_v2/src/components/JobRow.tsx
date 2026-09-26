@@ -1,4 +1,6 @@
-import { handleApplyClick } from "@/shared/handleJobClick";
+"use client";
+
+import { useTracking } from "@/contexts/TrackingContext";
 import { Bookmark, Briefcase, Clock, Flag, MapPin, Users } from "lucide-react";
 import { useState } from "react";
 import { useSavedJobs } from "../lib/SavedJobsContext";
@@ -51,6 +53,7 @@ export default function JobRow({
   onViewDetails,
   isExpired = false,
 }: JobRowProps) {
+  const { handleApply } = useTracking();
   const { isJobSaved, toggleSavedJob } = useSavedJobs();
   const isSaved = _id ? isJobSaved(_id) : false;
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -244,7 +247,7 @@ export default function JobRow({
                 )}
                 <button
                   onClick={(e) => {
-                    handleApplyClick({ url, _id });
+                    handleApply({ url, _id });
                   }}
                   className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold bg-primary text-white border border-primary uppercase tracking-wider hover:bg-emerald-700 transition-colors whitespace-nowrap block cursor-pointer"
                 >

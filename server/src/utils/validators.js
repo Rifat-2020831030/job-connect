@@ -167,3 +167,76 @@ export const unsubscribeEmailSchema = z.object({
   query: z.object({ id: objectId("ID") }),
 });
 export const verifyCodeSchema = verifyOtpSchema;
+
+// ─── Tracker Schemas ─────────────────────────────────────────────────────────
+
+export const VALID_TRACKER_STATUSES = [
+  "PENDING_CONFIRMATION",
+  "APPLIED",
+  "INTERVIEWING",
+  "OFFER",
+  "REJECTED",
+  "EXPIRED",
+];
+
+export const getTrackedJobsSchema = z.object({
+  params: z.object({
+    id: objectId("User ID"),
+  }),
+  query: z.object({
+    page: z.string().optional().refine(
+      (val) => !val || !isNaN(parseInt(val, 10)),
+      "Page must be a number"
+    ),
+    limit: z.string().optional().refine(
+      (val) => !val || !isNaN(parseInt(val, 10)),
+      "Limit must be a number"
+    ).default("10"),
+    status: commaSeparatedEnum(VALID_TRACKER_STATUSES, "status"),
+    q: z.string().optional(),
+    company: z.string().optional(),
+    sort: z.enum(["updatedAt_desc", "updatedAt_asc", "createdAt_desc", "createdAt_asc"]).optional(),
+  }),
+});
+
+export const addTrackedJobSchema = z.object({
+  params: z.object({ id: objectId("User ID") }),
+  body: z.discriminatedUnion("type", [
+    z.object({
+      type: z.literal("INTERNAL"),
+      jobId: z.string().min(1, "Job ID is required"),
+      status: z.enum(VALID_TRACKER_STATUSES).optional().default("PENDING_CONFIRMATION"),
+      notes: z.string().optional(),
+    }),
+    z.object({
+      type: z.literal("EXTERNAL"),
+      url: z.string().url("Must be a valid URL"),
+      title: z.string().min(1, "Title is required"),
+      company: z.string().min(1, "Company is required"),
+      deadline: z.string().optional(),
+      applicationTime: z.string().optional(), // ISO date string
+      cvLink: z.string().url("Must be a valid URL").optional(),
+      platform: z.string().min(1, "Platform is required"),
+      status: z.enum(VALID_TRACKER_STATUSES).optional().default("PENDING_CONFIRMATION"),
+      notes: z.string().optional(),
+    }),
+  ]),
+});
+
+export const updateTrackedJobSchema = z.object({
+  params: z.object({
+    id: objectId("User ID"),
+    jobId: objectId("Job ID"), // Actually this could be tracking document ID, but we'll use tracking doc _id
+  }),
+  body: z.object({
+    status: z.enum(VALID_TRACKER_STATUSES).optional(),
+    notes: z.string().optional(),
+  }),
+});
+
+export const deleteTrackedJobSchema = z.object({
+  params: z.object({
+    id: objectId("User ID"),
+    jobId: objectId("Job ID"), 
+  }),
+});
