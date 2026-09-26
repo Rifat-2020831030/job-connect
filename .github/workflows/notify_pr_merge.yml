@@ -1,0 +1,24 @@
+name: Notify Admin on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+
+jobs:
+  notify-merge:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send webhook to Admin server
+        run: |
+          curl -X POST https://chakrilagbe-server.vercel.app/api/webhooks/github/pr-merged \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.RELEASE_NOTES_WEBHOOK_SECRET }}" \
+            -d '{
+              "pr_title": ${{ toJSON(github.event.pull_request.title) }},
+              "pr_body": ${{ toJSON(github.event.pull_request.body) }},
+              "commits": ${{ toJSON(github.event.pull_request.commits) }},
+              "changed_files": ${{ toJSON(github.event.pull_request.changed_files) }}
+            }'
