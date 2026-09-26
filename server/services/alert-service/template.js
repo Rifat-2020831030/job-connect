@@ -58,9 +58,9 @@ export const jobCardBuilder = (job, frontendUrl) => {
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">SALARY</p>
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">
                             ${
-                                job.salary && job.salary !== ""
-                                    ? job.salary
-                                    : "Not mentioned"
+                              job.salary && job.salary !== ""
+                                ? job.salary
+                                : "Not mentioned"
                             }
                             </p>
                         </td>
@@ -177,6 +177,7 @@ export const createEmailTemplate = (jobList, unsubscribeUrl, data) => {
             <!-- Footer -->
             <tr>
                 <td style="background-color: #dbeafe; padding: 20px 30px; text-align: center; color: #2d3748; font-size: 14px; border-radius: 0 0 8px 8px;">
+                    <p style="margin: 0 0 10px 0; font-size: 12px; color: #718096; font-family: Arial, Helvetica, sans-serif; font-style: italic;">⚠️ Alert delivery time may not exactly match your preference due to GitHub Actions scheduler variability.</p>
                     <p style="margin: 0 0 10px 0; color: #2d3748; font-family: Arial, Helvetica, sans-serif;">&copy; 2025 Chakri Lagbe. All rights reserved.</p>
                     <p style="margin: 0; color: #2d3748; font-family: Arial, Helvetica, sans-serif; line-height: 1.5;">You are receiving this email because you have subscribed to job alerts. If you prefer not to receive these emails, <a href=${unsubscribeUrl} style="color: #1e40af; text-decoration: underline;">unsubscribe here</a>.</p>
                 </td>
