@@ -1,4 +1,6 @@
-import { handleApplyClick } from "@/shared/handleJobClick";
+"use client";
+
+import { useTracking } from "@/contexts/TrackingContext";
 import CompanyLogo from "./CompanyLogo";
 
 export interface FeaturedJobCardProps {
@@ -28,6 +30,7 @@ export default function FeaturedJobCard({
   logoUrl,
   url = "#",
 }: FeaturedJobCardProps) {
+  const { handleApply } = useTracking();
   return (
     <div className="card flex flex-col justify-between w-full col-span-1 md:col-span-2">
       <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between w-full">
@@ -69,7 +72,7 @@ export default function FeaturedJobCard({
             {salary}
           </span>
           <button
-            onClick={() => handleApplyClick({ url, _id })}
+            onClick={() => handleApply({ url, _id })}
             className="w-full md:w-auto px-8 py-2.5 btn-primary mt-2"
           >
             Apply
