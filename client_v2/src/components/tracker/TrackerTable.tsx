@@ -9,6 +9,7 @@ export type TrackedJob = {
   _id: string;
   userId: string;
   jobId: string;
+  type?: "INTERNAL" | "EXTERNAL";
   status:
     | "PENDING_CONFIRMATION"
     | "APPLIED"
@@ -92,6 +93,7 @@ export default function TrackerTable({
         <thead>
           <tr className="bg-gray-50 text-left text-xs font-mono uppercase tracking-wider text-gray-500 border-b-1">
             <th className="px-6 py-4 font-semibold">Job Title</th>
+            <th className="px-6 py-4 font-semibold">Type</th>
             <th className="px-6 py-4 font-semibold">Company Name</th>
             <th className="px-6 py-4 font-semibold">Status</th>
             <th className="px-6 py-4 font-semibold">Applied Date</th>
@@ -101,7 +103,7 @@ export default function TrackerTable({
         <tbody className="divide-y divide-gray-200">
           {jobs.length === 0 && (
             <tr>
-              <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+              <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                 No tracked jobs found. Start applying!
               </td>
             </tr>
@@ -138,7 +140,13 @@ export default function TrackerTable({
                     </span>
                   )}
                 </td>
-
+                <td className="px-6 py-4">
+                  <span className={`inline-block px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
+                    job.type === 'EXTERNAL' ? 'bg-purple-50 text-purple-600 border border-purple-200' : 'bg-gray-100 text-gray-600 border border-gray-200'
+                  }`}>
+                    {job.type || 'INTERNAL'}
+                  </span>
+                </td>
                 <td className="px-6 py-4">
                   <span className="font-semibold text-gray-900">
                     {job.jobDetails?.company || "Unknown"}
@@ -166,6 +174,19 @@ export default function TrackerTable({
                         className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
                       >
                         Confirm
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm("Are you sure you want to remove this job from your tracker?")) {
+                            onDelete(job._id);
+                          }
+                        }}
+                        disabled={isLoading}
+                        className="text-black hover:opacity-70 p-1.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
+                        title="Delete from Tracker"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
                       </button>
                     </div>
                   ) : (

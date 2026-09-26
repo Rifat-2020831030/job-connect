@@ -202,9 +202,25 @@ export const getTrackedJobsSchema = z.object({
 export const addTrackedJobSchema = z.object({
   params: z.object({ id: objectId("User ID") }),
   body: z.object({
-    jobId: objectId("Job ID"),
+    type: z.enum(["INTERNAL", "EXTERNAL"]).default("INTERNAL"),
+    jobId: z.string(),
+    url: z.string().url("Must be a valid URL"),
+    title: z.string().min(1, "Title is required"),
+    company: z.string().min(1, "Company is required"),
+    deadline: z.string().min(1, "Deadline is required"),
+    applicationTime: z.string().optional(), // ISO date string
+    cvLink: z.string("Must be a valid URL").optional(),
+    platform: z.string().min(1, "Platform is required"),
     status: z.enum(VALID_TRACKER_STATUSES).optional().default("PENDING_CONFIRMATION"),
     notes: z.string().optional(),
+  }).refine((data) => {
+    if (data.type === "INTERNAL" && !data.jobId) return false;
+    if (data.type === "EXTERNAL" && !data.url) return false;
+    if (data.type === "EXTERNAL" && (!data.platform || data.platform.trim() === "")) return false;
+    return true;
+  }, {
+    message: "INTERNAL jobs require jobId. EXTERNAL jobs require url and platform.",
+    path: ["type"],
   }),
 });
 
