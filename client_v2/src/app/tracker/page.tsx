@@ -1,12 +1,16 @@
 "use client";
 
+import SelectDropdown from "@/components/SelectDropdown";
 import AddExternalJobModal from "@/components/tracker/AddExternalJobModal";
 import TrackerNotesModal from "@/components/tracker/TrackerNotesModal";
+import TrackerStats, {
+  TrackerStatsData,
+} from "@/components/tracker/TrackerStats";
 import TrackerTable, { TrackedJob } from "@/components/tracker/TrackerTable";
-import TrackerStats, { TrackerStatsData } from "@/components/tracker/TrackerStats";
 import { fetchWithAuth } from "@/lib/apiClient";
 import { getUserInfo } from "@/lib/auth";
 import {
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Filter,
@@ -47,7 +51,9 @@ export default function TrackerPage() {
       const userInfo = getUserInfo();
       if (!userInfo) return;
       try {
-        const res = await fetchWithAuth(`/users/${userInfo.userId}/tracker-stats`);
+        const res = await fetchWithAuth(
+          `/users/${userInfo.userId}/tracker-stats`
+        );
         const data = await res.json();
         if (data.status === 1) setStats(data.data);
       } catch (err) {
@@ -182,13 +188,22 @@ export default function TrackerPage() {
           setStats((prev) => {
             if (!prev) return prev;
             const newStats = { ...prev, statuses: { ...prev.statuses } };
-            
-            newStats.statuses[oldStatus] = Math.max(0, (newStats.statuses[oldStatus] || 0) - 1);
+
+            newStats.statuses[oldStatus] = Math.max(
+              0,
+              (newStats.statuses[oldStatus] || 0) - 1
+            );
             newStats.statuses[status] = (newStats.statuses[status] || 0) + 1;
 
-            if (oldStatus === "PENDING_CONFIRMATION" && status !== "PENDING_CONFIRMATION") {
+            if (
+              oldStatus === "PENDING_CONFIRMATION" &&
+              status !== "PENDING_CONFIRMATION"
+            ) {
               newStats.total += 1;
-            } else if (oldStatus !== "PENDING_CONFIRMATION" && status === "PENDING_CONFIRMATION") {
+            } else if (
+              oldStatus !== "PENDING_CONFIRMATION" &&
+              status === "PENDING_CONFIRMATION"
+            ) {
               newStats.total = Math.max(0, newStats.total - 1);
             }
 
@@ -285,16 +300,16 @@ export default function TrackerPage() {
               Manage and track your job hunt history.
             </p>
           </div>
-
-                  </div>
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-12 py-8 w-full">
         <TrackerStats stats={stats} loading={loadingStats} />
 
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-            <div className="relative w-full sm:w-64">
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          {/* Row 1: Search + Companies always together on the same line */}
+          <div className="flex items-center gap-3 w-full md:w-auto order-1">
+            <div className="relative flex-1 md:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
@@ -304,28 +319,13 @@ export default function TrackerPage() {
                 className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
               />
             </div>
-            <select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setPage(1);
-              }}
-              className="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
-            >
-              <option value="">All Statuses</option>
-              <option value="PENDING_CONFIRMATION">Pending</option>
-              <option value="APPLIED">Applied</option>
-              <option value="INTERVIEWING">Interviewing</option>
-              <option value="OFFER">Offer</option>
-              <option value="REJECTED">Rejected</option>
 
-            </select>
-            {/* Company Multi-Select Filter */}
-            <div className="relative" ref={companyDropdownRef}>
+            {/* Company filter — beside search on mobile */}
+            <div className="relative shrink-0" ref={companyDropdownRef}>
               <button
                 type="button"
                 onClick={() => setIsCompanyDropdownOpen(!isCompanyDropdownOpen)}
-                className="flex items-center gap-2 w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
+                className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
               >
                 <Filter className="w-4 h-4 text-gray-500" />
                 <span>
@@ -334,10 +334,10 @@ export default function TrackerPage() {
                     ? `(${selectedCompanies.length})`
                     : ""}
                 </span>
+                <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
-
               {isCompanyDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-lg shadow-xl py-2 z-50 flex flex-col max-h-64">
+                <div className="absolute left-0 mt-1 w-56 bg-white border border-gray-100 rounded-lg shadow-xl py-2 z-50 flex flex-col max-h-64 animate-in fade-in zoom-in-95 duration-100">
                   <div className="px-3 pb-2 border-b border-gray-100 mb-2">
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       Filter by Company
@@ -386,57 +386,59 @@ export default function TrackerPage() {
                 </div>
               )}
             </div>
-            <select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setPage(1);
-              }}
-              className="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
+          </div>{" "}
+          {/* end row-1 wrapper */}
+          {/* Status filter — wraps to row 2 on mobile, stays inline on md+ */}
+          <SelectDropdown
+            value={statusFilter}
+            onChange={(val) => {
+              setStatusFilter(val);
+              setPage(1);
+            }}
+            options={[
+              { value: "", label: "All Statuses" },
+              { value: "PENDING_CONFIRMATION", label: "Pending" },
+              { value: "APPLIED", label: "Applied" },
+              { value: "INTERVIEWING", label: "Interviewing" },
+              { value: "OFFER", label: "Offer" },
+              { value: "REJECTED", label: "Rejected" },
+            ]}
+            className="flex-1 md:flex-none md:w-40 order-3"
+          />
+          {/* Sort — beside status on mobile row 2, inline on md+ */}
+          <SelectDropdown
+            value={sortOption}
+            onChange={(val) => {
+              setSortOption(val);
+              setPage(1);
+            }}
+            options={[
+              { value: "createdAt_desc", label: "Newest First" },
+              { value: "createdAt_asc", label: "Oldest First" },
+              { value: "updatedAt_desc", label: "Recently Updated" },
+            ]}
+            className="flex-1 md:flex-none md:w-44 order-4"
+          />
+          {/* Add button — pushes to end */}
+          <button
+            onClick={() => setIsAddingJob(true)}
+            className="ml-auto order-5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-sm transition-colors flex items-center gap-2 cursor-pointer whitespace-nowrap"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              <option value="">All Statuses</option>
-              <option value="PENDING_CONFIRMATION">Pending</option>
-              <option value="APPLIED">Applied</option>
-              <option value="INTERVIEWING">Interviewing</option>
-              <option value="OFFER">Offer</option>
-              <option value="REJECTED">Rejected</option>
-
-            </select>
-
-            <select
-              value={sortOption}
-              onChange={(e) => {
-                setSortOption(e.target.value);
-                setPage(1);
-              }}
-              className="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
-            >
-              <option value="createdAt_desc">Newest First</option>
-              <option value="createdAt_asc">Oldest First</option>
-              <option value="updatedAt_desc">Recently Updated</option>
-            </select>
-          </div>
-          <div className="w-full md:w-auto flex justify-end">
-            <button
-              onClick={() => setIsAddingJob(true)}
-              className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              <span className="sm:hidden">Add Job</span>
-              <span className="hidden sm:inline">Add External Job</span>
-            </button>
-          </div>
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span className="hidden sm:inline">Add External Job</span>
+            <span className="sm:hidden">Add Job</span>
+          </button>
         </div>
 
         {isLoading && jobs.length === 0 ? (

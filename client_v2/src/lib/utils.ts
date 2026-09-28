@@ -40,6 +40,20 @@ export function formatDate(dateString?: string): string {
   });
 }
 
+export function formatDateTime(dateString?: string): string {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return dateString;
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
 export function formatSalary(
   salary?: string,
   salary_min?: number,

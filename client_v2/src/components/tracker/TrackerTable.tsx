@@ -1,9 +1,10 @@
 "use client";
 
 import { formatDate } from "@/lib/utils";
-import { ChevronDown, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { JobDetail } from "../JobDetailsModal";
+import SelectDropdown from "../SelectDropdown";
 
 export type TrackedJob = {
   _id: string;
@@ -157,12 +158,12 @@ export default function TrackerTable({
                 >
                   {isPending ? (
                     <div className="flex items-center gap-2">
-                      <select
-                        disabled
-                        className="w-full sm:w-auto px-3 py-1.5 bg-orange-50 border border-orange-200 rounded-lg text-xs font-semibold text-orange-700 appearance-none pr-8 opacity-70 cursor-not-allowed"
-                      >
-                        <option>PENDING</option>
-                      </select>
+                      <SelectDropdown
+                        value="PENDING_CONFIRMATION"
+                        onChange={() => {}}
+                        options={[{ value: "PENDING_CONFIRMATION", label: "Pending" }]}
+                        className="w-[130px] opacity-70 pointer-events-none"
+                      />
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -188,22 +189,13 @@ export default function TrackerTable({
                       </button>
                     </div>
                   ) : (
-                    <div className="relative inline-block w-full max-w-[140px]">
-                      <select
+                    <div className="relative inline-flex items-center w-full max-w-[150px]">
+                      <SelectDropdown
                         value={job.status}
-                        onChange={(e) =>
-                          handleStatusChange(job, e.target.value)
-                        }
-                        disabled={isLoading}
-                        className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer appearance-none pr-8 disabled:opacity-50"
-                      >
-                        {STATUS_OPTIONS.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                        onChange={(val) => handleStatusChange(job, val)}
+                        options={STATUS_OPTIONS}
+                        className={`w-full ${isLoading ? "opacity-50 pointer-events-none" : ""}`}
+                      />
                       {isLoading && (
                         <div className="absolute -right-5 top-1/2 -translate-y-1/2">
                           <Loader2 className="w-3 h-3 animate-spin text-gray-400" />
