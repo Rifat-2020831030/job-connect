@@ -3,6 +3,7 @@
 import AddExternalJobModal from "@/components/tracker/AddExternalJobModal";
 import TrackerNotesModal from "@/components/tracker/TrackerNotesModal";
 import TrackerTable, { TrackedJob } from "@/components/tracker/TrackerTable";
+import TrackerStats, { TrackerStatsData } from "@/components/tracker/TrackerStats";
 import { fetchWithAuth } from "@/lib/apiClient";
 import { getUserInfo } from "@/lib/auth";
 import {
@@ -37,6 +38,26 @@ export default function TrackerPage() {
   const [totalCount, setTotalCount] = useState(0);
 
   const LIMIT = 10;
+
+  const [stats, setStats] = useState<TrackerStatsData | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const userInfo = getUserInfo();
+      if (!userInfo) return;
+      try {
+        const res = await fetchWithAuth(`/users/${userInfo.userId}/tracker-stats`);
+        const data = await res.json();
+        if (data.status === 1) setStats(data.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+    fetchStats();
+  }, []);
 
   const router = useRouter();
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -138,6 +159,9 @@ export default function TrackerPage() {
   };
 
   const handleUpdateStatus = async (id: string, status: string) => {
+    const job = jobs.find((j) => j._id === id);
+    const oldStatus = job?.status;
+
     try {
       const userInfo = getUserInfo();
       if (!userInfo) return;
@@ -153,11 +177,30 @@ export default function TrackerPage() {
         setJobs((prev) =>
           prev.map((j) => (j._id === id ? { ...j, ...data.data } : j))
         );
+
+        if (oldStatus && oldStatus !== status) {
+          setStats((prev) => {
+            if (!prev) return prev;
+            const newStats = { ...prev, statuses: { ...prev.statuses } };
+            
+            newStats.statuses[oldStatus] = Math.max(0, (newStats.statuses[oldStatus] || 0) - 1);
+            newStats.statuses[status] = (newStats.statuses[status] || 0) + 1;
+
+            if (oldStatus === "PENDING_CONFIRMATION" && status !== "PENDING_CONFIRMATION") {
+              newStats.total += 1;
+            } else if (oldStatus !== "PENDING_CONFIRMATION" && status === "PENDING_CONFIRMATION") {
+              newStats.total = Math.max(0, newStats.total - 1);
+            }
+
+            return newStats;
+          });
+        }
+
         toast.success(`Status updated to ${status}`);
       }
     } catch (err) {
       toast.error("Failed to update status");
-      throw err; // throw to let table remove loading state
+      throw err;
     }
   };
 
@@ -233,7 +276,7 @@ export default function TrackerPage() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 pb-12">
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 md:px-12 py-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 md:px-12 py-8">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
               Application Tracker
@@ -243,27 +286,24 @@ export default function TrackerPage() {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-            <button
-              onClick={() => setIsAddingJob(true)}
-              className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              <span className="sm:hidden">Add Job</span>
-              <span className="hidden sm:inline">Add External Job</span>
-            </button>
+                  </div>
+      </div>
 
+      <div className="max-w-7xl mx-auto px-4 md:px-12 py-8 w-full">
+        <TrackerStats stats={stats} loading={loadingStats} />
+
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search companies or titles..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              />
+            </div>
             <select
               value={statusFilter}
               onChange={(e) => {
@@ -278,22 +318,8 @@ export default function TrackerPage() {
               <option value="INTERVIEWING">Interviewing</option>
               <option value="OFFER">Offer</option>
               <option value="REJECTED">Rejected</option>
-              <option value="EXPIRED">Expired</option>
-            </select>
 
-            <select
-              value={sortOption}
-              onChange={(e) => {
-                setSortOption(e.target.value);
-                setPage(1);
-              }}
-              className="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
-            >
-              <option value="createdAt_desc">Newest First</option>
-              <option value="createdAt_asc">Oldest First</option>
-              <option value="updatedAt_desc">Recently Updated</option>
             </select>
-
             {/* Company Multi-Select Filter */}
             <div className="relative" ref={companyDropdownRef}>
               <button
@@ -360,22 +386,59 @@ export default function TrackerPage() {
                 </div>
               )}
             </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setPage(1);
+              }}
+              className="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
+            >
+              <option value="">All Statuses</option>
+              <option value="PENDING_CONFIRMATION">Pending</option>
+              <option value="APPLIED">Applied</option>
+              <option value="INTERVIEWING">Interviewing</option>
+              <option value="OFFER">Offer</option>
+              <option value="REJECTED">Rejected</option>
 
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search companies or titles..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
-              />
-            </div>
+            </select>
+
+            <select
+              value={sortOption}
+              onChange={(e) => {
+                setSortOption(e.target.value);
+                setPage(1);
+              }}
+              className="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
+            >
+              <option value="createdAt_desc">Newest First</option>
+              <option value="createdAt_asc">Oldest First</option>
+              <option value="updatedAt_desc">Recently Updated</option>
+            </select>
+          </div>
+          <div className="w-full md:w-auto flex justify-end">
+            <button
+              onClick={() => setIsAddingJob(true)}
+              className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              <span className="sm:hidden">Add Job</span>
+              <span className="hidden sm:inline">Add External Job</span>
+            </button>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-12 py-8 w-full">
         {isLoading && jobs.length === 0 ? (
           <div className="flex items-center justify-center py-24">
             <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />

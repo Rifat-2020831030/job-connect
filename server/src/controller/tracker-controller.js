@@ -7,7 +7,46 @@ const STATUS_ORDER = {
   INTERVIEWING: 2,
   OFFER: 3,
   REJECTED: 4,
-  EXPIRED: 4,
+};
+
+export const getTrackerStats = async (req, res) => {
+  try {
+    const userId = new ObjectId(req.params.id);
+    const db = await getDB();
+    const stats = await db.collection("job_track").aggregate([
+      { $match: { userId } },
+      { $group: { _id: "$status", count: { $sum: 1 } } }
+    ]).toArray();
+
+    const result = {
+      total: 0,
+      statuses: {
+        APPLIED: 0,
+        INTERVIEWING: 0,
+        OFFER: 0,
+        REJECTED: 0,
+        PENDING_CONFIRMATION: 0
+      }
+    };
+
+    stats.forEach(stat => {
+      const status = stat._id;
+      const count = stat.count;
+      
+      if (status !== "PENDING_CONFIRMATION") {
+        result.total += count;
+      }
+      
+      if (result.statuses[status] !== undefined) {
+        result.statuses[status] = count;
+      }
+    });
+
+    return res.status(200).json({ status: 1, data: result });
+  } catch (error) {
+    console.error("Error in getTrackerStats:", error);
+    return res.status(500).json({ status: 0, message: "Internal server error" });
+  }
 };
 
 export const getTrackedJobs = async (req, res) => {

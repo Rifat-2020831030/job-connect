@@ -37,7 +37,6 @@ const STATUS_OPTIONS = [
   { value: "INTERVIEWING", label: "Interviewing" },
   { value: "OFFER", label: "Offer" },
   { value: "REJECTED", label: "Rejected" },
-  { value: "EXPIRED", label: "Expired" },
 ];
 
 // Helper to determine status severity/index
@@ -48,7 +47,6 @@ const STATUS_ORDER: Record<string, number> = {
   INTERVIEWING: 2,
   OFFER: 3,
   REJECTED: 4,
-  EXPIRED: 4,
 };
 
 export default function TrackerTable({

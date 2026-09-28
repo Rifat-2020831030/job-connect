@@ -175,8 +175,7 @@ export const VALID_TRACKER_STATUSES = [
   "APPLIED",
   "INTERVIEWING",
   "OFFER",
-  "REJECTED",
-  "EXPIRED",
+  "REJECTED"
 ];
 
 export const getTrackedJobsSchema = z.object({
