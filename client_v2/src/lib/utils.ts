@@ -91,3 +91,24 @@ export function formatExp(
   }
   return `${experienceNumber} ${experienceNumber === 1 ? "yr" : "yrs"}`;
 }
+
+export function shouldRemindStatusUpdate(
+  status: string,
+  appliedDateString: string,
+  deadlineString?: string | null
+): boolean {
+  if (status === "OFFER" || status === "REJECTED") return false;
+
+  const now = new Date();
+  
+  const applied = new Date(appliedDateString);
+  const daysSinceApplied = Math.floor((now.getTime() - applied.getTime()) / (1000 * 3600 * 24));
+  
+  let daysSinceDeadline = -1;
+  if (deadlineString) {
+    const deadline = new Date(deadlineString);
+    daysSinceDeadline = Math.floor((now.getTime() - deadline.getTime()) / (1000 * 3600 * 24));
+  }
+
+  return daysSinceApplied >= 30 || daysSinceDeadline >= 30;
+}

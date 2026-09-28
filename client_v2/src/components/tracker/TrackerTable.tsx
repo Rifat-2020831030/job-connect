@@ -1,7 +1,7 @@
 "use client";
 
-import { formatDate } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import { formatDate, shouldRemindStatusUpdate } from "@/lib/utils";
+import { Loader2, HelpCircle } from "lucide-react";
 import { useState } from "react";
 import { JobDetail } from "../JobDetailsModal";
 import SelectDropdown from "../SelectDropdown";
@@ -111,6 +111,12 @@ export default function TrackerTable({
             const isLoading = loadingRows[job._id];
             const isPending = job.status === "PENDING_CONFIRMATION";
 
+            const needsUpdate = shouldRemindStatusUpdate(
+              job.status,
+              job.createdAt,
+              job.jobDetails?.deadline
+            );
+
             return (
               <tr
                 key={job._id}
@@ -207,9 +213,20 @@ export default function TrackerTable({
 
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
-                    <span className="text-sm text-gray-600">
-                      {formatDate(job.createdAt)}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm text-gray-600">
+                        {formatDate(job.createdAt)}
+                      </span>
+                      {needsUpdate && (
+                        <div className="group relative flex items-center" onClick={(e) => e.stopPropagation()}>
+                          <HelpCircle className="w-4 h-4 text-orange-500 cursor-help transition-colors group-hover:text-orange-600" />
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2.5 bg-gray-900 text-white text-xs leading-relaxed rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 text-center pointer-events-none">
+                            It&apos;s been 30+ days. Consider following up or updating the status.
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-gray-900" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     <span className="text-[11px] text-gray-400 font-mono mt-0.5">
                       {new Date(job.createdAt).toLocaleTimeString([], {
                         hour: "2-digit",
