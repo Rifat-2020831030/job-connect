@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Loader2, Edit2, Check } from "lucide-react";
+import { X, Loader2, Edit2 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchWithAuth } from "@/lib/apiClient";
 import { getUserInfo } from "@/lib/auth";
-import AutocompleteInput from "@/components/AutocompleteInput";
+import SelectDropdown from "@/components/SelectDropdown";
 import { RemoveScroll } from "react-remove-scroll";
 
 interface AddExternalJobModalProps {
@@ -41,27 +41,11 @@ export default function AddExternalJobModal({ onClose, onJobAdded }: AddExternal
   });
 
   const [isSaving, setIsSaving] = useState(false);
-  
-  // Suggestions
-  const [suggestions, setSuggestions] = useState({ companies: [] as string[], titles: [] as string[] });
 
   useEffect(() => {
-    // Default application time to now formatted for datetime-local
     const now = new Date();
-    // Offset for local timezone
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     setApplicationTime(now.toISOString().slice(0, 16));
-
-    // Fetch suggestions
-    const userInfo = getUserInfo();
-    if (userInfo) {
-      fetchWithAuth(`/users/${userInfo.userId}/tracker-suggestions`)
-        .then(r => r.json())
-        .then(d => {
-          if (d.status === 1) setSuggestions(d.data);
-        })
-        .catch(console.error);
-    }
   }, []);
 
   const handleNext = async () => {
@@ -263,21 +247,20 @@ export default function AddExternalJobModal({ onClose, onJobAdded }: AddExternal
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Company Name *</label>
                   <div className="relative flex items-center">
-                    <div className="w-full">
-                      <AutocompleteInput 
-                        value={company}
-                        onChange={setCompany}
-                        options={suggestions.companies}
-                        disabled={lockedFields.company}
-                        onBlur={() => {
-                          if (originallyLocked.company) {
-                            setLockedFields(p => ({ ...p, company: true }));
-                          }
-                        }}
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-50 disabled:text-gray-500 pr-10"
+                      value={company}
+                      onChange={(e) => setCompany(e.target.value)}
+                      disabled={lockedFields.company}
+                      onBlur={() => {
+                        if (originallyLocked.company) {
+                          setLockedFields(p => ({ ...p, company: true }));
+                        }
+                      }}
+                    />
                     {lockedFields.company && (
-                      <button 
+                      <button
                         onClick={() => setLockedFields(p => ({ ...p, company: false }))}
                         className="absolute right-2 p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded cursor-pointer z-10"
                         title="Unlock field to edit"
@@ -289,15 +272,20 @@ export default function AddExternalJobModal({ onClose, onJobAdded }: AddExternal
                 </div>
                 {/* Platform */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Platform</label>
-                  <div className="relative">
-                    <AutocompleteInput 
-                      value={platform}
-                      onChange={setPlatform}
-                      options={['LinkedIn', 'Facebook', 'Twitter', 'Reddit', 'Job Board', 'Other']}
-                      placeholder="Select Platform..."
-                    />
-                  </div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Platform *</label>
+                  <SelectDropdown
+                    value={platform}
+                    onChange={setPlatform}
+                    options={[
+                      { value: "LinkedIn", label: "LinkedIn" },
+                      { value: "Facebook", label: "Facebook" },
+                      { value: "Twitter", label: "Twitter" },
+                      { value: "Reddit", label: "Reddit" },
+                      { value: "Job Board", label: "Job Board" },
+                      { value: "Other", label: "Other" },
+                    ]}
+                    placeholder="Select Platform..."
+                  />
                 </div>
               </div>
 

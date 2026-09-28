@@ -40,6 +40,20 @@ export function formatDate(dateString?: string): string {
   });
 }
 
+export function formatDateTime(dateString?: string): string {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return dateString;
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
 export function formatSalary(
   salary?: string,
   salary_min?: number,
@@ -76,4 +90,25 @@ export function formatExp(
     return "Unknown Experience";
   }
   return `${experienceNumber} ${experienceNumber === 1 ? "yr" : "yrs"}`;
+}
+
+export function shouldRemindStatusUpdate(
+  status: string,
+  appliedDateString: string,
+  deadlineString?: string | null
+): boolean {
+  if (status === "OFFER" || status === "REJECTED") return false;
+
+  const now = new Date();
+  
+  const applied = new Date(appliedDateString);
+  const daysSinceApplied = Math.floor((now.getTime() - applied.getTime()) / (1000 * 3600 * 24));
+  
+  let daysSinceDeadline = -1;
+  if (deadlineString) {
+    const deadline = new Date(deadlineString);
+    daysSinceDeadline = Math.floor((now.getTime() - deadline.getTime()) / (1000 * 3600 * 24));
+  }
+
+  return daysSinceApplied >= 30 || daysSinceDeadline >= 30;
 }

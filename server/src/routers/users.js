@@ -1,4 +1,4 @@
-﻿import express from "express";
+import express from "express";
 import authMiddleware from "../middleware/auth.js";
 import {
   getPreferences,
@@ -14,7 +14,8 @@ import {
   deleteTrackedJob,
   getTrackedCompanies,
   getTrackerSuggestions,
-  lookupExternalJob
+  lookupExternalJob,
+  getTrackerStats
 } from "../controller/tracker-controller.js";
 import { validate } from "../middleware/validate.js";
 import {
@@ -48,6 +49,7 @@ router.delete("/:id/tracked-jobs/:jobId", validate(deleteTrackedJobSchema), dele
 
 router.get("/:id/tracked-companies", getTrackedCompanies);
 router.get("/:id/tracker-suggestions", getTrackerSuggestions);
+router.get("/:id/tracker-stats", getTrackerStats);
 router.get("/:id/external-lookup", lookupExternalJob);
 
 export default router;

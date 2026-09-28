@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { X, Save, Trash, Loader2 } from "lucide-react";
 import { TrackedJob } from "./TrackerTable";
-import { formatDate } from "@/lib/utils";
+import { formatDateTime } from "@/lib/utils";
 
 interface TrackerNotesModalProps {
   job: TrackedJob;
@@ -92,7 +92,7 @@ export default function TrackerNotesModal({
                       {h.state.replace("_", " ")}
                     </span>
                     <span className="text-xs text-gray-500 font-mono">
-                      {formatDate(h.timestamp)}
+                      {formatDateTime(h.timestamp)}
                     </span>
                   </div>
                 </div>

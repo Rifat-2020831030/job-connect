@@ -1,9 +1,10 @@
 "use client";
 
-import { formatDate } from "@/lib/utils";
-import { ChevronDown, Loader2 } from "lucide-react";
+import { formatDate, shouldRemindStatusUpdate } from "@/lib/utils";
+import { Loader2, HelpCircle } from "lucide-react";
 import { useState } from "react";
 import { JobDetail } from "../JobDetailsModal";
+import SelectDropdown from "../SelectDropdown";
 
 export type TrackedJob = {
   _id: string;
@@ -37,7 +38,6 @@ const STATUS_OPTIONS = [
   { value: "INTERVIEWING", label: "Interviewing" },
   { value: "OFFER", label: "Offer" },
   { value: "REJECTED", label: "Rejected" },
-  { value: "EXPIRED", label: "Expired" },
 ];
 
 // Helper to determine status severity/index
@@ -48,7 +48,6 @@ const STATUS_ORDER: Record<string, number> = {
   INTERVIEWING: 2,
   OFFER: 3,
   REJECTED: 4,
-  EXPIRED: 4,
 };
 
 export default function TrackerTable({
@@ -112,6 +111,12 @@ export default function TrackerTable({
             const isLoading = loadingRows[job._id];
             const isPending = job.status === "PENDING_CONFIRMATION";
 
+            const needsUpdate = shouldRemindStatusUpdate(
+              job.status,
+              job.createdAt,
+              job.jobDetails?.deadline
+            );
+
             return (
               <tr
                 key={job._id}
@@ -159,12 +164,12 @@ export default function TrackerTable({
                 >
                   {isPending ? (
                     <div className="flex items-center gap-2">
-                      <select
-                        disabled
-                        className="w-full sm:w-auto px-3 py-1.5 bg-orange-50 border border-orange-200 rounded-lg text-xs font-semibold text-orange-700 appearance-none pr-8 opacity-70 cursor-not-allowed"
-                      >
-                        <option>PENDING</option>
-                      </select>
+                      <SelectDropdown
+                        value="PENDING_CONFIRMATION"
+                        onChange={() => {}}
+                        options={[{ value: "PENDING_CONFIRMATION", label: "Pending" }]}
+                        className="w-[130px] opacity-70 pointer-events-none"
+                      />
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -190,22 +195,13 @@ export default function TrackerTable({
                       </button>
                     </div>
                   ) : (
-                    <div className="relative inline-block w-full max-w-[140px]">
-                      <select
+                    <div className="relative inline-flex items-center w-full max-w-[150px]">
+                      <SelectDropdown
                         value={job.status}
-                        onChange={(e) =>
-                          handleStatusChange(job, e.target.value)
-                        }
-                        disabled={isLoading}
-                        className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer appearance-none pr-8 disabled:opacity-50"
-                      >
-                        {STATUS_OPTIONS.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                        onChange={(val) => handleStatusChange(job, val)}
+                        options={STATUS_OPTIONS}
+                        className={`w-full ${isLoading ? "opacity-50 pointer-events-none" : ""}`}
+                      />
                       {isLoading && (
                         <div className="absolute -right-5 top-1/2 -translate-y-1/2">
                           <Loader2 className="w-3 h-3 animate-spin text-gray-400" />
@@ -217,9 +213,20 @@ export default function TrackerTable({
 
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
-                    <span className="text-sm text-gray-600">
-                      {formatDate(job.createdAt)}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm text-gray-600">
+                        {formatDate(job.createdAt)}
+                      </span>
+                      {needsUpdate && (
+                        <div className="group relative flex items-center" onClick={(e) => e.stopPropagation()}>
+                          <HelpCircle className="w-4 h-4 text-orange-500 cursor-help transition-colors group-hover:text-orange-600" />
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2.5 bg-gray-900 text-white text-xs leading-relaxed rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 text-center pointer-events-none">
+                            It&apos;s been 30+ days. Consider following up or updating the status.
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-gray-900" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     <span className="text-[11px] text-gray-400 font-mono mt-0.5">
                       {new Date(job.createdAt).toLocaleTimeString([], {
                         hour: "2-digit",
