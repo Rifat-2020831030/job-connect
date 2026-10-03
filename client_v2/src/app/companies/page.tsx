@@ -143,9 +143,29 @@ export default function CompaniesPage() {
         </div>
 
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
-            <p className="text-gray-500 font-medium text-lg">Loading companies...</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white p-5 border border-gray-200 shadow-sm flex flex-col h-full rounded-sm animate-pulse">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="w-14 h-14 bg-gray-200 rounded-sm"></div>
+                  <div className="w-24 h-6 bg-gray-200 rounded-sm"></div>
+                </div>
+                <div className="flex-grow">
+                  <div className="w-3/4 h-6 bg-gray-200 rounded-sm mb-2"></div>
+                  <div className="w-1/2 h-4 bg-gray-200 rounded-sm mb-3"></div>
+                  <div className="w-2/3 h-4 bg-gray-200 rounded-sm"></div>
+                </div>
+                <hr className="border-gray-200 my-4" />
+                <div className="mt-auto">
+                  <div className="w-1/3 h-3 bg-gray-200 rounded-sm mb-2"></div>
+                  <div className="flex gap-2">
+                    <div className="w-16 h-6 bg-gray-200 rounded-sm"></div>
+                    <div className="w-16 h-6 bg-gray-200 rounded-sm"></div>
+                    <div className="w-12 h-6 bg-gray-200 rounded-sm"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : companies.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
@@ -156,35 +176,56 @@ export default function CompaniesPage() {
             <p className="text-gray-500 max-w-sm mx-auto">We couldn't find any companies matching your search. Try a different keyword.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {companies.map((company, index) => {
-              if (index === companies.length - 1) {
-                return (
-                  <div ref={lastCompanyElementRef} key={company._id}>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {companies.map((company, index) => {
+                if (index === companies.length - 1) {
+                  return (
+                    <div ref={lastCompanyElementRef} key={company._id}>
+                      <CompanyCard 
+                        company={company}
+                        onClick={(c) => router.push(`/companies/${c._id}`)}
+                      />
+                    </div>
+                  );
+                } else {
+                  return (
                     <CompanyCard 
+                      key={company._id}
                       company={company}
                       onClick={(c) => router.push(`/companies/${c._id}`)}
                     />
+                  );
+                }
+              })}
+              
+              {/* Show skeleton row when loading more */}
+              {isFetchingMore && (
+                [...Array(4)].map((_, i) => (
+                  <div key={`fetching-${i}`} className="bg-white p-5 border border-gray-200 shadow-sm flex flex-col h-full rounded-sm animate-pulse">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="w-14 h-14 bg-gray-200 rounded-sm"></div>
+                      <div className="w-24 h-6 bg-gray-200 rounded-sm"></div>
+                    </div>
+                    <div className="flex-grow">
+                      <div className="w-3/4 h-6 bg-gray-200 rounded-sm mb-2"></div>
+                      <div className="w-1/2 h-4 bg-gray-200 rounded-sm mb-3"></div>
+                      <div className="w-2/3 h-4 bg-gray-200 rounded-sm"></div>
+                    </div>
+                    <hr className="border-gray-200 my-4" />
+                    <div className="mt-auto">
+                      <div className="w-1/3 h-3 bg-gray-200 rounded-sm mb-2"></div>
+                      <div className="flex gap-2">
+                        <div className="w-16 h-6 bg-gray-200 rounded-sm"></div>
+                        <div className="w-16 h-6 bg-gray-200 rounded-sm"></div>
+                        <div className="w-12 h-6 bg-gray-200 rounded-sm"></div>
+                      </div>
+                    </div>
                   </div>
-                );
-              } else {
-                return (
-                  <CompanyCard 
-                    key={company._id}
-                    company={company}
-                    onClick={(c) => router.push(`/companies/${c._id}`)}
-                  />
-                );
-              }
-            })}
-          </div>
-        )}
-        
-        {/* Loading more state */}
-        {isFetchingMore && (
-          <div className="w-full flex justify-center py-8 mt-4">
-            <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          </div>
+                ))
+              )}
+            </div>
+          </>
         )}
       </section>
     </div>

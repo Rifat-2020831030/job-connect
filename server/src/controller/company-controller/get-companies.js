@@ -10,7 +10,7 @@ const getCompanies = async (req, res) => {
     const search = req.query.search;
     
     let query = {};
-    const sort = { current_open_jobs: -1, name: 1, _id: 1 };
+    const sort = { name: 1, _id: 1 };
     
     if (search) {
       query = {
@@ -25,13 +25,12 @@ const getCompanies = async (req, res) => {
       try {
         const decoded = Buffer.from(cursorStr, 'base64').toString('utf8');
         const cursorObj = JSON.parse(decoded);
-        const { jobs, name, id } = cursorObj;
+        const { name, id } = cursorObj;
         
         const cursorQuery = {
           $or: [
-            { current_open_jobs: { $lt: jobs } },
-            { current_open_jobs: jobs, name: { $gt: name } },
-            { current_open_jobs: jobs, name: name, _id: { $gt: new ObjectId(id) } }
+            { name: { $gt: name } },
+            { name: name, _id: { $gt: new ObjectId(id) } }
           ]
         };
         
@@ -55,8 +54,7 @@ const getCompanies = async (req, res) => {
     if (companies.length === limit) {
       const lastCompany = companies[companies.length - 1];
       const cursorObj = {
-        jobs: lastCompany.current_open_jobs || 0,
-        name: lastCompany.name || "",
+        name: lastCompany.name,
         id: lastCompany._id.toString()
       };
       nextCursor = Buffer.from(JSON.stringify(cursorObj)).toString('base64');
@@ -65,7 +63,7 @@ const getCompanies = async (req, res) => {
     const formattedCompanies = companies.map(company => ({
       _id: company._id,
       logo: company.logo || "",
-      name: company.name || "",
+      name: company.name,
       category: company.category || "General",
       website: company.website || "",
       tech_stack: company.tech_stack || [],
