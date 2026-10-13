@@ -147,9 +147,11 @@ function JobsPageContent() {
     }
   };
 
-  const handleSearch = (q: string, loc: string) => {
+  const handleSearch = (q: string, loc: string, shouldScroll = true) => {
     updateUrl({ q, location: loc });
-    scrollToResults();
+    if (shouldScroll) {
+      scrollToResults();
+    }
   };
 
   const handleApplyFilters = (filters: ActiveFilters) => {
