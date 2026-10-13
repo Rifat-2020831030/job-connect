@@ -1,6 +1,6 @@
 import compression from "compression";
 import cors from "cors";
-import dns from "node:dns/promises";
+// import dns from "node:dns/promises";
 import dotenv from "dotenv";
 import express from "express";
 import { rateLimit } from "express-rate-limit";
@@ -10,7 +10,7 @@ import { getAllowedOrigins } from "./services/originsService.js";
 import { logger } from "./utils/logger.js";
 dotenv.config();
 
-dns.setServers(["1.1.1.1", "1.0.0.1"]); 
+// dns.setServers(["1.1.1.1", "1.0.0.1"]); 
 
 import serverHealth from "./controller/server-health.js";
 import authRouter from "./routers/auth.js";
