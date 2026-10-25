@@ -2,6 +2,9 @@
   "name": "client_v2",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=24.22.1"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,7 +15,7 @@
     "@vercel/analytics": "^2.0.1",
     "framer-motion": "^12.42.0",
     "lucide-react": "^1.21.0",
-    "next": "16.2.9",
+    "next": "^16.4.3",
     "pino": "^10.3.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
