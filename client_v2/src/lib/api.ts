@@ -5,8 +5,8 @@ import { cache } from "react";
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:3010/api";
 
-// 30 days in seconds (30 * 24 * 60 * 60)
-export const JOB_REVALIDATE_SECONDS = 2592000;
+// 1 hour in seconds
+export const JOB_REVALIDATE_SECONDS = 3600;
 
 export async function fetchFeaturedJobs(
   section: "featured" | "engineering" | "leadership"
@@ -15,8 +15,7 @@ export async function fetchFeaturedJobs(
     const res = await fetch(
       `${API_BASE_URL}/jobs/featured?section=${section}`,
       {
-        // Revalidate every hour, or use no-store for completely dynamic
-        next: { revalidate: 3600 },
+        next: { revalidate: 3600, tags: ["featured-jobs", "jobs"] },
       }
     );
 
@@ -39,7 +38,7 @@ export async function fetchFeaturedJobs(
 export async function fetchCategories() {
   try {
     const res = await fetch(`${API_BASE_URL}/jobs/categories`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 3600, tags: ["categories"] },
     });
 
     if (!res.ok) {
@@ -61,7 +60,7 @@ export async function fetchCategories() {
 export async function fetchSiteStats() {
   try {
     const res = await fetch(`${API_BASE_URL}/stat`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 3600, tags: ["site-stats"] },
     });
 
     if (!res.ok) {
@@ -90,7 +89,7 @@ export function calculateJobRevalidate(
 ): number {
   const expiryTarget = expiresAt || deadline;
   if (!expiryTarget) {
-    return JOB_REVALIDATE_SECONDS; // Default to 30 days (2,592,000s)
+    return JOB_REVALIDATE_SECONDS; // Default to 1 hour (3,600s)
   }
 
   const expiryMs = new Date(expiryTarget).getTime();
@@ -106,7 +105,7 @@ export function calculateJobRevalidate(
     return 3600;
   }
 
-  // Cap at 30 days maximum
+  // Cap at 1 hour maximum
   return Math.min(JOB_REVALIDATE_SECONDS, Math.max(60, diffInSeconds));
 }
 
@@ -114,7 +113,7 @@ export const fetchJobById = cache(async (id: string) => {
   try {
     const res = await fetch(`${API_BASE_URL}/jobs/${id}`, {
       next: {
-        revalidate: JOB_REVALIDATE_SECONDS, // 30 days (2,592,000 seconds)
+        revalidate: JOB_REVALIDATE_SECONDS, // 1 hour (3,600 seconds)
         tags: [`job-${id}`, "jobs"],
       },
     });
@@ -147,7 +146,7 @@ export const fetchSimilarJobs = cache(
       query.set("limit", String(limit + 2));
 
       const res = await fetch(`${API_BASE_URL}/jobs?${query.toString()}`, {
-        next: { revalidate: 3600 },
+        next: { revalidate: 3600, tags: ["similar-jobs", "jobs"] },
       });
 
       const json = await res.json();

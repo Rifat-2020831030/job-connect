@@ -7,43 +7,71 @@ export async function POST(request: NextRequest) {
     const { secret, tag, path } = body;
 
     const expectedSecret = process.env.REVALIDATE_SECRET;
-    // Enforce secret only if configured in environment
-    if (expectedSecret && secret !== expectedSecret) {
+    // Strict enforcement: secret must be configured in environment and match request
+    if (!expectedSecret || secret !== expectedSecret) {
       return NextResponse.json(
-        { status: 0, message: "Invalid revalidation secret" },
+        { status: 0, message: "Invalid or missing revalidation secret" },
         { status: 401 }
       );
     }
 
-    if (!tag && !path) {
+    // Extract tags (support single 'tag' or 'tags' array)
+    const rawTags: string[] = [];
+    if (typeof tag === "string" && tag.trim()) {
+      rawTags.push(tag.trim());
+    }
+    if (Array.isArray(body.tags)) {
+      body.tags.forEach((t: unknown) => {
+        if (typeof t === "string" && t.trim()) rawTags.push(t.trim());
+      });
+    }
+    const tags = Array.from(new Set(rawTags));
+
+    // Extract paths (support single 'path' or 'paths' array)
+    const rawPaths: string[] = [];
+    if (typeof path === "string" && path.trim()) {
+      rawPaths.push(path.trim());
+    }
+    if (Array.isArray(body.paths)) {
+      body.paths.forEach((p: unknown) => {
+        if (typeof p === "string" && p.trim()) rawPaths.push(p.trim());
+      });
+    }
+    const paths = Array.from(new Set(rawPaths));
+
+    if (tags.length === 0 && paths.length === 0) {
       return NextResponse.json(
-        { status: 0, message: "Either 'tag' or 'path' must be provided in the request body" },
+        {
+          status: 0,
+          message: "Either 'tag(s)' or 'path(s)' must be provided in the request body",
+        },
         { status: 400 }
       );
     }
 
-    const revalidatedItems: { tag?: string; path?: string } = {};
-
-    if (tag) {
-      // In Next.js 16, revalidateTag accepts a second argument for expiration profile or config
-      revalidateTag(tag, { expire: 0 });
-      revalidatedItems.tag = tag;
+    // Purge tagged fetch caches
+    for (const t of tags) {
+      revalidateTag(t, { expire: 0 });
     }
 
-    if (path) {
-      revalidatePath(path);
-      revalidatedItems.path = path;
+    // Purge route caches
+    for (const p of paths) {
+      revalidatePath(p);
     }
 
     return NextResponse.json({
       status: 1,
       message: "Cache revalidation successful",
-      revalidated: revalidatedItems,
+      revalidated: { tags, paths },
       revalidatedAt: new Date().toISOString(),
     });
   } catch (error: any) {
     return NextResponse.json(
-      { status: 0, message: "Internal server error during revalidation", error: error?.message },
+      {
+        status: 0,
+        message: "Internal server error during revalidation",
+        error: error?.message,
+      },
       { status: 500 }
     );
   }

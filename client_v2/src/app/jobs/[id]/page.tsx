@@ -19,8 +19,8 @@ export async function generateStaticParams() {
   return [];
 }
 
-// Job details revalidation every 30 days (ISR)
-export const revalidate = 2592000;
+// Job details revalidation every 1 hour (ISR)
+export const revalidate = 3600;
 
 export async function generateMetadata({
   params,
