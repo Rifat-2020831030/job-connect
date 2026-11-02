@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Loader2 } from "lucide-react";
 
 import Footer from "@/components/Footer";
-import JobDetailsSplitEditorial from "@/components/job-details/JobDetailsSplitEditorial";
+import JobDetailsView from "@/components/job-details/JobDetailsView";
 import { fetchJobById, fetchSimilarJobs } from "@/lib/api";
 import { formatDate, formatExp } from "@/lib/utils";
 
@@ -186,7 +186,7 @@ export default async function JobDetailPage({ params }: JobPageProps) {
             </div>
           }
         >
-          <JobDetailsSplitEditorial
+          <JobDetailsView
             job={job}
             hasDeadline={hasDeadline}
             displayDeadline={displayDeadline}

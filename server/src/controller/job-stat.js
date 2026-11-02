@@ -91,4 +91,36 @@ const registerVisitor = async (req, res) => {
   }
 };
 
-export { getJobStats, incrementJobClick, registerVisitor };
+const VALID_UTM_SOURCES = ["cv", "share", "referral", "social"];
+
+const trackSource = async (req, res) => {
+  try {
+    const rawSource = req.body?.utm_source || req.query?.utm_source;
+    const utm_source = typeof rawSource === "string" ? rawSource.trim().toLowerCase() : "";
+
+    if (!utm_source || !VALID_UTM_SOURCES.includes(utm_source)) {
+      return res.status(400).json({ status: 0, message: "Invalid utm_source" });
+    }
+
+    const db = await getDB();
+    const MIN_INTERVAL = 1 * 60 * 1000;
+    const now = new Date();
+    const timestamp = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString();
+
+    const lastEntry = await db.collection("sources").findOne(
+      { utm_source },
+      { sort: { timestamp: -1 } }
+    );
+
+    if (!lastEntry || (now - new Date(lastEntry.timestamp)) > MIN_INTERVAL) {
+      await db.collection("sources").insertOne({ utm_source, timestamp });
+    }
+
+    return res.status(200).json({ status: 1, message: "Source recorded" });
+  } catch (error) {
+    logger.error({ error }, "Error recording source");
+    return res.status(500).json({ status: 0, message: "Internal Server Error" });
+  }
+};
+
+export { getJobStats, incrementJobClick, registerVisitor, trackSource, VALID_UTM_SOURCES };

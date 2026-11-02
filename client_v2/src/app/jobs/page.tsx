@@ -73,7 +73,7 @@ function JobsPageContent() {
     fetchOptions();
   }, []);
 
-  // Fetch Jobs — build API params from URL state, excluding non-filter keys like jobId
+  // Fetch Jobs — build API params from URL state
   useEffect(() => {
     async function fetchJobs() {
       setIsLoadingJobs(true);
@@ -121,10 +121,6 @@ function JobsPageContent() {
 
   const updateUrl = (newParams: Record<string, string | null>, resetPage = true) => {
     const params = new URLSearchParams(searchParams.toString());
-    // Always strip jobId on normal navigations so modal auto-closes
-    if (!("jobId" in newParams)) {
-      params.delete("jobId");
-    }
     Object.entries(newParams).forEach(([key, value]) => {
       if (value === null || value === "") {
         params.delete(key);
@@ -142,7 +138,6 @@ function JobsPageContent() {
   const scrollToResults = () => {
     const el = document.getElementById("results-section");
     if (el) {
-      // Small delay ensures DOM paints before scrolling, though mostly needed for mobile filter close
       setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     }
   };
@@ -175,42 +170,21 @@ function JobsPageContent() {
     scrollToResults();
   };
 
-  // Open job details modal from URL jobId (shared link)
+  // If a shared link has ?jobId=..., redirect directly to the full details page
   const currentJobId = searchParams.get("jobId");
   useEffect(() => {
-    if (currentJobId && (!selectedJob || selectedJob._id !== currentJobId)) {
-      handleViewDetails(currentJobId, null);
-    } else if (!currentJobId && selectedJob) {
-      setSelectedJob(null);
+    if (currentJobId) {
+      router.replace(`/jobs/${currentJobId}`);
     }
-  }, [currentJobId]);
+  }, [currentJobId, router]);
 
+  // Kept in code for backward compatibility
   const handleViewDetails = async (jobId: string, fallbackJob: any) => {
-    if (!jobId) {
-      setSelectedJob(fallbackJob);
+    if (jobId) {
+      router.push(`/jobs/${jobId}`);
       return;
     }
-    
-    // Add jobId to URL via Next.js router
-    updateUrl({ jobId }, false);
-    
-    setIsLoadingDetails(true);
-    try {
-      const res = await fetch(`${API_BASE_URL}/jobs/${jobId}`);
-      const data = await res.json();
-      
-      if (res.ok && data.status === 1) {
-        setSelectedJob(data.data);
-      } else {
-        toast.error("Failed to load job details. Showing cached data.");
-        setSelectedJob(fallbackJob);
-      }
-    } catch (err) {
-      toast.error("Failed to fetch job details. Check your connection.");
-      setSelectedJob(fallbackJob);
-    } finally {
-      setIsLoadingDetails(false);
-    }
+    setSelectedJob(fallbackJob);
   };
 
   const handleCloseModal = () => {
@@ -387,7 +361,6 @@ function JobsPageContent() {
                     experience={job.experience}
                     vacancy={job.vacancy}
                     deadline={job.deadline}
-                    onViewDetails={() => handleViewDetails(job._id, job)}
                   />
                 ))}
               </div>
@@ -443,12 +416,13 @@ function JobsPageContent() {
         </div>
       </section>
 
-      {selectedJob && (
+      {/* Modal is kept in code for reference, but not displayed in UI in favor of full details page */}
+      {/* {selectedJob && (
         <JobDetailsModal 
           job={selectedJob} 
           onClose={handleCloseModal} 
         />
-      )}
+      )} */}
 
       <Footer />
     </div>
