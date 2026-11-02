@@ -106,7 +106,7 @@ export default function CompanyCard({ company, onClick }: CompanyCardProps) {
             </>
           ) : (
             <div className="text-xs font-mono text-gray-400 italic">
-              Not specified
+              No tech stack listed
             </div>
           )}
         </div>

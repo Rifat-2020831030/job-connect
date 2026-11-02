@@ -1,5 +1,5 @@
 export const jobCardBuilder = (job, frontendUrl) => {
-  const jobUrl = `${frontendUrl}/jobs?jobId=${job._id}`;
+  const jobUrl = `${frontendUrl}/jobs?jobId=${job._id}&utm_source=job_alert_email`;
   return `
     <!-- Card Container -->
     <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation" style="max-width: 300px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin: 0 auto 20px auto;">
@@ -58,9 +58,9 @@ export const jobCardBuilder = (job, frontendUrl) => {
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">SALARY</p>
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">
                             ${
-                                job.salary && job.salary !== ""
-                                    ? job.salary
-                                    : "Not mentioned"
+                              job.salary && job.salary !== ""
+                                ? job.salary
+                                : "Not mentioned"
                             }
                             </p>
                         </td>
@@ -101,7 +101,12 @@ export const jobCardBuilder = (job, frontendUrl) => {
   `;
 };
 
-export const createEmailTemplate = (jobList, unsubscribeUrl, data) => {
+export const createEmailTemplate = (
+  jobList,
+  unsubscribeUrl,
+  data,
+  frontendUrl = "https://chakrilagbe.vercel.app"
+) => {
   return `
   <!DOCTYPE html>
   <html lang="en">
@@ -163,7 +168,7 @@ export const createEmailTemplate = (jobList, unsubscribeUrl, data) => {
             <!-- Button -->
             <tr>
                 <td style="padding: 10px 30px 30px 30px; text-align: center;">
-                    <a href="https://chakrilagbe.vercel.app/jobs" style="background-color: #3b82f6; border-radius: 4px; color: #ffffff; display: inline-block; font-size: 16px; font-weight: bold; padding: 14px 30px; text-decoration: none; font-family: Arial, Helvetica, sans-serif; width: 80%; max-width: 400px;">View All Job Postings</a>
+                    <a href="${frontendUrl}/jobs?utm_source=email" style="background-color: #3b82f6; border-radius: 4px; color: #ffffff; display: inline-block; font-size: 16px; font-weight: bold; padding: 14px 30px; text-decoration: none; font-family: Arial, Helvetica, sans-serif; width: 80%; max-width: 400px;">View All Job Postings</a>
                 </td>
             </tr>
             

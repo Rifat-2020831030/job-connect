@@ -1,6 +1,6 @@
 "use client";
 
-import { useTracking } from "@/contexts/TrackingContext";
+import Link from "next/link";
 import { Bookmark, Briefcase, Clock, Flag, MapPin, Users } from "lucide-react";
 import { useState } from "react";
 import { useSavedJobs } from "../lib/SavedJobsContext";
@@ -19,15 +19,15 @@ export interface JobRowProps {
   title: string;
   company: string;
   location: string;
-  experience_level: string;
-  salary?: string;
+  experience_level?: string;
+  salary?: any;
   salary_min?: number;
   salary_max?: number;
-  skills: string[];
+  skills?: string[];
   first_seen: string;
   logo?: string;
   url?: string;
-  experience?: string;
+  experience?: any;
   vacancy?: string | number;
   deadline?: string;
   onViewDetails?: () => void;
@@ -39,7 +39,7 @@ export default function JobRow({
   title,
   company,
   location,
-  experience_level = "Not Specified",
+  experience_level = "Experience Unknown",
   salary,
   salary_min,
   salary_max,
@@ -53,7 +53,6 @@ export default function JobRow({
   onViewDetails,
   isExpired = false,
 }: JobRowProps) {
-  const { handleApply } = useTracking();
   const { isJobSaved, toggleSavedJob } = useSavedJobs();
   const isSaved = _id ? isJobSaved(_id) : false;
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -63,11 +62,18 @@ export default function JobRow({
 
   const displayExp = formatExp(experience);
   const displayVacancy = formatVacancy(vacancy);
-  const displayDeadline = formatDate(deadline) || "Unknown Deadline";
+  const displayDeadline = formatDate(deadline) || "No Deadline Set";
+
+  const displayLocation =
+    location && !/^not\s*specified$/i.test(location.trim())
+      ? location.trim()
+      : "Location Unknown";
 
   // Define mapping logic if level doesn't explicitly match the sidebar
   let mappedLevel = experience_level;
-  if (experience_level && typeof experience_level === "string") {
+  if (!experience_level || /^not\s*specified$/i.test(experience_level.trim())) {
+    mappedLevel = "Experience Unknown";
+  } else if (typeof experience_level === "string") {
     if (experience_level.toUpperCase().includes("SENIOR"))
       mappedLevel = "Senior (5+ years)";
     else if (experience_level.toUpperCase().includes("MID"))
@@ -75,6 +81,8 @@ export default function JobRow({
     else if (experience_level.toUpperCase().includes("JUNIOR"))
       mappedLevel = "Junior (0-2 years)";
   }
+
+  const jobDetailsHref = _id ? `/jobs/${_id}` : url;
 
   return (
     <>
@@ -96,15 +104,15 @@ export default function JobRow({
                     {title}
                   </h3>
                 </div>
-              ) : onViewDetails ? (
-                <button
-                  onClick={onViewDetails}
-                  className="inline-block hover:text-primary transition-colors text-left cursor-pointer"
+              ) : _id ? (
+                <Link
+                  href={jobDetailsHref}
+                  className="inline-block hover:text-primary transition-colors text-left"
                 >
                   <h3 className="text-lg md:text-xl font-bold text-foreground break-words whitespace-normal">
                     {title}
                   </h3>
-                </button>
+                </Link>
               ) : (
                 <a
                   href={url}
@@ -122,7 +130,7 @@ export default function JobRow({
                 <span className="mx-1 text-primary/60 sm:text-2xl">•</span>
                 <MapPin className="size-3.5 inline-block -mt-1 sm:mr-0.5" />
                 <span className="truncate max-w-[120px] sm:max-w-none">
-                  {location}
+                  {displayLocation}
                 </span>
               </div>
 
@@ -195,7 +203,7 @@ export default function JobRow({
         {/* Divider */}
         <div className="w-full h-px bg-gray-100 my-1 hidden sm:block"></div>
 
-        {/* Bottom Row: Salary, Tags, Posted Time, Buttons */}
+        {/* Bottom Row: Salary, Tags, Posted Time, Details Link */}
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 min-w-0">
             <div className="flex flex-col">
@@ -206,8 +214,10 @@ export default function JobRow({
                 {displaySalary}
               </span>
             </div>
-            <div className="flex flex-wrap gap-2 items-center sm:ml-4">
-              {skills.slice(0, 3).map((tag) => (
+
+            {/* Capped at 5 with hover tooltip for continuous skills */}
+            <div className="flex flex-wrap items-center gap-1.5 sm:ml-4">
+              {skills.slice(0, 5).map((tag) => (
                 <span
                   key={tag}
                   className="px-2.5 py-1 text-[11px] font-mono border border-gray-200 text-gray-600 uppercase truncate max-w-[120px]"
@@ -215,10 +225,29 @@ export default function JobRow({
                   {tag}
                 </span>
               ))}
-              {skills.length > 3 && (
-                <span className="px-2.5 py-1 text-[11px] font-mono border border-transparent text-gray-400 uppercase">
-                  +{skills.length - 3} more
-                </span>
+              {skills.length > 5 && (
+                <div className="relative group/skills inline-flex items-center">
+                  <span className="px-2 py-0.5 text-[11px] font-mono border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 uppercase rounded cursor-pointer transition-colors">
+                    +{skills.length - 5} more
+                  </span>
+                  {/* Hover Popover */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/skills:flex flex-col gap-1.5 p-3 bg-gray-900 text-white rounded-xl shadow-xl z-50 min-w-[200px] max-w-[280px] pointer-events-none transition-all">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-gray-400 border-b border-gray-800 pb-1">
+                      Remaining Skills ({skills.length - 5})
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {skills.slice(5).map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="px-1.5 py-0.5 text-[10px] font-mono bg-gray-800 text-gray-200 rounded border border-gray-700/60"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                  </div>
+                </div>
               )}
             </div>
           </div>
@@ -230,29 +259,21 @@ export default function JobRow({
               </div>
             ) : (
               <div className="flex gap-3 mt-2 sm:mt-0 w-full sm:w-auto">
-                {onViewDetails ? (
-                  <button
-                    onClick={onViewDetails}
-                    className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold text-primary border border-primary uppercase tracking-wider hover:bg-primary/5 transition-colors whitespace-nowrap cursor-pointer"
+                {_id ? (
+                  <Link
+                    href={jobDetailsHref}
+                    className="flex-1 sm:flex-none text-center px-6 py-2 text-xs md:text-sm font-bold text-primary border border-primary uppercase tracking-wider hover:bg-primary/5 transition-colors whitespace-nowrap block"
                   >
-                    Details
-                  </button>
+                    View Details
+                  </Link>
                 ) : (
                   <a
                     href={url}
-                    className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold text-primary border border-primary uppercase tracking-wider hover:bg-primary/5 transition-colors whitespace-nowrap block"
+                    className="flex-1 sm:flex-none text-center px-6 py-2 text-xs md:text-sm font-bold text-primary border border-primary uppercase tracking-wider hover:bg-primary/5 transition-colors whitespace-nowrap block"
                   >
-                    Details
+                    View Details
                   </a>
                 )}
-                <button
-                  onClick={(e) => {
-                    handleApply({ url, _id });
-                  }}
-                  className="flex-1 sm:flex-none text-center px-4 md:px-6 py-2 text-xs md:text-sm font-bold bg-primary text-white border border-primary uppercase tracking-wider hover:bg-emerald-700 transition-colors whitespace-nowrap block cursor-pointer"
-                >
-                  Apply Now
-                </button>
               </div>
             )}
           </div>
