@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect } from 'react';
-import { X, MapPin, DollarSign, Share2 } from 'lucide-react';
+import Link from 'next/link';
+import { X, MapPin, DollarSign, Share2, Maximize2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDate, formatVacancy, formatExp, formatSalary } from '../lib/utils';
 import { useTracking } from '@/contexts/TrackingContext';
@@ -66,6 +67,17 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
           <h2 className="text-base font-medium text-foreground">Job Details</h2>
           <div className="flex items-center gap-2">
+            {job._id && (
+              <Link
+                href={`/jobs/${job._id}`}
+                target="_blank"
+                className="p-1.5 hover:bg-gray-100 rounded-md transition-colors text-gray-500 cursor-pointer flex items-center gap-1.5 text-sm font-medium"
+                title="Open in full page view"
+              >
+                <Maximize2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Full Page</span>
+              </Link>
+            )}
             <button 
               onClick={handleShare}
               className="p-1.5 hover:bg-gray-100 rounded-md transition-colors text-gray-500 cursor-pointer flex items-center gap-2 text-sm font-medium"
@@ -122,19 +134,19 @@ export default function JobDetailsModal({ job, onClose }: JobDetailsModalProps) 
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Deadline</span>
-                <span className="text-sm font-semibold text-gray-700">{displayDeadline || 'Unknown Deadline'}</span>
+                <span className="text-sm font-semibold text-gray-700">{displayDeadline || 'No Deadline Set'}</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Level</span>
-                <span className="text-sm font-semibold text-gray-700">{job.experience_level || 'Unknown Level'}</span>
+                <span className="text-sm font-semibold text-gray-700">{job.experience_level || 'Experience Unknown'}</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Category</span>
-                <span className="text-sm font-semibold text-gray-700">{job.category.toUpperCase() || 'Unknown Category'}</span>
+                <span className="text-sm font-semibold text-gray-700">{job.category ? job.category.toUpperCase() : 'Category Unknown'}</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-0.5">Industry</span>
-                <span className="text-sm font-semibold text-gray-700">{job.industry || 'Unknown Industry'}</span>
+                <span className="text-sm font-semibold text-gray-700">{job.industry || 'Industry Unknown'}</span>
               </div>
             </div>
           </div>

@@ -9,12 +9,8 @@ import JobCard from "@/components/JobCard";
 import EngineeringJobRow from "@/components/JobRow";
 import SectionHeader from "@/components/SectionHeader";
 import JobDetailsModal, { JobDetail } from "@/components/JobDetailsModal";
-import { toast } from "sonner";
 
 import {
-  Briefcase,
-  MapPin,
-  Search,
   Monitor,
   Cpu,
   BarChart,
@@ -56,7 +52,6 @@ export default function HomeClient({
   siteStats,
 }: HomeClientProps) {
   const [selectedJob, setSelectedJob] = useState<JobDetail | null>(null);
-  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [currentSiteStats, setCurrentSiteStats] = useState(siteStats);
 
   // Initialize unique visitor tracking
@@ -81,61 +76,24 @@ export default function HomeClient({
     fetchRealTimeStats();
   }, []);
 
-  const handleViewDetails = async (jobId: string, fallbackJob: any) => {
-    if (!jobId) {
-      setSelectedJob(fallbackJob);
-      return;
-    }
-
-    setIsLoadingDetails(true);
-    try {
-      const res = await fetch(`${API_BASE_URL}/jobs/${jobId}`);
-      const data = await res.json();
-
-      if (res.ok && data.status === 1) {
-        setSelectedJob(data.data);
-      } else {
-        setSelectedJob(fallbackJob); // Fallback if API fails
-      }
-    } catch (err) {
-      toast.error("Failed to fetch job details. Check your connection.");
-      setSelectedJob(fallbackJob);
-    } finally {
-      setIsLoadingDetails(false);
-    }
-  };
-
   return (
     <div className="flex flex-col w-full">
       <HeroSection siteStats={currentSiteStats} />
 
       <main className="flex flex-col w-full max-w-7xl mx-auto px-6 md:px-12 py-16 gap-24 relative">
-        {/* Loading Overlay for details fetch */}
-        {isLoadingDetails && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-            <div className="bg-white p-4 rounded-lg shadow-lg flex items-center gap-3">
-              <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary border-t-transparent"></div>
-              <span className="font-mono text-sm text-gray-700">
-                Loading details...
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Featured Opportunities Section */}
+        {/* Latest Jobs Section */}
         <section className="flex flex-col w-full">
-          <SectionHeader title="Featured Opportunities" viewAllLink="/jobs" />
+          <SectionHeader title="Latest Jobs" viewAllLink="/jobs" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredJobs.map((job, index) => (
               <JobCard
                 key={job._id || index}
                 {...job}
-                onViewDetails={() => handleViewDetails(job._id, job)}
               />
             ))}
             {featuredJobs.length === 0 && (
               <p className="text-gray-500 col-span-full">
-                No featured jobs available right now.
+                No latest jobs available right now.
               </p>
             )}
           </div>
@@ -152,7 +110,6 @@ export default function HomeClient({
               <EngineeringJobRow
                 key={job._id || index}
                 {...job}
-                onViewDetails={() => handleViewDetails(job._id, job)}
               />
             ))}
             {engineeringJobs.length === 0 && (
@@ -174,7 +131,6 @@ export default function HomeClient({
               <JobCard
                 key={job._id || index}
                 {...job}
-                onViewDetails={() => handleViewDetails(job._id, job)}
               />
             ))}
             {leadershipJobs.length === 0 && (
@@ -210,13 +166,13 @@ export default function HomeClient({
         </section>
       </main>
 
-      {/* Render Modal if a job is selected */}
-      {selectedJob && (
+      {/* Details modal is kept in code, but UI navigates directly to full details page */}
+      {/* {selectedJob && (
         <JobDetailsModal
           job={selectedJob}
           onClose={() => setSelectedJob(null)}
         />
-      )}
+      )} */}
     </div>
   );
 }
