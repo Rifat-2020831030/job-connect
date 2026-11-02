@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import UtmTracker from "@/components/UtmTracker";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/react";
 import { SavedJobsProvider } from "@/lib/SavedJobsContext";
@@ -35,6 +36,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased font-sans bg-gray-50 text-gray-900 flex flex-col min-h-screen`}>
         <SavedJobsProvider>
           <TrackingProvider>
+            <UtmTracker />
             <Toaster position="top-center" richColors />
             <Navbar />
             {children}

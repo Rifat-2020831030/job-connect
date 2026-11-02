@@ -17,10 +17,8 @@ import authRouter from "./routers/auth.js";
 import companiesRouter from "./routers/companies.js";
 import emailRouter from "./routers/email.js";
 import jobsRouter from "./routers/jobs.js";
-import scrapeRouter from "./routers/scrape.js";
 import jobsStat from "./routers/stat.js";
 import usersRouter from "./routers/users.js";
-import { source } from "./utils/source.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -92,10 +90,9 @@ app.get("/", (_req, res) => res.send("The server is running"));
 app.use("/api/auth", authRouter);
 app.use("/api/companies", companiesRouter);
 app.use("/api/users", usersRouter);
-app.use("/api/jobs", source, jobsRouter);
+app.use("/api/jobs", jobsRouter);
 app.use("/api/stat", jobsStat);
 app.use("/api/email", emailRouter);
-app.use("/api/scrape", scrapeRouter);
 
 // Error handling middleware
 app.use((err, req, res, _next) => {

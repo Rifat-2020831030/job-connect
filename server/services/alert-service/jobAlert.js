@@ -68,7 +68,7 @@ export const sendJobAlert = async (timeSet, testEmail = null) => {
                 };
 
                 const unsubscribeUrl = `${frontendUrl}/unsubscribe?id=${user._id}`;
-                const html = createEmailTemplate(jobCards, unsubscribeUrl, data);
+                const html = createEmailTemplate(jobCards, unsubscribeUrl, data, frontendUrl);
                 const subject = "New Job Postings Alert - ChakriLagbe";
 
                 console.log(`Sending job alert to user: ${user.email} (${jobs.length} jobs)`);

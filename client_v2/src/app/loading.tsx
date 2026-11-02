@@ -16,10 +16,10 @@ export default function Loading() {
       </section>
 
       <main className="flex flex-col w-full max-w-7xl mx-auto px-6 md:px-12 py-16 gap-24 relative">
-        {/* Skeleton Featured Opportunities */}
+        {/* Skeleton Latest Jobs */}
         <section className="flex flex-col w-full">
           <SectionHeader
-            title="Featured Opportunities"
+            title="Latest Jobs"
             subtitle="Direct paths to elite roles. No gatekeepers, just code."
             viewAllLink="/jobs"
           />
