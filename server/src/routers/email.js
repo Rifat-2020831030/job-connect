@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  getEmailList,
   unsubscribeEmail,
   submitUnsubscribeReason,
   verifyCode,
@@ -16,7 +15,6 @@ const router = express.Router();
 
 router.get("/unsubscribe", validate(unsubscribeEmailSchema), unsubscribeEmail);
 router.post("/unsubscribe-reason", submitUnsubscribeReason);
-router.get("/", getEmailList);
 router.post("/verify-code", validate(verifyCodeSchema), verifyCode);
 
 export default router;

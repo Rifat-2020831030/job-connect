@@ -1,5 +1,4 @@
 import { getDB } from "../db/database.js";
-import { runScraper } from "../services/scraper-runner.js";
 import { logger } from "../utils/logger.js";
 
 const getLastScrapeTime = async (req, res) => {
@@ -25,5 +24,4 @@ const getLastScrapeTime = async (req, res) => {
 
 export {
   getLastScrapeTime,
-  runScraper,
 };

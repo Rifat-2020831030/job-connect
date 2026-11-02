@@ -2,24 +2,27 @@ import { getDB } from "../db/database.js";
 import { ObjectId } from "mongodb";
 import { logger } from "../utils/logger.js";
 import { trackVisitor } from "../services/visitor-service.js";
+import { getValidUtmSources, DEFAULT_UTM_SOURCES } from "../services/utmSourcesService.js";
 
 const getJobStats = async (req, res) => {
   try {
     const db = await getDB();
-    
+
     // Fetch stats and unique visitor count in parallel
     const [stats, uniqueVisitorsCount] = await Promise.all([
       db.collection("cache").findOne({ _id: "site_stats" }),
-      db.collection("unique_visitors").countDocuments()
+      db.collection("unique_visitors").countDocuments(),
     ]);
 
-    let data = stats ? { ...stats } : {
-      totalJobs: 0,
-      totalCompanies: 0,
-      subscribersCount: 0,
-      uniqueLocations: 0,
-      newRolesAdded: 0,
-    };
+    let data = stats
+      ? { ...stats }
+      : {
+          totalJobs: 0,
+          totalCompanies: 0,
+          subscribersCount: 0,
+          uniqueLocations: 0,
+          newRolesAdded: 0,
+        };
 
     if (data._id) {
       delete data._id;
@@ -47,16 +50,15 @@ const incrementJobClick = async (req, res) => {
 
     const db = await getDB();
     Promise.all([
-      db.collection("jobs").updateOne(
-      { _id: new ObjectId(jobID) },
-      { $inc: { clicks: 1 } }
-    ),
+      db
+        .collection("jobs")
+        .updateOne({ _id: new ObjectId(jobID) }, { $inc: { clicks: 1 } }),
       db.collection("job_click_stats").insertOne({
         jobID: new ObjectId(jobID),
-        userID: req.user ? new ObjectId(req.user._id) : null, 
+        userID: req.user ? new ObjectId(req.user._id) : null,
         clickedAt: new Date().toISOString(),
       }),
-    ])
+    ]);
 
     res.status(200).json({ status: 1, message: "Click registered" });
   } catch (error) {
@@ -68,37 +70,49 @@ const incrementJobClick = async (req, res) => {
 const registerVisitor = async (req, res) => {
   try {
     // Extract IP address from request headers or socket
-    let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    
+    let ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+
     // Handle cases where x-forwarded-for contains multiple IPs
-    if (typeof ip === 'string' && ip.includes(',')) {
-      ip = ip.split(',')[0].trim();
+    if (typeof ip === "string" && ip.includes(",")) {
+      ip = ip.split(",")[0].trim();
     }
 
     if (!ip) {
-      return res.status(400).json({ status: 0, message: "Could not determine IP address" });
+      return res
+        .status(400)
+        .json({ status: 0, message: "Could not determine IP address" });
     }
 
     const success = await trackVisitor(ip);
     if (success) {
-      return res.status(200).json({ status: 1, message: "Visitor tracked successfully" });
+      return res
+        .status(200)
+        .json({ status: 1, message: "Visitor tracked successfully" });
     } else {
-      return res.status(500).json({ status: 0, message: "Failed to track visitor" });
+      return res
+        .status(500)
+        .json({ status: 0, message: "Failed to track visitor" });
     }
   } catch (error) {
     logger.error({ error }, "Error in registerVisitor controller");
-    return res.status(500).json({ status: 0, message: "Internal Server Error" });
+    return res
+      .status(500)
+      .json({ status: 0, message: "Internal Server Error" });
   }
 };
-
-const VALID_UTM_SOURCES = ["cv", "share", "referral", "social"];
 
 const trackSource = async (req, res) => {
   try {
     const rawSource = req.body?.utm_source || req.query?.utm_source;
-    const utm_source = typeof rawSource === "string" ? rawSource.trim().toLowerCase() : "";
+    const utm_source =
+      typeof rawSource === "string" ? rawSource.trim().toLowerCase() : "";
 
-    if (!utm_source || !VALID_UTM_SOURCES.includes(utm_source)) {
+    if (!utm_source) {
+      return res.status(400).json({ status: 0, message: "Invalid utm_source" });
+    }
+
+    const validSources = await getValidUtmSources();
+    if (!validSources.includes(utm_source)) {
       return res.status(400).json({ status: 0, message: "Invalid utm_source" });
     }
 
@@ -107,20 +121,28 @@ const trackSource = async (req, res) => {
     const now = new Date();
     const timestamp = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString();
 
-    const lastEntry = await db.collection("sources").findOne(
-      { utm_source },
-      { sort: { timestamp: -1 } }
-    );
+    const lastEntry = await db
+      .collection("sources")
+      .findOne({ utm_source }, { sort: { timestamp: -1 } });
 
-    if (!lastEntry || (now - new Date(lastEntry.timestamp)) > MIN_INTERVAL) {
+    if (!lastEntry || now - new Date(lastEntry.timestamp) > MIN_INTERVAL) {
       await db.collection("sources").insertOne({ utm_source, timestamp });
     }
 
     return res.status(200).json({ status: 1, message: "Source recorded" });
   } catch (error) {
     logger.error({ error }, "Error recording source");
-    return res.status(500).json({ status: 0, message: "Internal Server Error" });
+    return res
+      .status(500)
+      .json({ status: 0, message: "Internal Server Error" });
   }
 };
 
-export { getJobStats, incrementJobClick, registerVisitor, trackSource, VALID_UTM_SOURCES };
+export {
+  getJobStats,
+  incrementJobClick,
+  registerVisitor,
+  trackSource,
+  getValidUtmSources,
+  DEFAULT_UTM_SOURCES,
+};
