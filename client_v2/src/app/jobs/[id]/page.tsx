@@ -130,6 +130,19 @@ export default async function JobDetailPage({ params }: JobPageProps) {
   const salaryMin = salaryObj?.min ?? job.salary_min;
   const salaryMax = salaryObj?.max ?? job.salary_max ?? salaryMin;
 
+  const isRemote =
+    Boolean(job.job_type?.toLowerCase().includes("remote")) ||
+    Boolean(jobLocation.toLowerCase().includes("remote"));
+
+  const mappedEmploymentType = (() => {
+    const jt = (job.job_type || "").toLowerCase();
+    if (jt.includes("part")) return "PART_TIME";
+    if (jt.includes("contract")) return "CONTRACTOR";
+    if (jt.includes("intern")) return "INTERN";
+    if (jt.includes("temp") || jt.includes("freelance")) return "TEMPORARY";
+    return "FULL_TIME";
+  })();
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "JobPosting",
@@ -140,7 +153,8 @@ export default async function JobDetailPage({ params }: JobPageProps) {
       hasDeadline && isValidExpiry && expiryDate
         ? expiryDate.toISOString()
         : undefined,
-    employmentType: jobType === "Remote" ? "FULL_TIME" : "FULL_TIME",
+    employmentType: mappedEmploymentType,
+    ...(isRemote ? { jobLocationType: "TELECOMMUTE" } : {}),
     hiringOrganization: {
       "@type": "Organization",
       name: companyName,

@@ -3,8 +3,6 @@
 import { useEffect } from "react";
 import { API_BASE_URL } from "@/lib/api";
 
-const VALID_UTM_SOURCES = ["cv", "share", "referral", "social"];
-
 export default function UtmTracker() {
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -16,8 +14,8 @@ export default function UtmTracker() {
       if (utmSource && utmSource.trim()) {
         const cleanSource = utmSource.trim().toLowerCase();
 
-        // Only ping backend if source is in the allowed whitelist
-        if (VALID_UTM_SOURCES.includes(cleanSource)) {
+        // Dispatch to backend (backend validates against db's settings collection)
+        if (cleanSource.length <= 64) {
           fetch(`${API_BASE_URL}/stat/source`, {
             method: "POST",
             headers: {

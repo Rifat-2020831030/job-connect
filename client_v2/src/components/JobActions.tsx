@@ -1,12 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
-import { Bookmark, ExternalLink, Flag, Share2, Check, Clock } from "lucide-react";
-import { toast } from "sonner";
-import { useSavedJobs } from "@/lib/SavedJobsContext";
 import { useTracking } from "@/contexts/TrackingContext";
-import ReportJobModal from "./ReportJobModal";
+import { useSavedJobs } from "@/lib/SavedJobsContext";
 import { JobDetail } from "@/types/job";
+import {
+  Bookmark,
+  Check,
+  Clock,
+  ExternalLink,
+  Flag,
+  Share2,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import ReportJobModal from "./ReportJobModal";
 
 interface JobActionsProps {
   job: JobDetail;
@@ -27,9 +34,21 @@ export default function JobActions({
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
-    const url = typeof window !== "undefined" ? window.location.href : "";
-    const jobTitle = job.title?.trim() || "Job Opening";
-    const companyName = job.company?.trim() || "Company";
+    let url = "";
+    if (typeof window !== "undefined") {
+      const base = job._id
+        ? `${window.location.origin}/jobs/${job._id}`
+        : window.location.href;
+      try {
+        const u = new URL(base);
+        u.searchParams.set("utm_source", "job_share");
+        url = u.toString();
+      } catch {
+        url = base;
+      }
+    }
+    const jobTitle = job.title.trim();
+    const companyName = job.company.trim();
 
     if (navigator.share) {
       try {
@@ -39,8 +58,8 @@ export default function JobActions({
           url,
         });
         return;
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
+      } catch (err: unknown) {
+        if ((err as Error)?.name !== "AbortError") {
           // Fall back to copy
         }
       }
@@ -77,7 +96,10 @@ export default function JobActions({
             }`}
             aria-label={isSaved ? "Saved" : "Save Job"}
           >
-            <Bookmark className="size-5" fill={isSaved ? "currentColor" : "none"} />
+            <Bookmark
+              className="size-5"
+              fill={isSaved ? "currentColor" : "none"}
+            />
           </button>
 
           <button
@@ -85,7 +107,11 @@ export default function JobActions({
             className="p-3 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer"
             aria-label="Share"
           >
-            {copied ? <Check className="size-5 text-emerald-600" /> : <Share2 className="size-5" />}
+            {copied ? (
+              <Check className="size-5 text-emerald-600" />
+            ) : (
+              <Share2 className="size-5" />
+            )}
           </button>
 
           {isExpired ? (
@@ -121,14 +147,21 @@ export default function JobActions({
             }`}
             title={isSaved ? "Saved" : "Save Job"}
           >
-            <Bookmark className="size-4" fill={isSaved ? "currentColor" : "none"} />
+            <Bookmark
+              className="size-4"
+              fill={isSaved ? "currentColor" : "none"}
+            />
           </button>
           <button
             onClick={handleShare}
             className="p-2.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer"
             title="Share"
           >
-            {copied ? <Check className="size-4 text-emerald-600" /> : <Share2 className="size-4" />}
+            {copied ? (
+              <Check className="size-4 text-emerald-600" />
+            ) : (
+              <Share2 className="size-4" />
+            )}
           </button>
           {isExpired ? (
             <div className="px-4 py-2 bg-gray-100 text-gray-400 font-bold rounded-lg text-xs flex items-center gap-1.5 cursor-not-allowed">
@@ -158,25 +191,28 @@ export default function JobActions({
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
         {/* Save / Bookmark Button */}
         <button
           onClick={() => job._id && toggleSavedJob(job._id)}
-          className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-sm font-semibold transition-all cursor-pointer ${
+          className={`flex items-center gap-2 p-2.5 sm:px-3.5 sm:py-2.5 rounded-lg border text-sm font-semibold transition-all cursor-pointer ${
             isSaved
               ? "border-primary/40 bg-primary/10 text-primary shadow-xs"
               : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300"
           }`}
           title={isSaved ? "Remove from saved jobs" : "Save job"}
         >
-          <Bookmark className="size-4" fill={isSaved ? "currentColor" : "none"} />
+          <Bookmark
+            className="size-4"
+            fill={isSaved ? "currentColor" : "none"}
+          />
           <span className="hidden sm:inline">{isSaved ? "Saved" : "Save"}</span>
         </button>
 
         {/* Share Button */}
         <button
           onClick={handleShare}
-          className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 text-sm font-semibold transition-all cursor-pointer"
+          className="flex items-center gap-2 p-2.5 sm:px-3.5 sm:py-2.5 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 text-sm font-semibold transition-all cursor-pointer"
           title="Share this job"
         >
           {copied ? (
@@ -205,7 +241,7 @@ export default function JobActions({
 
         {/* Apply Button */}
         {isExpired ? (
-          <div className="px-5 py-2.5 bg-gray-100 text-gray-500 border border-gray-200 font-bold rounded-lg text-sm flex items-center gap-2 cursor-not-allowed">
+          <div className="flex-1 sm:flex-initial px-5 py-2.5 bg-gray-100 text-gray-500 border border-gray-200 font-bold rounded-lg text-sm flex items-center justify-center gap-2 cursor-not-allowed">
             <Clock className="size-4" />
             <span>Application Closed</span>
           </div>
@@ -213,7 +249,7 @@ export default function JobActions({
           <button
             onClick={onApplyClick}
             disabled={!job.url}
-            className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-emerald-700 text-white font-bold rounded-lg text-sm transition-all shadow-sm hover:shadow-md cursor-pointer ml-auto sm:ml-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-2.5 bg-primary hover:bg-emerald-700 text-white font-bold rounded-lg text-sm transition-all shadow-sm hover:shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span>Apply</span>
             <ExternalLink className="size-4" />

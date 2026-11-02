@@ -109,36 +109,43 @@ export default function JobDetailsView({
       ) : null}
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10">
-        {/* Title Section (Starts directly from Title, no top company section) */}
-        <header className="mb-8 sm:mb-10">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-foreground tracking-tight break-words">
-            {jobTitle}
-          </h1>
+        {/* Title Section (Title and Action Buttons on the same line) */}
+        <header className="mb-8 sm:mb-10 flex flex-col md:flex-row md:items-start justify-between gap-5 sm:gap-6">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-foreground tracking-tight break-words">
+              {jobTitle}
+            </h1>
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3.5 text-xs sm:text-sm text-gray-600">
-            {isExpired && (
-              <span className="px-2.5 py-0.5 text-[11px] font-bold font-mono uppercase bg-gray-100 text-gray-600 rounded-full">
-                Expired
-              </span>
-            )}
-            <div className="flex items-center gap-1.5">
-              <MapPin className="size-4 text-gray-400" />
-              <span>{jobLocation}</span>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3.5 text-xs sm:text-sm text-gray-600">
+              {isExpired && (
+                <span className="px-2.5 py-0.5 text-[11px] font-bold font-mono uppercase bg-gray-100 text-gray-600 rounded-full">
+                  Expired
+                </span>
+              )}
+              <div className="flex items-center gap-1.5">
+                <MapPin className="size-4 text-gray-400" />
+                <span>{jobLocation}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Briefcase className="size-4 text-gray-400" />
+                <span>{jobType}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Clock className="size-4 text-gray-400" />
+                <span>Posted {postedTime}</span>
+              </div>
+              {isFreshersAllowed && (
+                <span className="px-2.5 py-0.5 text-[11px] font-bold font-mono uppercase text-black border border-black bg-white rounded-full inline-flex items-center gap-1.5">
+                  <Check className="size-3 text-blue-600 stroke-[2.5]" />
+                  <span>Freshers Allowed</span>
+                </span>
+              )}
             </div>
-            <div className="flex items-center gap-1.5">
-              <Briefcase className="size-4 text-gray-400" />
-              <span>{jobType}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Clock className="size-4 text-gray-400" />
-              <span>Posted {postedTime}</span>
-            </div>
-            {isFreshersAllowed && (
-              <span className="px-2.5 py-0.5 text-[11px] font-bold font-mono uppercase text-black border border-black bg-white rounded-full inline-flex items-center gap-1.5">
-                <Check className="size-3 text-blue-600 stroke-[2.5]" />
-                <span>Freshers Allowed</span>
-              </span>
-            )}
+          </div>
+
+          {/* Action Buttons in line with Title section */}
+          <div className="shrink-0 w-full md:w-auto">
+            <JobActions job={job} isExpired={isExpired} variant="header" />
           </div>
         </header>
 
@@ -308,21 +315,6 @@ export default function JobDetailsView({
                 </div>
               </div>
             )}
-
-            {/* Ready to Apply Card */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
-              <div>
-                <h3 className="text-xl font-bold text-foreground">
-                  Ready to apply?
-                </h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  {hasDeadline
-                    ? `Applications close on ${displayDeadline}.`
-                    : "Direct application through official company portal."}
-                </p>
-              </div>
-              <JobActions job={job} isExpired={isExpired} variant="header" />
-            </div>
           </div>
 
           {/* Sticky Sidebar (Desktop Right 1/3, Mobile 1st Order directly after title) */}
