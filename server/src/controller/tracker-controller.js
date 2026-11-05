@@ -1,5 +1,7 @@
 import { ObjectId } from "mongodb";
 import { getDB } from "../db/database.js";
+import { escapeRegex } from "./job-controller/shared.js";
+import { logger } from "../utils/logger.js";
 // Helper to calculate the severity/index of a status for backward direction checks
 const STATUS_ORDER = {
   PENDING_CONFIRMATION: 0,
@@ -225,19 +227,19 @@ export const addTrackedJob = async (req, res) => {
           await externalJobColl.updateOne({ _id: jobId }, { $set: updates });
         }
       } else {
-        const givenReq = title && company && platform && deadline;
+        const givenReq = title && company && platform;
         if (!givenReq) {
           return res.status(400).json({
             status: 0,
             message:
-              "Title, company, platform, and deadline are required for new external jobs.",
+              "Title, company, and platform are required for new external jobs.",
           });
         }
         const newExt = {
           url,
           title: title,
           company: company,
-          deadline: deadline,
+          deadline: deadline || null,
           platform: platform,
           addedBy: userId,
           createdAt: new Date(),
@@ -468,23 +470,110 @@ export const lookupExternalJob = async (req, res) => {
 
 export const getTrackerSuggestions = async (req, res) => {
   try {
-    const userId = new ObjectId(req.params.id);
+    const { field, q } = req.query;
+
+    if (!q || !q.trim()) {
+      return res.status(200).json({ status: 1, data: [] });
+    }
+
+    const cleanQ = q.trim();
+    const regex = new RegExp("^" + escapeRegex(cleanQ), "i");
     const db = await getDB();
 
-    // Global internal companies & external companies
-    const internalCompanies = await db.collection("jobs").distinct("company");
-    const externalCompanies = await db
-      .collection("external_jobs")
-      .distinct("company");
+    if (field === "title") {
+      // Titles suggested via Atlas Search autocomplete on external_jobs
+      try {
+        const pipeline = [
+          {
+            $search: {
+              autocomplete: {
+                query: cleanQ,
+                path: "title",
+                fuzzy: {
+                  maxEdits: 1,
+                  prefixLength: 1,
+                },
+              },
+            },
+          },
+          { $limit: 20 },
+          { $project: { title: 1, _id: 0 } },
+        ];
+        const searchDocs = await db
+          .collection("external_jobs")
+          .aggregate(pipeline)
+          .toArray();
 
-    const companies = [
-      ...new Set([...internalCompanies, ...externalCompanies]),
-    ].filter(Boolean);
+        const seen = new Set();
+        const suggestions = [];
+        for (const doc of searchDocs) {
+          if (!doc.title) continue;
+          const lower = doc.title.toLowerCase();
+          if (!seen.has(lower)) {
+            seen.add(lower);
+            suggestions.push(doc.title);
+            if (suggestions.length >= 8) break;
+          }
+        }
+        return res.status(200).json({ status: 1, data: suggestions });
+      } catch (searchError) {
+        // Fallback to regex prefix search if Atlas Search index is not yet built or available
+        logger.warn(
+          { error: searchError.message },
+          "Atlas Search unavailable for title suggestions, falling back to regex"
+        );
+        const docs = await db
+          .collection("external_jobs")
+          .find({ title: regex }, { projection: { title: 1, _id: 0 } })
+          .limit(30)
+          .toArray();
 
-    return res.status(200).json({
-      status: 1,
-      data: { companies, titles: [] },
-    });
+        const seen = new Set();
+        const suggestions = [];
+        for (const doc of docs) {
+          if (!doc.title) continue;
+          const lower = doc.title.toLowerCase();
+          if (!seen.has(lower)) {
+            seen.add(lower);
+            suggestions.push(doc.title);
+            if (suggestions.length >= 8) break;
+          }
+        }
+        return res.status(200).json({ status: 1, data: suggestions });
+      }
+    }
+
+    if (field === "company") {
+      // Companies suggested from both internal jobs and external_jobs
+      const [internalDocs, externalDocs] = await Promise.all([
+        db
+          .collection("jobs")
+          .find({ company: regex }, { projection: { company: 1, _id: 0 } })
+          .limit(30)
+          .toArray(),
+        db
+          .collection("external_jobs")
+          .find({ company: regex }, { projection: { company: 1, _id: 0 } })
+          .limit(30)
+          .toArray(),
+      ]);
+
+      const seen = new Set();
+      const suggestions = [];
+      const allDocs = [...internalDocs, ...externalDocs];
+      for (const doc of allDocs) {
+        if (!doc.company) continue;
+        const lower = doc.company.toLowerCase();
+        if (!seen.has(lower)) {
+          seen.add(lower);
+          suggestions.push(doc.company);
+          if (suggestions.length >= 8) break;
+        }
+      }
+      return res.status(200).json({ status: 1, data: suggestions });
+    }
+
+    return res.status(200).json({ status: 1, data: [] });
   } catch (error) {
     console.error("Error in getTrackerSuggestions:", error);
     return res

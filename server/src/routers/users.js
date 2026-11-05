@@ -27,7 +27,7 @@ import {
   getTrackedJobsSchema,
   addTrackedJobSchema,
   updateTrackedJobSchema,
-  deleteTrackedJobSchema,
+  deleteTrackedJobSchema, trackerSuggestionsSchema,
 } from "../utils/validators.js";
 
 const router = express.Router();
@@ -48,7 +48,7 @@ router.put("/:id/tracked-jobs/:jobId", validate(updateTrackedJobSchema), updateT
 router.delete("/:id/tracked-jobs/:jobId", validate(deleteTrackedJobSchema), deleteTrackedJob);
 
 router.get("/:id/tracked-companies", getTrackedCompanies);
-router.get("/:id/tracker-suggestions", getTrackerSuggestions);
+router.get("/:id/tracker-suggestions", validate(trackerSuggestionsSchema), getTrackerSuggestions);
 router.get("/:id/tracker-stats", getTrackerStats);
 router.get("/:id/external-lookup", lookupExternalJob);
 

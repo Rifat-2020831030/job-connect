@@ -1,6 +1,9 @@
 "use client";
 
-import JobFilters, { ActiveFilters, FilterOptions } from "@/components/JobFilters";
+import JobFilters, {
+  ActiveFilters,
+  FilterOptions,
+} from "@/components/JobFilters";
 import JobRow from "@/components/JobRow";
 import JobSearchBar from "@/components/JobSearchBar";
 import JobDetailsModal, { JobDetail } from "@/components/JobDetailsModal";
@@ -30,7 +33,7 @@ function JobsPageContent() {
     categories: [],
     experienceLevels: [],
     jobTypes: [],
-    topCompanies: []
+    topCompanies: [],
   });
 
   // URL state parsing
@@ -38,12 +41,20 @@ function JobsPageContent() {
   const currentSort = searchParams.get("sort") || "recent";
   const currentQuery = searchParams.get("q") || "";
   const currentLocation = searchParams.get("location") || "";
-  
+
   const activeFilters: ActiveFilters = {
-    categories: searchParams.get("category") ? searchParams.get("category")!.split(",") : [],
-    experienceLevels: searchParams.get("experience_level") ? searchParams.get("experience_level")!.split(",") : [],
-    jobTypes: searchParams.get("job_type") ? searchParams.get("job_type")!.split(",") : [],
-    companies: searchParams.get("company") ? searchParams.get("company")!.split(",") : [],
+    categories: searchParams.get("category")
+      ? searchParams.get("category")!.split(",")
+      : [],
+    experienceLevels: searchParams.get("experience_level")
+      ? searchParams.get("experience_level")!.split(",")
+      : [],
+    jobTypes: searchParams.get("job_type")
+      ? searchParams.get("job_type")!.split(",")
+      : [],
+    companies: searchParams.get("company")
+      ? searchParams.get("company")!.split(",")
+      : [],
   };
 
   // Fetch Filter Options
@@ -52,18 +63,21 @@ function JobsPageContent() {
       try {
         const [optRes, catRes] = await Promise.all([
           fetch(`${API_BASE_URL}/jobs/filter-options`),
-          fetch(`${API_BASE_URL}/jobs/categories`)
+          fetch(`${API_BASE_URL}/jobs/categories`),
         ]);
-        
+
         const optData = await optRes.json();
         const catData = await catRes.json();
 
         if (optData.status === 1 && catData.status === 1) {
           setFilterOptions({
-            categories: catData.data.map((c: any) => ({ value: c.label || c.category, count: c.count })),
+            categories: catData.data.map((c: any) => ({
+              value: c.label || c.category,
+              count: c.count,
+            })),
             experienceLevels: optData.data.experienceLevels,
             jobTypes: optData.data.jobTypes,
-            topCompanies: optData.data.topCompanies
+            topCompanies: optData.data.topCompanies,
           });
         }
       } catch (err) {
@@ -83,15 +97,25 @@ function JobsPageContent() {
           ...(currentSort && { sort: currentSort }),
           ...(currentQuery && { q: currentQuery }),
           ...(currentLocation && { location: currentLocation }),
-          ...(activeFilters.categories.length && { category: activeFilters.categories.join(",") }),
-          ...(activeFilters.experienceLevels.length && { experience_level: activeFilters.experienceLevels.join(",") }),
-          ...(activeFilters.jobTypes.length && { job_type: activeFilters.jobTypes.join(",") }),
-          ...(activeFilters.companies.length && { company: activeFilters.companies.join(",") }),
+          ...(activeFilters.categories.length && {
+            category: activeFilters.categories.join(","),
+          }),
+          ...(activeFilters.experienceLevels.length && {
+            experience_level: activeFilters.experienceLevels.join(","),
+          }),
+          ...(activeFilters.jobTypes.length && {
+            job_type: activeFilters.jobTypes.join(","),
+          }),
+          ...(activeFilters.companies.length && {
+            company: activeFilters.companies.join(","),
+          }),
         };
 
-        const res = await fetch(`${API_BASE_URL}/jobs?${new URLSearchParams(apiParams).toString()}`);
+        const res = await fetch(
+          `${API_BASE_URL}/jobs?${new URLSearchParams(apiParams).toString()}`
+        );
         const data = await res.json();
-        
+
         if (data.status === 1) {
           setJobs(data.data);
           setTotalJobs(data.total);
@@ -109,17 +133,20 @@ function JobsPageContent() {
     }
     fetchJobs();
   }, [
-    currentPage, 
-    currentSort, 
-    currentQuery, 
-    currentLocation, 
-    searchParams.get("category"), 
-    searchParams.get("experience_level"), 
-    searchParams.get("job_type"), 
-    searchParams.get("company")
+    currentPage,
+    currentSort,
+    currentQuery,
+    currentLocation,
+    searchParams.get("category"),
+    searchParams.get("experience_level"),
+    searchParams.get("job_type"),
+    searchParams.get("company"),
   ]);
 
-  const updateUrl = (newParams: Record<string, string | null>, resetPage = true) => {
+  const updateUrl = (
+    newParams: Record<string, string | null>,
+    resetPage = true
+  ) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(newParams).forEach(([key, value]) => {
       if (value === null || value === "") {
@@ -138,7 +165,10 @@ function JobsPageContent() {
   const scrollToResults = () => {
     const el = document.getElementById("results-section");
     if (el) {
-      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+      setTimeout(
+        () => el.scrollIntoView({ behavior: "smooth", block: "start" }),
+        50
+      );
     }
   };
 
@@ -151,17 +181,27 @@ function JobsPageContent() {
 
   const handleApplyFilters = (filters: ActiveFilters) => {
     updateUrl({
-      category: filters.categories.length > 0 ? filters.categories.join(",") : null,
-      experience_level: filters.experienceLevels.length > 0 ? filters.experienceLevels.join(",") : null,
+      category:
+        filters.categories.length > 0 ? filters.categories.join(",") : null,
+      experience_level:
+        filters.experienceLevels.length > 0
+          ? filters.experienceLevels.join(",")
+          : null,
       job_type: filters.jobTypes.length > 0 ? filters.jobTypes.join(",") : null,
-      company: filters.companies.length > 0 ? filters.companies.join(",") : null,
+      company:
+        filters.companies.length > 0 ? filters.companies.join(",") : null,
     });
     setShowMobileFilters(false);
     scrollToResults();
   };
 
   const handleClearFilters = () => {
-    updateUrl({ category: null, experience_level: null, job_type: null, company: null });
+    updateUrl({
+      category: null,
+      experience_level: null,
+      job_type: null,
+      company: null,
+    });
     scrollToResults();
   };
 
@@ -198,7 +238,7 @@ function JobsPageContent() {
     const maxVisible = 5;
     let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
     const end = Math.min(totalPages, start + maxVisible - 1);
-    
+
     if (end - start + 1 < maxVisible) {
       start = Math.max(1, end - maxVisible + 1);
     }
@@ -215,11 +255,13 @@ function JobsPageContent() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/20 backdrop-blur-sm">
           <div className="bg-white p-4 rounded-lg shadow-lg flex items-center gap-3">
             <Loader2 className="animate-spin h-5 w-5 text-primary" />
-            <span className="font-mono text-sm text-gray-700">Loading details...</span>
+            <span className="font-mono text-sm text-gray-700">
+              Loading details...
+            </span>
           </div>
         </div>
       )}
-      
+
       {/* Header / Search Section */}
       <section className="w-full border-b border-gray-200 bg-white">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-8 md:py-12 flex flex-col items-center">
@@ -230,9 +272,9 @@ function JobsPageContent() {
             Browse thousands of active jobs from top tech companies.
           </p>
           <div className="w-full max-w-4xl">
-            <JobSearchBar 
-              initialQuery={currentQuery} 
-              initialLocation={currentLocation} 
+            <JobSearchBar
+              initialQuery={currentQuery}
+              initialLocation={currentLocation}
               onSearch={handleSearch}
               isLoading={isLoadingJobs}
             />
@@ -292,7 +334,7 @@ function JobsPageContent() {
 
             {/* Filter Content */}
             <div className="flex-1 min-h-0 overflow-hidden">
-              <JobFilters 
+              <JobFilters
                 options={filterOptions}
                 activeFilters={activeFilters}
                 onApplyFilters={handleApplyFilters}
@@ -302,14 +344,17 @@ function JobsPageContent() {
             </div>
           </aside>
 
-          <main id="results-section" className="flex-1 w-full flex flex-col min-w-0 scroll-mt-24 lg:scroll-mt-28">
+          <main
+            id="results-section"
+            className="flex-1 w-full flex flex-col min-w-0 scroll-mt-24 lg:scroll-mt-28"
+          >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
               <h2 className="text-lg md:text-xl font-bold text-foreground">
                 Showing Results
               </h2>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <span className="font-mono">Sort by:</span>
-                <select 
+                <select
                   className="border-none bg-transparent font-bold text-primary cursor-pointer outline-none hover:text-emerald-700"
                   value={currentSort}
                   onChange={(e) => updateUrl({ sort: e.target.value }, true)}
@@ -323,18 +368,23 @@ function JobsPageContent() {
             {isLoadingJobs ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4 w-full">
                 <Loader2 className="animate-spin h-8 w-8 text-primary" />
-                <span className="text-gray-500 font-medium">Loading jobs...</span>
+                <span className="text-gray-500 font-medium">
+                  Loading jobs...
+                </span>
               </div>
             ) : jobs.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4 text-center px-4 w-full">
                 <div className="size-16 bg-gray-100 rounded-full flex items-center justify-center mb-2">
                   <Search className="size-8 text-gray-400" />
                 </div>
-                <h3 className="text-xl font-bold text-foreground">No jobs found</h3>
+                <h3 className="text-xl font-bold text-foreground">
+                  No jobs found
+                </h3>
                 <p className="text-gray-500 max-w-md">
-                  We couldn't find any jobs matching your current search criteria. Try adjusting your filters or search terms.
+                  We couldn&apos;t find any jobs matching your current search
+                  criteria. Try adjusting your filters or search terms.
                 </p>
-                <button 
+                <button
                   onClick={handleClearFilters}
                   className="mt-4 px-6 py-2 bg-primary text-white font-bold rounded-md hover:bg-emerald-700 transition-colors"
                 >
@@ -369,22 +419,22 @@ function JobsPageContent() {
             {/* Pagination */}
             {!isLoadingJobs && totalPages > 1 && (
               <div className="mt-8 flex justify-center items-center gap-1 md:gap-2 pb-12 w-full">
-                <button 
+                <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage <= 1}
                   className="size-8 md:size-10 flex items-center justify-center border border-gray-200 rounded-md hover:border-gray-300 hover:bg-gray-50 transition-colors text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   &larr;
                 </button>
-                
-                {getPages().map(p => (
-                  <button 
+
+                {getPages().map((p) => (
+                  <button
                     key={p}
                     onClick={() => handlePageChange(p)}
                     className={`size-8 md:size-10 flex items-center justify-center border rounded-md transition-colors font-medium cursor-pointer ${
-                      p === currentPage 
-                        ? 'border-primary bg-primary/10 text-primary font-bold' 
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-foreground'
+                      p === currentPage
+                        ? "border-primary bg-primary/10 text-primary font-bold"
+                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-foreground"
                     }`}
                   >
                     {p}
@@ -394,7 +444,7 @@ function JobsPageContent() {
                 {totalPages > getPages()[getPages().length - 1] && (
                   <>
                     <span className="px-1 md:px-2 text-gray-400">...</span>
-                    <button 
+                    <button
                       onClick={() => handlePageChange(totalPages)}
                       className="size-8 md:size-10 flex items-center justify-center border border-gray-200 rounded-md hover:border-gray-300 hover:bg-gray-50 transition-colors text-foreground font-medium cursor-pointer"
                     >
@@ -403,7 +453,7 @@ function JobsPageContent() {
                   </>
                 )}
 
-                <button 
+                <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage >= totalPages}
                   className="size-8 md:size-10 flex items-center justify-center border border-gray-200 rounded-md hover:border-gray-300 hover:bg-gray-50 transition-colors text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
@@ -431,11 +481,13 @@ function JobsPageContent() {
 
 export default function JobsPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="animate-spin h-8 w-8 text-primary" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <Loader2 className="animate-spin h-8 w-8 text-primary" />
+        </div>
+      }
+    >
       <JobsPageContent />
     </Suspense>
   );

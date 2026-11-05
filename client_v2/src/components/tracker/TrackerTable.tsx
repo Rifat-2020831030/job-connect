@@ -1,7 +1,7 @@
 "use client";
 
 import { formatDate, shouldRemindStatusUpdate } from "@/lib/utils";
-import { Loader2, HelpCircle } from "lucide-react";
+import { Loader2, HelpCircle, FileText } from "lucide-react";
 import { useState } from "react";
 import { JobDetail } from "../JobDetailsModal";
 import SelectDropdown from "../SelectDropdown";
@@ -140,9 +140,27 @@ export default function TrackerTable({
                     {job.jobDetails?.title || "Unknown Title"}
                   </a>
                   {job.notes && (
-                    <span className="inline-block mt-1 bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
-                      Notes
-                    </span>
+                    <div className="relative inline-block mt-1 group/note">
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onOpenNotes(job);
+                        }}
+                        className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200/60 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                        title="View notes"
+                      >
+                        <FileText className="w-2.5 h-2.5" />
+                        Notes
+                      </span>
+                      <div className="absolute left-0 bottom-full mb-1.5 hidden group-hover/note:block z-30 w-64 p-2.5 bg-gray-900 text-white text-xs rounded-lg shadow-xl pointer-events-none animate-in fade-in zoom-in-95 duration-100">
+                        <p className="line-clamp-3 font-normal text-gray-200 whitespace-pre-wrap">
+                          {job.notes}
+                        </p>
+                        <span className="text-[10px] text-gray-400 mt-1 block font-mono">
+                          Click to open notes
+                        </span>
+                      </div>
+                    </div>
                   )}
                 </td>
                 <td className="px-6 py-4">
