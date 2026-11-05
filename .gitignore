@@ -21,4 +21,5 @@ venv/
 .project/
 
 learning_base.md
+docs/superpowers/**/*utm-source-*.md
 
