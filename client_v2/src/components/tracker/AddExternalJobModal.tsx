@@ -144,9 +144,14 @@ export default function AddExternalJobModal({
             onClose();
             return; // completely bypass step 2
           } else if (addData.message && addData.message.includes("already")) {
-            toast.info("This job is already in your tracker.");
-            onClose();
-            return;
+            // Already tracked as internal -> auto-fill and allow tracking another entry as external
+            setTitle(data.data.title || "");
+            setCompany(data.data.company || "");
+            if (data.data.deadline) {
+              setDeadline(data.data.deadline.split("T")[0]);
+            }
+            setPlatform("Other");
+            toast.info("Job details auto-filled. You can add another tracked entry below.");
           }
         } else {
           // External job found

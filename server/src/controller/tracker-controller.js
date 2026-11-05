@@ -208,46 +208,29 @@ export const addTrackedJob = async (req, res) => {
           .status(400)
           .json({ status: 0, message: "URL is required for external jobs." });
 
-      // Upsert into external_jobs
-      const externalJobColl = db.collection("external_jobs");
-      const existingJob = await externalJobColl.findOne({ url });
-
-      if (existingJob) {
-        jobId = existingJob._id;
-        // Optionally update title, company, deadline if provided
-        const updates = {};
-        if (title && title !== existingJob.title) updates.title = title;
-        if (company && company !== existingJob.company)
-          updates.company = company;
-        if (deadline && deadline !== existingJob.deadline)
-          updates.deadline = deadline;
-
-        if (Object.keys(updates).length > 0) {
-          updates.updatedAt = new Date();
-          await externalJobColl.updateOne({ _id: jobId }, { $set: updates });
-        }
-      } else {
-        const givenReq = title && company && platform;
-        if (!givenReq) {
-          return res.status(400).json({
-            status: 0,
-            message:
-              "Title, company, and platform are required for new external jobs.",
-          });
-        }
-        const newExt = {
-          url,
-          title: title,
-          company: company,
-          deadline: deadline || null,
-          platform: platform,
-          addedBy: userId,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-        const result = await externalJobColl.insertOne(newExt);
-        jobId = result.insertedId;
+      const givenReq = title && company && platform;
+      if (!givenReq) {
+        return res.status(400).json({
+          status: 0,
+          message:
+            "Title, company, and platform are required for new external jobs.",
+        });
       }
+
+      // Always create a dedicated external_jobs record so multiple jobs can share the same URL
+      const externalJobColl = db.collection("external_jobs");
+      const newExt = {
+        url,
+        title: title,
+        company: company,
+        deadline: deadline || null,
+        platform: platform,
+        addedBy: userId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const result = await externalJobColl.insertOne(newExt);
+      jobId = result.insertedId;
     }
 
     if (!jobId) {
@@ -259,14 +242,16 @@ export const addTrackedJob = async (req, res) => {
         });
     }
 
-    // Check if already tracked
-    const existing = await db
-      .collection("job_track")
-      .findOne({ userId, jobId });
-    if (existing) {
-      return res
-        .status(400)
-        .json({ status: 0, message: "Job is already being tracked." });
+    // Check if already tracked (only for INTERNAL jobs where jobId is shared)
+    if (type === "INTERNAL") {
+      const existing = await db
+        .collection("job_track")
+        .findOne({ userId, jobId });
+      if (existing) {
+        return res
+          .status(400)
+          .json({ status: 0, message: "Job is already being tracked." });
+      }
     }
 
     const appTime = applicationTime ? new Date(applicationTime) : new Date();
@@ -441,10 +426,12 @@ export const lookupExternalJob = async (req, res) => {
       return res.status(400).json({ status: 0, message: "URL is required" });
     const db = await getDB();
 
-    // Query parallelly
+    // Query parallelly (fetch latest external job if multiple exist with same url)
     const [internalJob, externalJob] = await Promise.all([
       db.collection("jobs").findOne({ url }),
-      db.collection("external_jobs").findOne({ url }),
+      db
+        .collection("external_jobs")
+        .findOne({ url }, { sort: { createdAt: -1 } }),
     ]);
 
     if (internalJob) {
