@@ -41,7 +41,7 @@ export default function LoginPage() {
       } else {
         toast.error(data.message || "Invalid email or password");
       }
-    } catch (err) {
+    } catch {
       toast.error("Invalid email or password");
     } finally {
       setLoading(false);
@@ -84,7 +84,7 @@ export default function LoginPage() {
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
                 <label className="text-sm font-semibold text-gray-700">Password</label>
-                <Link href="/login" onClick={(e) => { e.preventDefault(); toast.info("Forgot password feature coming soon"); }} className="text-xs font-semibold text-primary hover:underline underline-offset-2">
+                <Link href="/forgot-password" className="text-xs font-semibold text-primary hover:underline underline-offset-2 cursor-pointer">
                   Forgot password?
                 </Link>
               </div>
@@ -113,16 +113,16 @@ export default function LoginPage() {
             <button 
               type="submit" 
               disabled={loading || !email || !password}
-              className="w-full py-4 btn-primary text-base disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 btn-primary text-base cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Signing in..." : "Sign In"}
             </button>
             
             <div className="flex items-center justify-center gap-2 text-sm mt-2">
-              <span className="font-mono text-gray-500 font-semibold tracking-wide">Don't have an account?</span>
+              <span className="font-mono text-gray-500 font-semibold tracking-wide">Don&apos;t have an account?</span>
               <Link 
                 href="/#subscribe" 
-                className="font-mono text-primary font-semibold tracking-wide hover:underline decoration-primary/30 underline-offset-4"
+                className="font-mono text-primary font-semibold tracking-wide hover:underline decoration-primary/30 underline-offset-4 cursor-pointer"
               >
                 Subscribe
               </Link>

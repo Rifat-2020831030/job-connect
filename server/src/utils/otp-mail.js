@@ -11,11 +11,20 @@ import mailer from "../services/mail-service.js";
 
 const BRAND = "ChakriLagbe";
 const BRAND_COLOR = "#16a34a"; // emerald-600
-const FROM_DOMAIN = (process.env.MAIL_USER || "noreply@example.com").split("@")[1];
+const FROM_DOMAIN = (process.env.MAIL_USER || "noreply@example.com").split(
+  "@"
+)[1];
 
 // ─── HTML template ────────────────────────────────────────────────────────────
 
-const buildHtml = ({ heading, bodyLines, code, expiryHours = 24, footerNote }) => `
+const buildHtml = ({
+  heading,
+  bodyLines,
+  code,
+  expiryHours = 24,
+  footerNote,
+}) =>
+  `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,7 +54,12 @@ const buildHtml = ({ heading, bodyLines, code, expiryHours = 24, footerNote }) =
               <h1 style="margin:0 0 16px;font-size:20px;font-weight:700;color:#111827;">
                 ${heading}
               </h1>
-              ${bodyLines.map((line) => `<p style="margin:0 0 12px;font-size:15px;color:#374151;line-height:1.6;">${line}</p>`).join("")}
+              ${bodyLines
+                .map(
+                  (line) =>
+                    `<p style="margin:0 0 12px;font-size:15px;color:#374151;line-height:1.6;">${line}</p>`
+                )
+                .join("")}
 
               ${
                 code
@@ -77,7 +91,10 @@ const buildHtml = ({ heading, bodyLines, code, expiryHours = 24, footerNote }) =
           <tr>
             <td style="padding:16px 32px 24px;border-top:1px solid #f3f4f6;">
               <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.5;">
-                ${footerNote || `You received this email because an account action was requested on ${BRAND}. If you did not make this request, you can safely ignore this email.`}
+                ${
+                  footerNote ||
+                  `You received this email because an account action was requested on ${BRAND}. If you did not make this request, you can safely ignore this email.`
+                }
               </p>
               <p style="margin:8px 0 0;font-size:12px;color:#9ca3af;">
                 &copy; ${new Date().getFullYear()} ${BRAND}. All rights reserved.
@@ -103,11 +120,7 @@ const buildText = ({ heading, bodyLines, code, expiryHours = 24 }) =>
     ...bodyLines,
     "",
     ...(code
-      ? [
-          `Your code: ${code}`,
-          `This code expires in 5 minutes.`,
-          "",
-        ]
+      ? [`Your code: ${code}`, `This code expires in 5 minutes.`, ""]
       : []),
     "If you did not request this, please ignore this email.",
     "",
@@ -160,9 +173,7 @@ export const sendPasswordResetOtp = (to, code) => {
  */
 export const sendResendOtp = (to, code) => {
   const heading = "New verification code";
-  const bodyLines = [
-    "As requested, here is your new verification code.",
-  ];
+  const bodyLines = ["As requested, here is your new verification code."];
   return mailer(
     to,
     `${code} is your new ${BRAND} verification code`,
