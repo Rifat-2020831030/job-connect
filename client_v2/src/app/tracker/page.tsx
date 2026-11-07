@@ -9,10 +9,12 @@ import TrackerStats, {
 import TrackerTable, { TrackedJob } from "@/components/tracker/TrackerTable";
 import { fetchWithAuth } from "@/lib/apiClient";
 import { getUserInfo } from "@/lib/auth";
+import { buildTrackedJobsCSV, downloadCSV } from "@/lib/csvExport";
 import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Download,
   Filter,
   Loader2,
   Search,
@@ -26,6 +28,7 @@ export default function TrackerPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState<TrackedJob | null>(null);
   const [isAddingJob, setIsAddingJob] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Pagination, Search, Filter & Sort state
   const [searchQuery, setSearchQuery] = useState("");
@@ -288,6 +291,65 @@ export default function TrackerPage() {
     }
   };
 
+  const handleExportCSV = async () => {
+    const userInfo = getUserInfo();
+    if (!userInfo) return;
+
+    if (totalCount === 0) {
+      toast.info("No applications to export");
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      let exportData: TrackedJob[] = jobs;
+
+      // If total items exceed the currently loaded page size, or if on page > 1, fetch all matching records
+      if (totalCount > jobs.length || page > 1) {
+        let url = `/users/${userInfo.userId}/tracked-jobs?page=1&limit=${Math.max(
+          totalCount,
+          1
+        )}&sort=${sortOption}`;
+        if (searchQuery) url += `&q=${encodeURIComponent(searchQuery)}`;
+        if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
+        if (selectedCompanies.length > 0)
+          url += `&company=${encodeURIComponent(selectedCompanies.join(","))}`;
+
+        const res = await fetchWithAuth(url);
+        const data = await res.json();
+        if (data.status === 1 && Array.isArray(data.data)) {
+          exportData = data.data;
+        } else {
+          throw new Error(data.message || "Failed to fetch jobs for export");
+        }
+      }
+
+      if (exportData.length === 0) {
+        toast.info("No applications found to export");
+        return;
+      }
+
+      const csvContent = buildTrackedJobsCSV(exportData);
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      const filename = `job-applications-${year}-${month}-${day}.csv`;
+
+      downloadCSV(csvContent, filename);
+      toast.success(
+        `Exported ${exportData.length} ${
+          exportData.length === 1 ? "application" : "applications"
+        } to CSV`
+      );
+    } catch (err) {
+      console.error("Export error:", err);
+      toast.error("Failed to export applications to CSV");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 pb-12">
       <div className="bg-white border-b border-gray-200">
@@ -419,26 +481,49 @@ export default function TrackerPage() {
             ]}
             className="flex-1 md:flex-none md:w-44 order-4"
           />
-          {/* Add button — pushes to end */}
-          <button
-            onClick={() => setIsAddingJob(true)}
-            className="ml-auto order-5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-sm transition-colors flex items-center gap-2 cursor-pointer whitespace-nowrap"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          {/* Action buttons (Export CSV & Add Job) — pushes to end */}
+          <div className="ml-auto order-5 flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={handleExportCSV}
+              disabled={isExporting || totalCount === 0}
+              className="px-3.5 py-2 bg-white hover:bg-gray-50 text-gray-700 font-medium border border-gray-200 rounded-lg text-sm transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-xs"
+              title={
+                totalCount === 0
+                  ? "No applications to export"
+                  : "Export applications to CSV"
+              }
             >
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            <span className="hidden sm:inline">Add External Job</span>
-            <span className="sm:hidden">Add Job</span>
-          </button>
+              {isExporting ? (
+                <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
+              ) : (
+                <Download className="w-4 h-4 text-gray-500" />
+              )}
+              <span className="hidden sm:inline">Export CSV</span>
+              <span className="sm:hidden">Export</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsAddingJob(true)}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-sm transition-colors flex items-center gap-2 cursor-pointer whitespace-nowrap shadow-xs"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              <span className="hidden sm:inline">Add External Job</span>
+              <span className="sm:hidden">Add Job</span>
+            </button>
+          </div>
         </div>
 
         {isLoading && jobs.length === 0 ? (

@@ -1,5 +1,7 @@
 import { ObjectId } from "mongodb";
 import { getDB } from "../db/database.js";
+import { escapeRegex } from "./job-controller/shared.js";
+import { logger } from "../utils/logger.js";
 // Helper to calculate the severity/index of a status for backward direction checks
 const STATUS_ORDER = {
   PENDING_CONFIRMATION: 0,
@@ -206,46 +208,29 @@ export const addTrackedJob = async (req, res) => {
           .status(400)
           .json({ status: 0, message: "URL is required for external jobs." });
 
-      // Upsert into external_jobs
-      const externalJobColl = db.collection("external_jobs");
-      const existingJob = await externalJobColl.findOne({ url });
-
-      if (existingJob) {
-        jobId = existingJob._id;
-        // Optionally update title, company, deadline if provided
-        const updates = {};
-        if (title && title !== existingJob.title) updates.title = title;
-        if (company && company !== existingJob.company)
-          updates.company = company;
-        if (deadline && deadline !== existingJob.deadline)
-          updates.deadline = deadline;
-
-        if (Object.keys(updates).length > 0) {
-          updates.updatedAt = new Date();
-          await externalJobColl.updateOne({ _id: jobId }, { $set: updates });
-        }
-      } else {
-        const givenReq = title && company && platform && deadline;
-        if (!givenReq) {
-          return res.status(400).json({
-            status: 0,
-            message:
-              "Title, company, platform, and deadline are required for new external jobs.",
-          });
-        }
-        const newExt = {
-          url,
-          title: title,
-          company: company,
-          deadline: deadline,
-          platform: platform,
-          addedBy: userId,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-        const result = await externalJobColl.insertOne(newExt);
-        jobId = result.insertedId;
+      const givenReq = title && company && platform;
+      if (!givenReq) {
+        return res.status(400).json({
+          status: 0,
+          message:
+            "Title, company, and platform are required for new external jobs.",
+        });
       }
+
+      // Always create a dedicated external_jobs record so multiple jobs can share the same URL
+      const externalJobColl = db.collection("external_jobs");
+      const newExt = {
+        url,
+        title: title,
+        company: company,
+        deadline: deadline || null,
+        platform: platform,
+        addedBy: userId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const result = await externalJobColl.insertOne(newExt);
+      jobId = result.insertedId;
     }
 
     if (!jobId) {
@@ -257,14 +242,16 @@ export const addTrackedJob = async (req, res) => {
         });
     }
 
-    // Check if already tracked
-    const existing = await db
-      .collection("job_track")
-      .findOne({ userId, jobId });
-    if (existing) {
-      return res
-        .status(400)
-        .json({ status: 0, message: "Job is already being tracked." });
+    // Check if already tracked (only for INTERNAL jobs where jobId is shared)
+    if (type === "INTERNAL") {
+      const existing = await db
+        .collection("job_track")
+        .findOne({ userId, jobId });
+      if (existing) {
+        return res
+          .status(400)
+          .json({ status: 0, message: "Job is already being tracked." });
+      }
     }
 
     const appTime = applicationTime ? new Date(applicationTime) : new Date();
@@ -439,10 +426,12 @@ export const lookupExternalJob = async (req, res) => {
       return res.status(400).json({ status: 0, message: "URL is required" });
     const db = await getDB();
 
-    // Query parallelly
+    // Query parallelly (fetch latest external job if multiple exist with same url)
     const [internalJob, externalJob] = await Promise.all([
       db.collection("jobs").findOne({ url }),
-      db.collection("external_jobs").findOne({ url }),
+      db
+        .collection("external_jobs")
+        .findOne({ url }, { sort: { createdAt: -1 } }),
     ]);
 
     if (internalJob) {
@@ -468,23 +457,110 @@ export const lookupExternalJob = async (req, res) => {
 
 export const getTrackerSuggestions = async (req, res) => {
   try {
-    const userId = new ObjectId(req.params.id);
+    const { field, q } = req.query;
+
+    if (!q || !q.trim()) {
+      return res.status(200).json({ status: 1, data: [] });
+    }
+
+    const cleanQ = q.trim();
+    const regex = new RegExp("^" + escapeRegex(cleanQ), "i");
     const db = await getDB();
 
-    // Global internal companies & external companies
-    const internalCompanies = await db.collection("jobs").distinct("company");
-    const externalCompanies = await db
-      .collection("external_jobs")
-      .distinct("company");
+    if (field === "title") {
+      // Titles suggested via Atlas Search autocomplete on external_jobs
+      try {
+        const pipeline = [
+          {
+            $search: {
+              autocomplete: {
+                query: cleanQ,
+                path: "title",
+                fuzzy: {
+                  maxEdits: 1,
+                  prefixLength: 1,
+                },
+              },
+            },
+          },
+          { $limit: 20 },
+          { $project: { title: 1, _id: 0 } },
+        ];
+        const searchDocs = await db
+          .collection("external_jobs")
+          .aggregate(pipeline)
+          .toArray();
 
-    const companies = [
-      ...new Set([...internalCompanies, ...externalCompanies]),
-    ].filter(Boolean);
+        const seen = new Set();
+        const suggestions = [];
+        for (const doc of searchDocs) {
+          if (!doc.title) continue;
+          const lower = doc.title.toLowerCase();
+          if (!seen.has(lower)) {
+            seen.add(lower);
+            suggestions.push(doc.title);
+            if (suggestions.length >= 8) break;
+          }
+        }
+        return res.status(200).json({ status: 1, data: suggestions });
+      } catch (searchError) {
+        // Fallback to regex prefix search if Atlas Search index is not yet built or available
+        logger.warn(
+          { error: searchError.message },
+          "Atlas Search unavailable for title suggestions, falling back to regex"
+        );
+        const docs = await db
+          .collection("external_jobs")
+          .find({ title: regex }, { projection: { title: 1, _id: 0 } })
+          .limit(30)
+          .toArray();
 
-    return res.status(200).json({
-      status: 1,
-      data: { companies, titles: [] },
-    });
+        const seen = new Set();
+        const suggestions = [];
+        for (const doc of docs) {
+          if (!doc.title) continue;
+          const lower = doc.title.toLowerCase();
+          if (!seen.has(lower)) {
+            seen.add(lower);
+            suggestions.push(doc.title);
+            if (suggestions.length >= 8) break;
+          }
+        }
+        return res.status(200).json({ status: 1, data: suggestions });
+      }
+    }
+
+    if (field === "company") {
+      // Companies suggested from both internal jobs and external_jobs
+      const [internalDocs, externalDocs] = await Promise.all([
+        db
+          .collection("jobs")
+          .find({ company: regex }, { projection: { company: 1, _id: 0 } })
+          .limit(30)
+          .toArray(),
+        db
+          .collection("external_jobs")
+          .find({ company: regex }, { projection: { company: 1, _id: 0 } })
+          .limit(30)
+          .toArray(),
+      ]);
+
+      const seen = new Set();
+      const suggestions = [];
+      const allDocs = [...internalDocs, ...externalDocs];
+      for (const doc of allDocs) {
+        if (!doc.company) continue;
+        const lower = doc.company.toLowerCase();
+        if (!seen.has(lower)) {
+          seen.add(lower);
+          suggestions.push(doc.company);
+          if (suggestions.length >= 8) break;
+        }
+      }
+      return res.status(200).json({ status: 1, data: suggestions });
+    }
+
+    return res.status(200).json({ status: 1, data: [] });
   } catch (error) {
     console.error("Error in getTrackerSuggestions:", error);
     return res

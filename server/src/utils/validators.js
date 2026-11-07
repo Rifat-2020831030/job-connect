@@ -212,7 +212,7 @@ export const addTrackedJobSchema = z.object({
       url: z.string().url("Must be a valid URL"),
       title: z.string().min(1, "Title is required"),
       company: z.string().min(1, "Company is required"),
-      deadline: z.string().optional(),
+      deadline: z.string().nullable().optional(),
       applicationTime: z.string().optional(), // ISO date string
       cvLink: z.string().url("Must be a valid URL").optional(),
       platform: z.string().min(1, "Platform is required"),
@@ -237,5 +237,16 @@ export const deleteTrackedJobSchema = z.object({
   params: z.object({
     id: objectId("User ID"),
     jobId: objectId("Job ID"), 
+  }),
+});
+
+
+export const trackerSuggestionsSchema = z.object({
+  params: z.object({
+    id: objectId("User ID"),
+  }),
+  query: z.object({
+    field: z.enum(["title", "company"]),
+    q: z.string().optional(),
   }),
 });

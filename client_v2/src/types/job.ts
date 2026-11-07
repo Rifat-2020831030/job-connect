@@ -54,5 +54,6 @@ export interface JobDetail {
   job_type?: string | null;
   category?: string | null;
   url: string;
+  platform?: string | null;
   first_seen?: string | null;
 }
