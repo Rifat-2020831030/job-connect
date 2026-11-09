@@ -57,6 +57,16 @@ function JobsPageContent() {
       : [],
   };
 
+  // Sync document title with selected categories
+  useEffect(() => {
+    const categoryParam = searchParams.get("category");
+    if (categoryParam) {
+      document.title = `Browse tech jobs in bd | ${categoryParam} | Chakrilagbe`;
+    } else {
+      document.title = "Browse tech jobs in bd | Chakrilagbe";
+    }
+  }, [searchParams]);
+
   // Fetch Filter Options
   useEffect(() => {
     async function fetchOptions() {

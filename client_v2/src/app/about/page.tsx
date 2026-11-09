@@ -1,8 +1,13 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About | ChakriLagbe",
+  title: {
+    absolute: "About | ChakriLagbe",
+  },
   description: "The story behind ChakriLagbe",
+  alternates: {
+    canonical: "/about",
+  },
 };
 
 export default function AboutPage() {
@@ -45,10 +50,6 @@ export default function AboutPage() {
             seamlessly handles everything from discovering the perfect role to
             submitting your application.
           </p>
-
-          {/* <p>
-            Our mission is to eliminate the friction from the job hunt. We want to empower you by taking the busywork out of the process, providing a smooth, intuitive workflow so you can focus on what truly matters: showcasing your potential and landing the job you deserve.
-          </p> */}
         </div>
       </div>
     </main>
