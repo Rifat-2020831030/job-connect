@@ -86,14 +86,11 @@ export default function HomeClient({
           <SectionHeader title="Latest Jobs" viewAllLink="/jobs" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredJobs.map((job, index) => (
-              <JobCard
-                key={job._id || index}
-                {...job}
-              />
+              <JobCard key={job._id || index} {...job} />
             ))}
             {featuredJobs.length === 0 && (
               <p className="text-gray-500 col-span-full">
-                No latest jobs available right now.
+                No featured jobs available right now
               </p>
             )}
           </div>
@@ -107,14 +104,11 @@ export default function HomeClient({
           />
           <div className="flex flex-col gap-3">
             {engineeringJobs.map((job, index) => (
-              <EngineeringJobRow
-                key={job._id || index}
-                {...job}
-              />
+              <EngineeringJobRow key={job._id || index} {...job} />
             ))}
             {engineeringJobs.length === 0 && (
               <p className="text-gray-500">
-                No engineering jobs available right now.
+                No engineering jobs available right now
               </p>
             )}
           </div>
@@ -128,14 +122,11 @@ export default function HomeClient({
           />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {leadershipJobs.map((job, index) => (
-              <JobCard
-                key={job._id || index}
-                {...job}
-              />
+              <JobCard key={job._id || index} {...job} />
             ))}
             {leadershipJobs.length === 0 && (
               <p className="text-gray-500 col-span-full">
-                No leadership jobs available right now.
+                No leadership jobs available right now
               </p>
             )}
           </div>
