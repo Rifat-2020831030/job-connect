@@ -1,5 +1,14 @@
 export const jobCardBuilder = (job, frontendUrl) => {
   const jobUrl = `${frontendUrl}/jobs?jobId=${job._id}&utm_source=job_alert_email`;
+  const salaryText =
+    typeof job.salary === "object" && job.salary !== null
+      ? (job.salary.text_form || "Not mentioned")
+      : (typeof job.salary === "string" && job.salary.trim() !== "" ? job.salary : "Not mentioned");
+  const vacancyText =
+    job.vacancy != null && job.vacancy !== -1 && job.vacancy !== ""
+      ? job.vacancy
+      : "Not mentioned";
+
   return `
     <!-- Card Container -->
     <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation" style="max-width: 300px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin: 0 auto 20px auto;">
@@ -56,20 +65,11 @@ export const jobCardBuilder = (job, frontendUrl) => {
                     <tr>
                         <td style="width: 33.33%; padding-right: 10px; vertical-align: top;">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">SALARY</p>
-                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">
-                            ${
-                              job.salary && job.salary !== ""
-                                ? job.salary
-                                : "Not mentioned"
-                            }
-                            </p>
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">${salaryText}</p>
                         </td>
                         <td style="width: 33.33%; padding-right: 10px; vertical-align: top;">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">VACANCY</p>
-                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">
-                            ${
-                              job.vacancy != -1 ? job.vacancy : "Not mentioned"
-                            }</p>
+                            <p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E293B; margin: 0; font-weight: 400;">${vacancyText}</p>
                         </td>
                         <td style="width: 33.33%; vertical-align: top;">
                             <p style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #64748B; margin: 0 0 3px 0; font-weight: 500;">DEADLINE</p>

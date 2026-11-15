@@ -79,35 +79,6 @@ export async function fetchSiteStats() {
   }
 }
 
-/**
- * Calculates seconds remaining until the job's expiration date.
- * If expired or invalid, provides a safe fallback revalidation interval.
- */
-export function calculateJobRevalidate(
-  expiresAt?: string,
-  deadline?: string
-): number {
-  const expiryTarget = expiresAt || deadline;
-  if (!expiryTarget) {
-    return JOB_REVALIDATE_SECONDS; // Default to 1 hour (3,600s)
-  }
-
-  const expiryMs = new Date(expiryTarget).getTime();
-  if (isNaN(expiryMs)) {
-    return JOB_REVALIDATE_SECONDS;
-  }
-
-  const nowMs = Date.now();
-  const diffInSeconds = Math.floor((expiryMs - nowMs) / 1000);
-
-  // If already expired, revalidate periodically (e.g. 1 hour)
-  if (diffInSeconds <= 0) {
-    return 3600;
-  }
-
-  // Cap at 1 hour maximum
-  return Math.min(JOB_REVALIDATE_SECONDS, Math.max(60, diffInSeconds));
-}
 
 export const fetchJobById = cache(async (id: string) => {
   try {
@@ -162,3 +133,90 @@ export const fetchSimilarJobs = cache(
     }
   }
 );
+
+
+export interface JobsApiResponse {
+  status: number;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  data: any[];
+}
+
+export async function fetchJobsList(
+  params: Record<string, string>
+): Promise<JobsApiResponse> {
+  try {
+    const search = new URLSearchParams(params).toString();
+    const res = await fetch(`${API_BASE_URL}/jobs?${search}`, {
+      next: { revalidate: 60, tags: ["jobs-list"] },
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (!res.ok) {
+      return {
+        status: 0,
+        total: 0,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        data: [],
+      };
+    }
+
+    const json = await res.json();
+    return json;
+  } catch (error) {
+    logger.error({ error }, "Error fetching jobs list");
+    return {
+      status: 0,
+      total: 0,
+      page: 1,
+      limit: 10,
+      totalPages: 1,
+      data: [],
+    };
+  }
+}
+
+export async function fetchJobsFilterOptions() {
+  try {
+    const [optRes, catRes] = await Promise.all([
+      fetch(`${API_BASE_URL}/jobs/filter-options`, {
+        next: { revalidate: 3600, tags: ["filter-options"] },
+        signal: AbortSignal.timeout(5000),
+      }),
+      fetch(`${API_BASE_URL}/jobs/categories`, {
+        next: { revalidate: 3600, tags: ["categories"] },
+        signal: AbortSignal.timeout(5000),
+      }),
+    ]);
+
+    const optData = optRes.ok ? await optRes.json() : null;
+    const catData = catRes.ok ? await catRes.json() : null;
+
+    return {
+      categories:
+        catData?.status === 1 && Array.isArray(catData.data)
+          ? catData.data.map((c: any) => ({
+              value: c.label || c.category,
+              count: c.count,
+            }))
+          : [],
+      experienceLevels:
+        optData?.status === 1 ? optData.data?.experienceLevels || [] : [],
+      jobTypes: optData?.status === 1 ? optData.data?.jobTypes || [] : [],
+      topCompanies:
+        optData?.status === 1 ? optData.data?.topCompanies || [] : [],
+    };
+  } catch (error) {
+    logger.error({ error }, "Error fetching filter options");
+    return {
+      categories: [],
+      experienceLevels: [],
+      jobTypes: [],
+      topCompanies: [],
+    };
+  }
+}
