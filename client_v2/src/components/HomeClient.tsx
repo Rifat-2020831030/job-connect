@@ -44,6 +44,14 @@ interface HomeClientProps {
   siteStats: any;
 }
 
+function EmptyJobs({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="col-span-full flex min-h-48 items-center justify-center rounded-xl border border-gray-200 bg-white p-6 text-center text-gray-500">
+      {children}
+    </p>
+  );
+}
+
 export default function HomeClient({
   featuredJobs,
   engineeringJobs,
@@ -89,9 +97,9 @@ export default function HomeClient({
               <JobCard key={job._id || index} {...job} />
             ))}
             {featuredJobs.length === 0 && (
-              <p className="text-gray-500 col-span-full">
+              <EmptyJobs>
                 No featured jobs available right now
-              </p>
+              </EmptyJobs>
             )}
           </div>
         </section>
@@ -107,9 +115,9 @@ export default function HomeClient({
               <EngineeringJobRow key={job._id || index} {...job} />
             ))}
             {engineeringJobs.length === 0 && (
-              <p className="text-gray-500">
+              <EmptyJobs>
                 No engineering jobs available right now
-              </p>
+              </EmptyJobs>
             )}
           </div>
         </section>
@@ -125,9 +133,9 @@ export default function HomeClient({
               <JobCard key={job._id || index} {...job} />
             ))}
             {leadershipJobs.length === 0 && (
-              <p className="text-gray-500 col-span-full">
+              <EmptyJobs>
                 No leadership jobs available right now
-              </p>
+              </EmptyJobs>
             )}
           </div>
         </section>
