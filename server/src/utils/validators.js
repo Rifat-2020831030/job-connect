@@ -8,7 +8,7 @@ export const VALID_CATEGORIES = [
 ];
 export const VALID_WORK_MODELS = ["Remote", "Onsite", "Hybrid", "Not Specified"];
 export const VALID_ALERT_TIMINGS = ["Morning", "Evening", "Night"];
-export const VALID_EXPERIENCE_LEVELS = ["Junior", "Mid", "Senior", "Not Specified"];
+export const VALID_EXPERIENCE_LEVELS = ["Junior", "Mid", "Senior", "Lead", "Staff / Architect", "Principal / Director", "Not Specified"];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

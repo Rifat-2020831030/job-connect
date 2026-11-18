@@ -248,7 +248,7 @@ Retrieve a list of jobs with robust filtering, pagination, and search capabiliti
   - `page`: Page number for pagination (must be a number). Default: 1.
   - `limit`: Number of items per page (must be a number, max 100). Default: 20.
   - `category`: Comma-separated list of valid categories (`web`, `ai/ml`, `data science`, `devops`, `mobile`, `security`, `design`, `PM`, `other`).
-  - `experience_level`: Comma-separated list of valid levels (`Junior`, `Mid`, `Senior`, `Not Specified`).
+  - `experience_level`: Comma-separated list of valid levels (`Junior`, `Mid`, `Senior`, `Lead`, `Staff / Architect`, `Principal / Director`, `Not Specified`), matched against `experience.level`.
   - `job_type`: Comma-separated list of valid models (`Remote`, `Onsite`, `Hybrid`).
   - `company`: Name of the company (comma-separated for multiple).
   - `salary_min`: Minimum salary (must be a number).

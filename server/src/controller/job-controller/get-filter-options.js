@@ -13,9 +13,9 @@ export const getFilterOptions = async (req, res) => {
         .collection("jobs")
         .aggregate([
           {
-            $match: { experience_level: { $in: [...VALID_EXPERIENCE_LEVELS] } },
+            $match: { "experience.level": { $in: [...VALID_EXPERIENCE_LEVELS] } },
           },
-          { $group: { _id: "$experience_level", count: { $sum: 1 } } },
+          { $group: { _id: "$experience.level", count: { $sum: 1 } } },
           { $sort: { count: -1 } },
         ])
         .toArray(),

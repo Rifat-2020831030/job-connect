@@ -98,7 +98,7 @@ export default function HomeClient({
             ))}
             {featuredJobs.length === 0 && (
               <EmptyJobs>
-                No featured jobs available right now
+                No featured openings available right now
               </EmptyJobs>
             )}
           </div>
@@ -116,7 +116,7 @@ export default function HomeClient({
             ))}
             {engineeringJobs.length === 0 && (
               <EmptyJobs>
-                No engineering jobs available right now
+                No engineering openings available right now
               </EmptyJobs>
             )}
           </div>
@@ -134,7 +134,7 @@ export default function HomeClient({
             ))}
             {leadershipJobs.length === 0 && (
               <EmptyJobs>
-                No leadership jobs available right now
+                No leadership openings available right now
               </EmptyJobs>
             )}
           </div>

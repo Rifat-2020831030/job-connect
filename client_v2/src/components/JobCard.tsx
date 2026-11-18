@@ -2,9 +2,11 @@ import Link from "next/link";
 import { Bookmark, Flag, MapPin } from "lucide-react";
 import { useState } from "react";
 import { useSavedJobs } from "../lib/SavedJobsContext";
+import type { ExperienceInput, SalaryInput } from "../lib/utils";
 import {
   formatDate,
   formatExp,
+  formatExperienceLevel,
   formatRelativeTime,
   formatSalary,
   formatVacancy,
@@ -18,12 +20,11 @@ export interface JobCardProps {
   title: string;
   company: string;
   location: string;
-  experience_level?: string;
-  salary?: any;
+  salary: SalaryInput;
   salary_min?: number;
   salary_max?: number;
   vacancy?: string | number;
-  experience?: any;
+  experience: ExperienceInput;
   deadline?: string;
   first_seen: string;
   skills?: string[];
@@ -37,7 +38,6 @@ export default function JobCard({
   title,
   company,
   location,
-  experience_level = "Experience Unknown",
   salary,
   salary_min,
   salary_max,
@@ -66,10 +66,7 @@ export default function JobCard({
       ? location.trim()
       : "Location Unknown";
 
-  const displayLevel =
-    experience_level && !/^not\s*specified$/i.test(experience_level.trim())
-      ? experience_level.trim()
-      : "Experience Unknown";
+  const displayLevel = formatExperienceLevel(experience);
 
   const jobDetailsHref = _id ? `/jobs/${_id}` : url;
 
@@ -84,7 +81,6 @@ export default function JobCard({
               className="size-12 logo-box text-xl shrink-0"
             />
             <div className="flex items-center gap-2">
-              <NewJobBadge firstSeen={first_seen} />
               {_id && (
                 <button
                   onClick={(e) => {
@@ -142,9 +138,10 @@ export default function JobCard({
               <MapPin className="size-3.5 inline-block -mt-1 sm:mr-0.5" />
               {displayLocation}
             </p>
-            <p className="text-meta tracking-widest mb-2 line-clamp-1">
-              {displayLevel}
-            </p>
+            <div className="flex items-center gap-2 mb-2">
+              <NewJobBadge firstSeen={first_seen} />
+              <p className="text-meta tracking-widest line-clamp-1">{displayLevel}</p>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-y-1 mb-4 text-xs text-gray-500 font-mono">

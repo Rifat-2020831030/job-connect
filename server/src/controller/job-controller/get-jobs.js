@@ -59,7 +59,7 @@ export const getJobs = async (req, res) => {
         .split(",")
         .map((l) => l.trim())
         .filter((l) => VALID_EXPERIENCE_LEVELS.has(l));
-      if (levels.length) andClauses.push({ experience_level: { $in: levels } });
+      if (levels.length) andClauses.push({ "experience.level": { $in: levels } });
     }
 
     if (job_type) {

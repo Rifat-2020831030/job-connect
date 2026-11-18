@@ -1,7 +1,13 @@
 import { Experience, Salary } from "@/types/job";
 
 export type SalaryInput = Salary | string | number | null | undefined;
-export type ExperienceInput = Experience | string | number | null | undefined;
+export type ExperienceInput = Experience;
+
+export function formatExperienceLevel(experience: ExperienceInput): string {
+  return experience.level !== "Not Specified"
+    ? `${experience.level} level`
+    : "Experience Unknown";
+}
 
 export function isRecentlyPosted(dateString: string, now = new Date().getTime()): boolean {
   const age = now - new Date(dateString).getTime();
@@ -132,34 +138,11 @@ export function formatVacancy(
 }
 
 export function formatExp(experience?: ExperienceInput): string {
-  if (experience && typeof experience === "object") {
-    if (experience.text_form && typeof experience.text_form === "string") {
-      const text = experience.text_form.trim();
-      if (/^not\s*specified$/i.test(text) || /^unknown$/i.test(text)) {
-        return "Experience Unknown";
-      }
-      return text;
-    }
-    if (experience.level && typeof experience.level === "string") {
-      const lvl = experience.level.trim();
-      if (/^not\s*specified$/i.test(lvl) || /^unknown$/i.test(lvl)) {
-        return "Experience Unknown";
-      }
-      return lvl;
-    }
-  }
-  if (typeof experience === "string") {
-    const s = experience.trim();
-    if (!s || /^not\s*specified$/i.test(s) || /^unknown$/i.test(s)) {
-      return "Experience Unknown";
-    }
-    return s;
-  }
-  const experienceNumber = Number(experience);
-  if (experience == null || isNaN(experienceNumber) || experienceNumber < 0) {
+  const text = experience?.text_form?.trim();
+  if (!text || /^not\s*specified$/i.test(text) || /^unknown$/i.test(text)) {
     return "Experience Unknown";
   }
-  return `${experienceNumber} ${experienceNumber === 1 ? "yr" : "yrs"}`;
+  return text;
 }
 
 export function shouldRemindStatusUpdate(

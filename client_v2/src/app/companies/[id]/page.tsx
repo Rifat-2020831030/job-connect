@@ -219,7 +219,6 @@ export default function CompanyProfilePage() {
                   title={job.title}
                   company={job.company}
                   location={job.location}
-                  experience_level={job.experience_level}
                   salary={job.salary}
                   salary_min={job.salary_min}
                   salary_max={job.salary_max}

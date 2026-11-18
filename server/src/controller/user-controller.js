@@ -109,7 +109,7 @@ export const getSavedJobs = async (req, res) => {
             {
               projection: {
                 title: 1, company: 1, logo: 1, location: 1, salary: 1,
-                salary_min: 1, salary_max: 1, experience_level: 1,
+                salary_min: 1, salary_max: 1, experience: 1,
                 job_type: 1, skills: 1, deadline: 1, category: 1,
               },
             }

@@ -1,3 +1,5 @@
+import { VALID_EXPERIENCE_LEVELS as EXPERIENCE_LEVELS } from "../../utils/validators.js";
+
 export const activeJobsFilter = () => {
   return { expires_at: { $gte: new Date().toISOString() } };
 };
@@ -70,12 +72,7 @@ export const VALID_CATEGORIES = new Set([
   "PM",
   "other",
 ]);
-export const VALID_EXPERIENCE_LEVELS = new Set([
-  "Junior",
-  "Mid",
-  "Senior",
-  "Not Specified",
-]);
+export const VALID_EXPERIENCE_LEVELS = new Set(EXPERIENCE_LEVELS);
 export const VALID_JOB_TYPES = new Set([
   "Remote",
   "Onsite",
