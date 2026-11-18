@@ -12,6 +12,7 @@ import {
   formatVacancy,
 } from "../lib/utils";
 import CompanyLogo from "./CompanyLogo";
+import NewJobBadge from "./NewJobBadge";
 import ReportJobModal from "./ReportJobModal";
 
 export interface JobRowProps {
@@ -158,7 +159,8 @@ export default function JobRow({
               <span className="font-mono text-[11px] uppercase tracking-wider text-gray-400">
                 {mappedLevel}
               </span>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
+                <NewJobBadge firstSeen={first_seen} />
                 {_id && (
                   <button
                     onClick={(e) => {

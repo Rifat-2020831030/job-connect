@@ -3,6 +3,11 @@ import { Experience, Salary } from "@/types/job";
 export type SalaryInput = Salary | string | number | null | undefined;
 export type ExperienceInput = Experience | string | number | null | undefined;
 
+export function isRecentlyPosted(dateString: string, now = new Date().getTime()): boolean {
+  const age = now - new Date(dateString).getTime();
+  return age >= 0 && age < 24 * 60 * 60 * 1000;
+}
+
 export function formatRelativeTime(dateString: string): string {
   if (!dateString) return "Unknown Time";
 

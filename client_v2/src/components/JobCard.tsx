@@ -10,6 +10,7 @@ import {
   formatVacancy,
 } from "../lib/utils";
 import CompanyLogo from "./CompanyLogo";
+import NewJobBadge from "./NewJobBadge";
 import ReportJobModal from "./ReportJobModal";
 
 export interface JobCardProps {
@@ -82,7 +83,8 @@ export default function JobCard({
               companyName={company}
               className="size-12 logo-box text-xl shrink-0"
             />
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              <NewJobBadge firstSeen={first_seen} />
               {_id && (
                 <button
                   onClick={(e) => {
