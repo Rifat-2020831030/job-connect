@@ -1,55 +1,26 @@
 import { getDB } from "../../db/database.js";
 import { logger } from "../../utils/logger.js";
-import { VALID_EXPERIENCE_LEVELS, VALID_JOB_TYPES } from "./shared.js";
+import { CATEGORY_LABELS, VALID_CATEGORIES, VALID_EXPERIENCE_LEVELS, VALID_JOB_TYPES } from "./shared.js";
 
 // GET /api/jobs/filter-options
-// Unique filter options and top 20 companies
+// Valid filter options and all companies
 export const getFilterOptions = async (req, res) => {
   try {
     const db = await getDB();
 
-    const [expResults, typeResults, companyResults] = await Promise.all([
-      db
-        .collection("jobs")
-        .aggregate([
-          {
-            $match: { experience_level: { $in: [...VALID_EXPERIENCE_LEVELS] } },
-          },
-          { $group: { _id: "$experience_level", count: { $sum: 1 } } },
-          { $sort: { count: -1 } },
-        ])
-        .toArray(),
-      db
-        .collection("jobs")
-        .aggregate([
-          { $match: { job_type: { $in: [...VALID_JOB_TYPES] } } },
-          { $group: { _id: "$job_type", count: { $sum: 1 } } },
-          { $sort: { count: -1 } },
-        ])
-        .toArray(),
-      db
-        .collection("jobs")
-        .aggregate([
-          { $match: { company: { $ne: null, $exists: true } } },
-          { $group: { _id: "$company", count: { $sum: 1 } } },
-          { $sort: { count: -1 } },
-          { $limit: 20 },
-        ])
-        .toArray(),
-    ]);
+    const companyResults = await db.collection("companies").aggregate([
+      { $match: { name: { $type: "string", $ne: "" } } },
+      { $group: { _id: "$name" } },
+      { $sort: { _id: 1 } },
+    ]).toArray();
 
     return res.status(200).json({
       status: 1,
       data: {
-        experienceLevels: expResults.map(({ _id, count }) => ({
-          value: _id,
-          count,
-        })),
-        jobTypes: typeResults.map(({ _id, count }) => ({ value: _id, count })),
-        topCompanies: companyResults.map(({ _id, count }) => ({
-          value: _id,
-          count,
-        })),
+        categories: [...VALID_CATEGORIES].map(value => ({ value, label: CATEGORY_LABELS[value] || value })),
+        experienceLevels: [...VALID_EXPERIENCE_LEVELS].map(value => ({ value })),
+        jobTypes: [...VALID_JOB_TYPES].map(value => ({ value })),
+        topCompanies: companyResults.map(({ _id }) => ({ value: _id })),
       },
     });
   } catch (error) {

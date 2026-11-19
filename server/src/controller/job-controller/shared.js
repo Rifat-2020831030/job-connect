@@ -1,3 +1,5 @@
+import { VALID_CATEGORIES as CATEGORIES, VALID_WORK_MODELS, VALID_EXPERIENCE_LEVELS as EXPERIENCE_LEVELS } from "../../utils/job-filter-values.js";
+
 export const activeJobsFilter = () => {
   return { expires_at: { $gte: new Date().toISOString() } };
 };
@@ -59,29 +61,13 @@ export const DETAIL_PROJECTION = {
   industry: 1,
 };
 
-export const VALID_CATEGORIES = new Set([
-  "web",
-  "ai/ml",
-  "data science",
-  "devops",
-  "mobile",
-  "security",
-  "design",
-  "PM",
-  "other",
-]);
-export const VALID_EXPERIENCE_LEVELS = new Set([
-  "Junior",
-  "Mid",
-  "Senior",
-  "Not Specified",
-]);
-export const VALID_JOB_TYPES = new Set([
-  "Remote",
-  "Onsite",
-  "Hybrid",
-  "Not Specified",
-]);
+export const VALID_CATEGORIES = new Set(CATEGORIES);
+export const CATEGORY_LABELS = {
+  web: "Web Dev", "ai/ml": "AI/ML", "data science": "Data Science", devops: "DevOps",
+  mobile: "Mobile", security: "Security", design: "Design", PM: "PM", other: "Other",
+};
+export const VALID_EXPERIENCE_LEVELS = new Set(EXPERIENCE_LEVELS);
+export const VALID_JOB_TYPES = new Set(VALID_WORK_MODELS);
 export const VALID_SORTS = new Set(["recent", "salary_high"]);
 
 export function escapeRegex(str) {

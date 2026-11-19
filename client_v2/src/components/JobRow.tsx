@@ -4,14 +4,17 @@ import Link from "next/link";
 import { Bookmark, Briefcase, Clock, Flag, MapPin, Users } from "lucide-react";
 import { useState } from "react";
 import { useSavedJobs } from "../lib/SavedJobsContext";
+import type { ExperienceInput, SalaryInput } from "../lib/utils";
 import {
   formatDate,
   formatExp,
+  formatExperienceLevel,
   formatRelativeTime,
   formatSalary,
   formatVacancy,
 } from "../lib/utils";
 import CompanyLogo from "./CompanyLogo";
+import NewJobBadge from "./NewJobBadge";
 import ReportJobModal from "./ReportJobModal";
 
 export interface JobRowProps {
@@ -19,15 +22,14 @@ export interface JobRowProps {
   title: string;
   company: string;
   location: string;
-  experience_level?: string;
-  salary?: any;
+  salary?: SalaryInput;
   salary_min?: number;
   salary_max?: number;
   skills?: string[];
   first_seen: string;
   logo?: string;
   url?: string;
-  experience?: any;
+  experience: ExperienceInput;
   vacancy?: string | number;
   deadline?: string;
   onViewDetails?: () => void;
@@ -39,7 +41,6 @@ export default function JobRow({
   title,
   company,
   location,
-  experience_level = "Experience Unknown",
   salary,
   salary_min,
   salary_max,
@@ -69,18 +70,7 @@ export default function JobRow({
       ? location.trim()
       : "Location Unknown";
 
-  // Define mapping logic if level doesn't explicitly match the sidebar
-  let mappedLevel = experience_level;
-  if (!experience_level || /^not\s*specified$/i.test(experience_level.trim())) {
-    mappedLevel = "Experience Unknown";
-  } else if (typeof experience_level === "string") {
-    if (experience_level.toUpperCase().includes("SENIOR"))
-      mappedLevel = "Senior (5+ years)";
-    else if (experience_level.toUpperCase().includes("MID"))
-      mappedLevel = "Mid-Level (2-5 years)";
-    else if (experience_level.toUpperCase().includes("JUNIOR"))
-      mappedLevel = "Junior (0-2 years)";
-  }
+  const mappedLevel = formatExperienceLevel(experience);
 
   const jobDetailsHref = _id ? `/jobs/${_id}` : url;
 
@@ -127,7 +117,7 @@ export default function JobRow({
                 <span className="truncate max-w-[120px] sm:max-w-none">
                   {company}
                 </span>
-                <span className="mx-1 text-primary/60 sm:text-2xl">•</span>
+                <span className="mx-1 text-gray-500">|</span>
                 <MapPin className="size-3.5 inline-block -mt-1 sm:mr-0.5" />
                 <span className="truncate max-w-[120px] sm:max-w-none">
                   {displayLocation}
@@ -155,10 +145,13 @@ export default function JobRow({
           {/* Right: Seniority & Bookmark & Posted */}
           <div className="flex flex-col sm:items-end w-full sm:w-auto shrink-0 mt-2 sm:mt-0 border-t border-gray-100 sm:border-0 pt-3 sm:pt-0">
             <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
-              <span className="font-mono text-[11px] uppercase tracking-wider text-gray-400">
-                {mappedLevel}
-              </span>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
+                <NewJobBadge firstSeen={first_seen} />
+                <span className="font-mono text-[11px] uppercase tracking-wider text-gray-400">
+                  {mappedLevel}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
                 {_id && (
                   <button
                     onClick={(e) => {

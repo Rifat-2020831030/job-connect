@@ -213,15 +213,16 @@ Retrieve live counts of active jobs grouped by category.
   ```
 
 ### `GET /api/jobs/filter-options`
-Retrieve unique filter options and a list of the top 20 companies by job volume.
+Retrieve all valid categories, experience levels, work models, and distinct names from the companies collection.
 - **Response Format:**
   ```json
   {
     "status": 1,
     "data": {
-      "experienceLevels": [{ "value": "Senior", "count": 50 }],
-      "jobTypes": [{ "value": "Remote", "count": 120 }],
-      "topCompanies": [{ "value": "Google", "count": 30 }]
+      "categories": [{ "value": "web", "label": "Web" }],
+      "experienceLevels": [{ "value": "Senior" }],
+      "jobTypes": [{ "value": "Remote" }],
+      "topCompanies": [{ "value": "Google" }]
     }
   }
   ```
@@ -248,7 +249,7 @@ Retrieve a list of jobs with robust filtering, pagination, and search capabiliti
   - `page`: Page number for pagination (must be a number). Default: 1.
   - `limit`: Number of items per page (must be a number, max 100). Default: 20.
   - `category`: Comma-separated list of valid categories (`web`, `ai/ml`, `data science`, `devops`, `mobile`, `security`, `design`, `PM`, `other`).
-  - `experience_level`: Comma-separated list of valid levels (`Junior`, `Mid`, `Senior`, `Not Specified`).
+  - `experience_level`: Comma-separated list of valid levels (`Junior`, `Mid`, `Senior`, `Lead`, `Staff / Architect`, `Principal / Director`, `Not Specified`), matched against `experience.level`.
   - `job_type`: Comma-separated list of valid models (`Remote`, `Onsite`, `Hybrid`).
   - `company`: Name of the company (comma-separated for multiple).
   - `salary_min`: Minimum salary (must be a number).

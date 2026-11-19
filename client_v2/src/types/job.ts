@@ -37,7 +37,7 @@ export interface JobDetail {
   salary?: string | Salary | null;
   salary_min?: number;
   salary_max?: number;
-  experience?: string | number | Experience | null;
+  experience: Experience;
   experience_level?: string;
   intro?: string | null;
   responsibilities?: string[];
