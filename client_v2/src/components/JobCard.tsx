@@ -132,9 +132,9 @@ export default function JobCard({
             )}
             <p
               className="text-meta !text-primary mb-2 line-clamp-1"
-              title={`${company} • ${displayLocation}`}
+              title={`${company} | ${displayLocation}`}
             >
-              {company} <span className="sm:mx-1 text-primary/60">•</span>
+              {company} <span className="sm:mx-1 text-gray-500">|</span>
               <MapPin className="size-3.5 inline-block -mt-1 sm:mr-0.5" />
               {displayLocation}
             </p>

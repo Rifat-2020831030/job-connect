@@ -117,7 +117,7 @@ export default function JobRow({
                 <span className="truncate max-w-[120px] sm:max-w-none">
                   {company}
                 </span>
-                <span className="mx-1 text-primary/60 sm:text-2xl">•</span>
+                <span className="mx-1 text-gray-500">|</span>
                 <MapPin className="size-3.5 inline-block -mt-1 sm:mr-0.5" />
                 <span className="truncate max-w-[120px] sm:max-w-none">
                   {displayLocation}
