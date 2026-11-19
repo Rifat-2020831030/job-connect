@@ -182,28 +182,15 @@ export async function fetchJobsList(
 
 export async function fetchJobsFilterOptions() {
   try {
-    const [optRes, catRes] = await Promise.all([
-      fetch(`${API_BASE_URL}/jobs/filter-options`, {
+    const optRes = await fetch(`${API_BASE_URL}/jobs/filter-options`, {
         next: { revalidate: 3600, tags: ["filter-options"] },
         signal: AbortSignal.timeout(5000),
-      }),
-      fetch(`${API_BASE_URL}/jobs/categories`, {
-        next: { revalidate: 3600, tags: ["categories"] },
-        signal: AbortSignal.timeout(5000),
-      }),
-    ]);
+      });
 
     const optData = optRes.ok ? await optRes.json() : null;
-    const catData = catRes.ok ? await catRes.json() : null;
 
     return {
-      categories:
-        catData?.status === 1 && Array.isArray(catData.data)
-          ? catData.data.map((c: any) => ({
-              value: c.label || c.category,
-              count: c.count,
-            }))
-          : [],
+      categories: optData?.status === 1 ? optData.data?.categories || [] : [],
       experienceLevels:
         optData?.status === 1 ? optData.data?.experienceLevels || [] : [],
       jobTypes: optData?.status === 1 ? optData.data?.jobTypes || [] : [],

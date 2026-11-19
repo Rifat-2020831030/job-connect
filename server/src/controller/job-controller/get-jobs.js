@@ -49,8 +49,8 @@ export const getJobs = async (req, res) => {
     if (category) {
       const cats = category
         .split(",")
-        .map((c) => c.trim().toLowerCase())
-        .filter((c) => VALID_CATEGORIES.has(c));
+        .map((c) => [...VALID_CATEGORIES].find((value) => value.toLowerCase() === c.trim().toLowerCase()))
+        .filter(Boolean);
       if (cats.length) andClauses.push({ category: { $in: cats } });
     }
 
@@ -115,7 +115,7 @@ export const getJobs = async (req, res) => {
       andClauses.length === 1 ? andClauses[0] : { $and: andClauses };
     const sortObj =
       VALID_SORTS.has(sort) && sort === "salary_high"
-        ? { salary_max: -1, first_seen: -1 }
+        ? { "salary.max": -1, first_seen: -1 }
         : { first_seen: -1 };
 
     const [jobs, total] = await Promise.all([

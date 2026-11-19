@@ -5,14 +5,14 @@ import { Loader2, Search, X } from 'lucide-react';
 
 export interface FilterOption {
   value: string;
-  count: number;
+  label?: string;
 }
 
 export interface FilterOptions {
   categories: FilterOption[];
   experienceLevels: FilterOption[];
   jobTypes: FilterOption[];
-  topCompanies: FilterOption[];
+  topCompanies: { value: string }[];
 }
 
 export interface ActiveFilters {
@@ -145,7 +145,7 @@ export default function JobFilters({
                       : "bg-white border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900"
                   }`}
                 >
-                  {cat.value}
+                  {cat.label || cat.value}
                 </button>
               );
             })}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition, useEffect } from "react";
+import React, { useState, useTransition, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import JobFilters, {
   ActiveFilters,
@@ -51,12 +51,12 @@ export default function JobsClient({
     }
   }, [currentJobId, router]);
 
-  const activeFilters: ActiveFilters = {
+  const activeFilters: ActiveFilters = useMemo(() => ({
     categories: currentParams.category,
     experienceLevels: currentParams.experience_level,
     jobTypes: currentParams.job_type,
     companies: currentParams.company,
-  };
+  }), [currentParams.category, currentParams.experience_level, currentParams.job_type, currentParams.company]);
 
   const updateUrl = (
     newParams: Record<string, string | null>,

@@ -1,24 +1,12 @@
 import { getDB } from "../../db/database.js";
 import { logger } from "../../utils/logger.js";
-import { activeJobsFilter, VALID_CATEGORIES } from "./shared.js";
+import { activeJobsFilter, VALID_CATEGORIES, CATEGORY_LABELS } from "./shared.js";
 
 // GET /api/jobs/categories
 // Live counts of active jobs by category
 export const getCategories = async (req, res) => {
   try {
     const db = await getDB();
-    const categoryLabels = {
-      web: "Web",
-      "ai/ml": "AI/ML",
-      "data science": "Data Science",
-      devops: "DevOps",
-      mobile: "Mobile",
-      security: "Security",
-      design: "Design",
-      PM: "PM",
-      other: "Other",
-    };
-
     const pipeline = [
       {
         $match: {
@@ -38,7 +26,7 @@ export const getCategories = async (req, res) => {
     // Always return ALL valid categories, even those with 0 active jobs
     const data = [...VALID_CATEGORIES].map((cat) => ({
       category: cat,
-      label: categoryLabels[cat] || cat,
+      label: CATEGORY_LABELS[cat] || cat,
       count: countMap.get(cat) || 0,
     }));
 

@@ -72,6 +72,10 @@ export const VALID_CATEGORIES = new Set([
   "PM",
   "other",
 ]);
+export const CATEGORY_LABELS = {
+  web: "Web Dev", "ai/ml": "AI/ML", "data science": "Data Science", devops: "DevOps",
+  mobile: "Mobile", security: "Security", design: "Design", PM: "PM", other: "Other",
+};
 export const VALID_EXPERIENCE_LEVELS = new Set(EXPERIENCE_LEVELS);
 export const VALID_JOB_TYPES = new Set([
   "Remote",

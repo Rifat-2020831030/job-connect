@@ -213,15 +213,16 @@ Retrieve live counts of active jobs grouped by category.
   ```
 
 ### `GET /api/jobs/filter-options`
-Retrieve unique filter options and a list of the top 20 companies by job volume.
+Retrieve all valid categories, experience levels, work models, and distinct company names from jobs.
 - **Response Format:**
   ```json
   {
     "status": 1,
     "data": {
-      "experienceLevels": [{ "value": "Senior", "count": 50 }],
-      "jobTypes": [{ "value": "Remote", "count": 120 }],
-      "topCompanies": [{ "value": "Google", "count": 30 }]
+      "categories": [{ "value": "web", "label": "Web" }],
+      "experienceLevels": [{ "value": "Senior" }],
+      "jobTypes": [{ "value": "Remote" }],
+      "topCompanies": [{ "value": "Google" }]
     }
   }
   ```
