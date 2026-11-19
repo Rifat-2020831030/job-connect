@@ -1,11 +1,10 @@
 import { ObjectId } from "mongodb";
 import { getDB } from "../db/database.js";
 import { logger } from "../utils/logger.js";
+import { VALID_CATEGORIES, VALID_WORK_MODELS } from "../utils/job-filter-values.js";
+import { VALID_ALERT_TIMINGS } from "../utils/validators.js";
 
-// Valid enum values from DB
-const VALID_CATEGORIES = ["web", "ai/ml", "data science", "devops", "mobile", "security", "design", "PM", "other"];
-const VALID_WORK_MODELS = ["Remote", "Onsite", "Hybrid"];
-const VALID_ALERT_TIMINGS = ["Morning", "Evening", "Night"];
+const PREFERENCE_WORK_MODELS = VALID_WORK_MODELS.filter((model) => model !== "Not Specified");
 
 // ─── GET /api/users/:id/preferences ─────────────────────────────────────────
 export const getPreferences = async (req, res) => {
@@ -48,7 +47,7 @@ export const savePreferences = async (req, res) => {
     if (invalidCats.length) {
       return res.status(400).json({ status: 0, message: `Invalid categories: ${invalidCats.join(", ")}` });
     }
-    const invalidModels = workModel.filter((m) => !VALID_WORK_MODELS.includes(m));
+    const invalidModels = workModel.filter((m) => !PREFERENCE_WORK_MODELS.includes(m));
     if (invalidModels.length) {
       return res.status(400).json({ status: 0, message: `Invalid work models: ${invalidModels.join(", ")}` });
     }

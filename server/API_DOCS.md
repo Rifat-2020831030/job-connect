@@ -213,7 +213,7 @@ Retrieve live counts of active jobs grouped by category.
   ```
 
 ### `GET /api/jobs/filter-options`
-Retrieve all valid categories, experience levels, work models, and distinct company names from jobs.
+Retrieve all valid categories, experience levels, work models, and distinct names from the companies collection.
 - **Response Format:**
   ```json
   {

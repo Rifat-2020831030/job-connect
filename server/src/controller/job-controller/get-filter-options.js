@@ -8,9 +8,9 @@ export const getFilterOptions = async (req, res) => {
   try {
     const db = await getDB();
 
-    const companyResults = await db.collection("jobs").aggregate([
-      { $match: { company: { $type: "string", $ne: "" } } },
-      { $group: { _id: "$company" } },
+    const companyResults = await db.collection("companies").aggregate([
+      { $match: { name: { $type: "string", $ne: "" } } },
+      { $group: { _id: "$name" } },
       { $sort: { _id: 1 } },
     ]).toArray();
 
